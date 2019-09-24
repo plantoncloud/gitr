@@ -1,4 +1,4 @@
-package main
+package pkg
 
 import (
 	"fmt"
@@ -31,10 +31,15 @@ type CloneUrl struct {
 	repopath     string
 	reponame     string
 	sshCloneUrl  string
+	httpCloneUrl string
 }
 
 func (c CloneUrl) get_ssh_clone_url() string {
 	return fmt.Sprintf("git@%s:%s.git", c.hostname, c.repopath)
+}
+
+func (c CloneUrl) get_http_clone_url() string {
+	return fmt.Sprintf("%s://%s/%s.git", c.protocol, c.hostname, c.repopath)
 }
 
 func get_absolute_path(pemFilePath string) string {
@@ -93,8 +98,10 @@ func set_up_ssh_auth(hostname string) *ssh2.PublicKeys {
 	return &ssh2.PublicKeys{User: "git", Signer: signer}
 }
 
-func clone_repo(clone_url string) {
+func CloneRepo(clone_url string) {
 	clone_url_object := parse_clone_url(clone_url)
+	println("http url " + clone_url_object.get_http_clone_url())
+	os.Exit(3)
 	auth := set_up_ssh_auth(clone_url_object.hostname)
 	os.Mkdir(clone_url_object.reponame, os.ModePerm)
 	_, err := git.PlainClone(clone_url_object.reponame, false, &git.CloneOptions{
@@ -105,9 +112,4 @@ func clone_repo(clone_url string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func main() {
-	clone_url := os.Args[1]
-	clone_repo(clone_url)
 }
