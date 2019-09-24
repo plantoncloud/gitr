@@ -2,10 +2,17 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"os/user"
 	"path/filepath"
 	"strings"
+
+	"github.com/kevinburke/ssh_config"
+	"golang.org/x/crypto/ssh"
+	"gopkg.in/src-d/go-git.v4"
+	ssh2 "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
 )
 
 type ScmProvider string
@@ -27,7 +34,6 @@ type CloneUrl struct {
 }
 
 func (c CloneUrl) get_ssh_clone_url() string {
-	// git clone git@github.com:maurodelazeri/mysql-backup-golang.git
 	return fmt.Sprintf("git@%s:%s.git", c.hostname, c.repopath)
 }
 
@@ -58,13 +64,9 @@ func get_scm_provider(hostname string) ScmProvider {
 }
 
 func get_repo_path(clone_url string, url_path string, scm_provider ScmProvider) string {
-	if scm_provider == GitHub || scm_provider == GitLab {
-		org_or_team := strings.Split(url_path, "/")[1]
-		repo_name := strings.Split(url_path, "/")[2]
-		return fmt.Sprintf("%s/%s", org_or_team, repo_name)
-	} else {
-		return "blah"
-	}
+	org_or_team := strings.Split(url_path, "/")[1]
+	repo_name := strings.Split(url_path, "/")[2]
+	return fmt.Sprintf("%s/%s", org_or_team, repo_name)
 }
 
 func get_repo_name(repopath string) string {
@@ -84,30 +86,25 @@ func parse_clone_url(clone_url string) CloneUrl {
 	return clone_url_object
 }
 
+func set_up_ssh_auth(hostname string) *ssh2.PublicKeys {
+	pkeyfile := get_absolute_path(ssh_config.Get(hostname, "IdentityFile"))
+	pem, _ := ioutil.ReadFile(pkeyfile)
+	signer, _ := ssh.ParsePrivateKey(pem)
+	return &ssh2.PublicKeys{User: "git", Signer: signer}
+}
+
 func clone_repo(clone_url string) {
 	clone_url_object := parse_clone_url(clone_url)
-	println(clone_url_object.protocol)
-	println(clone_url_object.hostname)
-	println(clone_url_object.scm_provider)
-	println(clone_url_object.url_path)
-	println(clone_url_object.repopath)
-	println(clone_url_object.reponame)
-	println(clone_url_object.get_ssh_clone_url())
-	// pkeyfile := ssh_config.Get("gitlab.zgtools.net", "IdentityFile")
-	// print(pkeyfile)
-
-	// pem, _ := ioutil.ReadFile(pkeyfile)
-	// signer, _ := ssh.ParsePrivateKey(pem)
-	// auth := &ssh2.PublicKeys{User: "git", Signer: signer}
-	// _, err := git.PlainClone("/Users/swarupd/Desktop/deleteme/clones", false, &git.CloneOptions{
-	// 	URL:      clone_url,
-	// 	Progress: os.Stdout,
-	// 	Auth:     auth,
-	// })
-	// if err != nil {
-	// 	print("Error occurred ")
-	// 	log.Fatal(err)
-	// }
+	auth := set_up_ssh_auth(clone_url_object.hostname)
+	os.Mkdir(clone_url_object.reponame, os.ModePerm)
+	_, err := git.PlainClone(clone_url_object.reponame, false, &git.CloneOptions{
+		URL:      clone_url_object.get_ssh_clone_url(),
+		Progress: os.Stdout,
+		Auth:     auth,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func main() {
