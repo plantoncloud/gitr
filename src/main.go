@@ -58,7 +58,7 @@ func get_scm_provider(hostname string) ScmProvider {
 }
 
 func get_repo_path(clone_url string, url_path string, scm_provider ScmProvider) string {
-	if scm_provider == GitHub {
+	if scm_provider == GitHub || scm_provider == GitLab {
 		org_or_team := strings.Split(url_path, "/")[1]
 		repo_name := strings.Split(url_path, "/")[2]
 		return fmt.Sprintf("%s/%s", org_or_team, repo_name)
