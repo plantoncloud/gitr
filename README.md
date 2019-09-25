@@ -1,6 +1,6 @@
 # gitr
 
-Open the following in the SCM Web Insterface of the repo in the browser right from the command line.
+Open the following of your repo in Github, Gitlab and Bitbucket in the browser right from the command line.
 
 * branches
 * prs
