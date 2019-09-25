@@ -1,6 +1,17 @@
 # gitr
 
-Tool to clone git repositories and locate git repo on SCM using Browser URLs
+Open the following in the SCM Web Insterface of the repo in the browser right from the command line.
+
+* branches
+* prs
+* commits
+* issues
+* pipelines
+* releases
+
+Did you ever hate searching for clone URL for a repo and then use your mouse pointer to copy the link?
+
+`gitr` solves that problem by cloning git repositories using `browser urls`
 
 ### Install
 
