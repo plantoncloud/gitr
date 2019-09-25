@@ -18,7 +18,9 @@ var branchesCmd = &cobra.Command{
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
 			repoUrl := url.Parse(remoteUrl)
-			open.Run(repoUrl.GetBranchesUrl())
+			if repoUrl.GetBranchesUrl() != "" {
+				open.Run(repoUrl.GetBranchesUrl())
+			}
 		}
 	},
 }

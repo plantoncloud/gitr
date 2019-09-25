@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 	url "gitr/src/pkg"
@@ -18,7 +19,11 @@ var remCmd = &cobra.Command{
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
 			repoUrl := url.Parse(remoteUrl)
-			open.Run(repoUrl.GetWebUrl())
+			if repoUrl.GetWebUrl() != "" {
+				open.Run(repoUrl.GetWebUrl())
+			} else {
+				fmt.Println("No remote Web URL found for git remote url " + remoteUrl)
+			}
 		}
 	},
 }
