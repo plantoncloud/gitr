@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -91,25 +92,66 @@ func parse_clone_url(clone_url string) CloneUrl {
 	return clone_url_object
 }
 
-func set_up_ssh_auth(hostname string) *ssh2.PublicKeys {
-	pkeyfile := get_absolute_path(ssh_config.Get(hostname, "IdentityFile"))
-	pem, _ := ioutil.ReadFile(pkeyfile)
-	signer, _ := ssh.ParsePrivateKey(pem)
-	return &ssh2.PublicKeys{User: "git", Signer: signer}
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }
 
-func CloneRepo(clone_url string) {
-	clone_url_object := parse_clone_url(clone_url)
-	println("http url " + clone_url_object.get_http_clone_url())
-	os.Exit(3)
-	auth := set_up_ssh_auth(clone_url_object.hostname)
+func set_up_ssh_auth(hostname string) (*ssh2.PublicKeys, error) {
+	pkeyfilepath := ssh_config.Get(hostname, "IdentityFile")
+	if strings.HasSuffix(pkeyfilepath, "identity") {
+		var defaultSshKey = "~/.ssh/id_rsa"
+		if fileExists(get_absolute_path(defaultSshKey)) {
+			pkeyfilepath = ("~/.ssh/id_rsa")
+		} else {
+			return nil, errors.New("ssh auth not found")
+		}
+	}
+	println(pkeyfilepath)
+	pkeyfile := get_absolute_path(pkeyfilepath)
+	println(pkeyfile)
+	pem, _ := ioutil.ReadFile(pkeyfile)
+	signer, _ := ssh.ParsePrivateKey(pem)
+	return &ssh2.PublicKeys{User: "git", Signer: signer}, nil
+}
+
+func ssh_clone(clone_url_object CloneUrl) error {
+	auth, ssh_err := set_up_ssh_auth(clone_url_object.hostname)
+
+	if ssh_err != nil {
+		return ssh_err
+	}
+
 	os.Mkdir(clone_url_object.reponame, os.ModePerm)
 	_, err := git.PlainClone(clone_url_object.reponame, false, &git.CloneOptions{
 		URL:      clone_url_object.get_ssh_clone_url(),
 		Progress: os.Stdout,
 		Auth:     auth,
 	})
-	if err != nil {
-		log.Fatal(err)
+	return err
+}
+
+func http_clone(clone_url_object CloneUrl) error {
+	os.Mkdir(clone_url_object.reponame, os.ModePerm)
+	_, err := git.PlainClone(clone_url_object.reponame, false, &git.CloneOptions{
+		URL:      clone_url_object.get_http_clone_url(),
+		Progress: os.Stdout,
+	})
+	return err
+}
+
+func CloneRepo(clone_url string) {
+	clone_url_object := parse_clone_url(clone_url)
+	err_ssh := ssh_clone(clone_url_object)
+
+	if err_ssh != nil {
+		println("Failed SSH. Trying HTTP Clone")
+		err_http := http_clone(clone_url_object)
+		if err_http != nil {
+			log.Fatal(err_http)
+		}
 	}
 }
