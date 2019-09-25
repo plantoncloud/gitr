@@ -16,12 +16,12 @@ const (
 )
 
 type RepoUrl struct {
-	Protocol     string
-	HostName     string
-	UrlPath      string
-	ScmProvider  ScmProvider
-	RepoPath     string
-	RepoName     string
+	Protocol    string
+	HostName    string
+	UrlPath     string
+	ScmProvider ScmProvider
+	RepoPath    string
+	RepoName    string
 }
 
 func (c RepoUrl) GetSshCloneUrl() string {
@@ -36,6 +36,44 @@ func (c RepoUrl) GetWebUrl() string {
 	return fmt.Sprintf("%s://%s/%s", c.Protocol, c.HostName, c.RepoPath)
 }
 
+func (c RepoUrl) GetPrsUrl() string {
+	switch c.ScmProvider {
+	case GitHub:
+		return fmt.Sprintf("%s/pulls", c.GetWebUrl())
+	case GitLab:
+		return fmt.Sprintf("%s/merge_requests", c.GetWebUrl())
+	case BitBucket:
+		return fmt.Sprintf("%s/pull-requests", c.GetWebUrl())
+	default:
+		return ""
+	}
+}
+
+func (c RepoUrl) GetBranchesUrl() string {
+	switch c.ScmProvider {
+	case GitHub:
+		return fmt.Sprintf("%s/branches", c.GetWebUrl())
+	case GitLab:
+		return fmt.Sprintf("%s/-/branches", c.GetWebUrl())
+	case BitBucket:
+		return fmt.Sprintf("%s/branches", c.GetWebUrl())
+	default:
+		return ""
+	}
+}
+
+func (c RepoUrl) GetCommitsUrl() string {
+	switch c.ScmProvider {
+	case GitHub:
+		return fmt.Sprintf("%s/commits", c.GetWebUrl())
+	case GitLab:
+		return fmt.Sprintf("%s/-/commits", c.GetWebUrl())
+	case BitBucket:
+		return fmt.Sprintf("%s/commits", c.GetWebUrl())
+	default:
+		return ""
+	}
+}
 
 func getAbsolutePath(pemFilePath string) string {
 	usr, _ := user.Current()

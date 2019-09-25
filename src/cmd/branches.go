@@ -8,21 +8,21 @@ import (
 	"os"
 )
 
-var remCmd = &cobra.Command{
-	Use:   "rem",
-	Short: "Opens the repo on the SCM Web interface",
-	Long:  ``,
+var branchesCmd = &cobra.Command{
+	Use:   "branches",
+	Short: "Open branches on SCM Web Interface",
+	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, _ := os.Getwd()
 		repo := util.GetGitRepo(pwd)
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
 			repoUrl := url.Parse(remoteUrl)
-			open.Run(repoUrl.GetWebUrl())
+			open.Run(repoUrl.GetBranchesUrl())
 		}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(remCmd)
+	rootCmd.AddCommand(branchesCmd)
 }
