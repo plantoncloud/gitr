@@ -18,7 +18,9 @@ var commitsCmd = &cobra.Command{
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
 			repoUrl := url.Parse(remoteUrl)
-			open.Run(repoUrl.GetCommitsUrl())
+			if repoUrl.GetCommitsUrl() != "" {
+				open.Run(repoUrl.GetCommitsUrl())
+			}
 		}
 	},
 }

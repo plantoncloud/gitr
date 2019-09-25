@@ -10,9 +10,9 @@ import (
 type ScmProvider string
 
 const (
-	GitHub    ScmProvider = "github.com"
-	GitLab    ScmProvider = "gitlab.com"
-	BitBucket ScmProvider = "bitbucket.com"
+	GitHub    ScmProvider = "GitHub"
+	GitLab    ScmProvider = "GitLab"
+	BitBucket ScmProvider = "BitBucket"
 )
 
 type RepoUrl struct {
@@ -51,25 +51,46 @@ func (c RepoUrl) GetPrsUrl() string {
 
 func (c RepoUrl) GetBranchesUrl() string {
 	switch c.ScmProvider {
-	case GitHub:
-		return fmt.Sprintf("%s/branches", c.GetWebUrl())
 	case GitLab:
 		return fmt.Sprintf("%s/-/branches", c.GetWebUrl())
-	case BitBucket:
-		return fmt.Sprintf("%s/branches", c.GetWebUrl())
 	default:
-		return ""
+		return fmt.Sprintf("%s/branches", c.GetWebUrl())
 	}
 }
 
 func (c RepoUrl) GetCommitsUrl() string {
 	switch c.ScmProvider {
-	case GitHub:
-		return fmt.Sprintf("%s/commits", c.GetWebUrl())
 	case GitLab:
 		return fmt.Sprintf("%s/-/commits", c.GetWebUrl())
-	case BitBucket:
+	default:
 		return fmt.Sprintf("%s/commits", c.GetWebUrl())
+	}
+}
+
+func (c RepoUrl) GetIssuesUrl() string {
+	switch c.ScmProvider {
+	case BitBucket:
+		return ""
+	default:
+		return fmt.Sprintf("%s/issues", c.GetWebUrl())
+	}
+}
+
+func (c RepoUrl) GetReleasesUrl() string {
+	switch c.ScmProvider {
+	case GitHub:
+		return fmt.Sprintf("%s/releases", c.GetWebUrl())
+	default:
+		return ""
+	}
+}
+
+func (c RepoUrl) GetPipelinesUrl() string {
+	switch c.ScmProvider {
+	case GitLab:
+		return fmt.Sprintf("%s/pipelines", c.GetWebUrl())
+	case BitBucket:
+		return fmt.Sprintf("%s/addon/pipelines/home", c.GetWebUrl())
 	default:
 		return ""
 	}

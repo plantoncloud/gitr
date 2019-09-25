@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 	url "gitr/src/pkg"
@@ -8,9 +9,9 @@ import (
 	"os"
 )
 
-var prsCmd = &cobra.Command{
-	Use:   "prs",
-	Short: "Open Pull Requests on SCM Web Interface",
+var releasesCmd = &cobra.Command{
+	Use:   "releases",
+	Short: "Open Releases on SCM Web Interface",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, _ := os.Getwd()
@@ -18,13 +19,15 @@ var prsCmd = &cobra.Command{
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
 			repoUrl := url.Parse(remoteUrl)
-			if repoUrl.GetPrsUrl() != "" {
-				open.Run(repoUrl.GetPrsUrl())
+			if(repoUrl.ScmProvider == url.GitHub) {
+				open.Run(repoUrl.GetReleasesUrl())
+			} else {
+				println(fmt.Sprintf("SCM Provider %s does not support Releases", repoUrl.ScmProvider))
 			}
 		}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(prsCmd)
+	rootCmd.AddCommand(releasesCmd)
 }
