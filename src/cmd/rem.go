@@ -24,7 +24,6 @@ var remCmd = &cobra.Command{
 			}
 			remoteUrl := remotes[0].Config().URLs[0]
 			repoUrl := url.Parse(remoteUrl)
-			println(repoUrl.GetWebUrl())
 			open.Run(repoUrl.GetWebUrl())
 		}
 	},
