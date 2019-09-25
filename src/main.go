@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "super-clone/src/cmd"
+import "gitr/src/cmd"
 
 func main() {
 	cmd.Execute()
