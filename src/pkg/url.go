@@ -105,8 +105,12 @@ func getAbsolutePath(pemFilePath string) string {
 	return pemFilePath
 }
 
-func isGitSshUrl(repo_url string) bool {
-	return strings.HasPrefix(repo_url, "git@")
+func isGitUrl(repoUrl string) bool {
+	return strings.HasSuffix(repoUrl, ".git")
+}
+
+func isGitSshUrl(repoUrl string) bool {
+	return strings.HasPrefix(repoUrl, "git@")
 }
 
 func getScmProvider(hostname string) ScmProvider {
@@ -132,23 +136,26 @@ func getRepoName(repopath string) string {
 	return string(repopath[strings.LastIndex(repopath, "/")+1 : len(repopath)])
 }
 
-func parseUrl(repoUrl string) RepoUrl {
+func Parse(repoUrl string) RepoUrl {
 	var repoUrlObject = RepoUrl{}
-	if (isGitSshUrl(repoUrl)) {
-		repoUrlObject.Protocol = "https"
-		repoUrlObject.HostName = strings.Split(strings.Split(repoUrl, "@")[1], ":")[0]
-		repoUrlObject.UrlPath = string(repoUrl[strings.Index(repoUrl, repoUrlObject.HostName)+len(repoUrlObject.HostName)+1 : strings.Index(repoUrl, ".git")])
+
+	if isGitUrl(repoUrl) {
+		if isGitSshUrl(repoUrl) {
+			repoUrlObject.Protocol = "https"
+			repoUrlObject.HostName = strings.Split(strings.Split(repoUrl, "@")[1], ":")[0]
+		} else {
+			repoUrlObject.Protocol = strings.Split(repoUrl, "://")[0]
+			repoUrlObject.HostName = strings.Split(strings.Split(repoUrl, "://")[1], "/")[0]
+		}
+		repoUrlObject.UrlPath = string(repoUrl[strings.Index(repoUrl, repoUrlObject.HostName)+1+len(repoUrlObject.HostName) : strings.Index(repoUrl, ".git")])
 	} else {
 		repoUrlObject.Protocol = strings.Split(repoUrl, "://")[0]
 		repoUrlObject.HostName = strings.Split(strings.Split(repoUrl, "://")[1], "/")[0]
 		repoUrlObject.UrlPath = string(repoUrl[strings.Index(repoUrl, repoUrlObject.HostName)+1+len(repoUrlObject.HostName):])
 	}
+
 	repoUrlObject.ScmProvider = getScmProvider(repoUrlObject.HostName)
 	repoUrlObject.RepoPath = getRepoPath(repoUrlObject.UrlPath)
 	repoUrlObject.RepoName = getRepoName(repoUrlObject.RepoPath)
 	return repoUrlObject
-}
-
-func Parse(repoUrl string) RepoUrl {
-	return parseUrl(repoUrl)
 }

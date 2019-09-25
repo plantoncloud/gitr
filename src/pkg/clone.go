@@ -63,7 +63,7 @@ func http_clone(clone_url_object RepoUrl) error {
 }
 
 func CloneRepo(clone_url string) {
-	clone_url_object := parseUrl(clone_url)
+	clone_url_object := Parse(clone_url)
 	err_ssh := ssh_clone(clone_url_object)
 
 	if err_ssh != nil {
