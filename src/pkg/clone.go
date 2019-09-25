@@ -110,9 +110,7 @@ func set_up_ssh_auth(hostname string) (*ssh2.PublicKeys, error) {
 			return nil, errors.New("ssh auth not found")
 		}
 	}
-	println(pkeyfilepath)
 	pkeyfile := get_absolute_path(pkeyfilepath)
-	println(pkeyfile)
 	pem, _ := ioutil.ReadFile(pkeyfile)
 	signer, _ := ssh.ParsePrivateKey(pem)
 	return &ssh2.PublicKeys{User: "git", Signer: signer}, nil

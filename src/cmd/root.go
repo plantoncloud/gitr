@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	clone "gitr/src/pkg"
 	"log"
 	"os"
-	clone "super-clone/src/pkg"
 
 	"github.com/spf13/cobra"
 
@@ -16,9 +16,9 @@ var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "clone",
-	Short: "Tool to clone git repos using browser urls",
-	Long: `Tool to clone git repos using browser urls
+	Use:   "gitr",
+	Short: "Tool to clone and locate git repos on scm using browser urls",
+	Long: `Tool to clone and locate git repos on scm using browser urls
 You can also open the remote location of your repo from command line. For example:
 
 When you type prs from any location of a git repo in your command line you should be
@@ -51,7 +51,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.clone.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gitr.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -71,9 +71,9 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".clone" (without extension).
+		// Search config in home directory with name ".gitr" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".clone")
+		viper.SetConfigName(".gitr")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
