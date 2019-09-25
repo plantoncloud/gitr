@@ -2,13 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	clone "gitr/src/pkg"
-	"log"
 	"os"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
-
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
@@ -25,14 +22,7 @@ When you type prs from any location of a git repo in your command line you shoul
 able to get to the Pull Requests section of the repo.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			log.Fatal("Requires atlease one argument")
-			os.Exit(3)
-		} else {
-			clone.CloneRepo(args[0])
-		}
-	},
+	// Run: func(cmd *cobra.Command, args []string) {},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
