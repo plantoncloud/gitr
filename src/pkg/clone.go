@@ -25,13 +25,13 @@ func set_up_ssh_auth(hostname string) (*ssh2.PublicKeys, error) {
 	pkeyfilepath := ssh_config.Get(hostname, "IdentityFile")
 	if strings.HasSuffix(pkeyfilepath, "identity") {
 		var defaultSshKey = "~/.ssh/id_rsa"
-		if fileExists(get_absolute_path(defaultSshKey)) {
+		if fileExists(getAbsolutePath(defaultSshKey)) {
 			pkeyfilepath = ("~/.ssh/id_rsa")
 		} else {
 			return nil, errors.New("ssh auth not found")
 		}
 	}
-	pkeyfile := get_absolute_path(pkeyfilepath)
+	pkeyfile := getAbsolutePath(pkeyfilepath)
 	pem, _ := ioutil.ReadFile(pkeyfile)
 	signer, _ := ssh.ParsePrivateKey(pem)
 	return &ssh2.PublicKeys{User: "git", Signer: signer}, nil
@@ -46,7 +46,7 @@ func ssh_clone(clone_url_object RepoUrl) error {
 
 	os.Mkdir(clone_url_object.RepoName, os.ModePerm)
 	_, err := git.PlainClone(clone_url_object.RepoName, false, &git.CloneOptions{
-		URL:      clone_url_object.get_ssh_clone_url(),
+		URL:      clone_url_object.GetSshCloneUrl(),
 		Progress: os.Stdout,
 		Auth:     auth,
 	})
@@ -56,14 +56,14 @@ func ssh_clone(clone_url_object RepoUrl) error {
 func http_clone(clone_url_object RepoUrl) error {
 	os.Mkdir(clone_url_object.RepoName, os.ModePerm)
 	_, err := git.PlainClone(clone_url_object.RepoName, false, &git.CloneOptions{
-		URL:      clone_url_object.get_http_clone_url(),
+		URL:      clone_url_object.GetHttpCloneUrl(),
 		Progress: os.Stdout,
 	})
 	return err
 }
 
 func CloneRepo(clone_url string) {
-	clone_url_object := parse_url(clone_url)
+	clone_url_object := parseUrl(clone_url)
 	err_ssh := ssh_clone(clone_url_object)
 
 	if err_ssh != nil {

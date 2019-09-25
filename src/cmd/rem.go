@@ -1,11 +1,12 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
+	url "gitr/src/pkg"
 	util "gitr/src/pkg"
 	"log"
 	"os"
+	"github.com/skratchdot/open-golang/open"
 )
 
 var remCmd = &cobra.Command{
@@ -21,10 +22,10 @@ var remCmd = &cobra.Command{
 				println("2")
 				log.Fatal(err2)
 			}
-			for i, v := range remotes {
-				fmt.Printf(string(i))
-				fmt.Printf(v.Config().URLs[0])
-			}
+			remoteUrl := remotes[0].Config().URLs[0]
+			repoUrl := url.Parse(remoteUrl)
+			println(repoUrl.GetWebUrl())
+			open.Run(repoUrl.GetWebUrl())
 		}
 	},
 }
