@@ -22,20 +22,22 @@ type RepoUrl struct {
 	ScmProvider  ScmProvider
 	RepoPath     string
 	RepoName     string
-	SshCloneUrl  string
-	HttpCloneUrl string
-	WebUrl       string
 }
 
-func (c RepoUrl) get_ssh_clone_url() string {
+func (c RepoUrl) GetSshCloneUrl() string {
 	return fmt.Sprintf("git@%s:%s.git", c.HostName, c.RepoPath)
 }
 
-func (c RepoUrl) get_http_clone_url() string {
+func (c RepoUrl) GetHttpCloneUrl() string {
 	return fmt.Sprintf("%s://%s/%s.git", c.Protocol, c.HostName, c.RepoPath)
 }
 
-func get_absolute_path(pemFilePath string) string {
+func (c RepoUrl) GetWebUrl() string {
+	return fmt.Sprintf("%s://%s/%s", c.Protocol, c.HostName, c.RepoPath)
+}
+
+
+func getAbsolutePath(pemFilePath string) string {
 	usr, _ := user.Current()
 	dir := usr.HomeDir
 	if strings.HasPrefix(pemFilePath, "~/") {
@@ -44,11 +46,11 @@ func get_absolute_path(pemFilePath string) string {
 	return pemFilePath
 }
 
-func is_browser_url(clone_url string) bool {
-	return strings.HasSuffix(clone_url, ".git")
+func isGitSshUrl(repo_url string) bool {
+	return strings.HasPrefix(repo_url, "git@")
 }
 
-func get_scm_provider(hostname string) ScmProvider {
+func getScmProvider(hostname string) ScmProvider {
 	switch hostname {
 	case "github.com":
 		return GitHub
@@ -61,29 +63,33 @@ func get_scm_provider(hostname string) ScmProvider {
 	}
 }
 
-func get_repo_path(clone_url string, url_path string, scm_provider ScmProvider) string {
-	org_or_team := strings.Split(url_path, "/")[1]
-	repo_name := strings.Split(url_path, "/")[2]
-	return fmt.Sprintf("%s/%s", org_or_team, repo_name)
+func getRepoPath(url_path string) string {
+	orgOrTeam := strings.Split(url_path, "/")[0]
+	repoName := strings.Split(url_path, "/")[1]
+	return fmt.Sprintf("%s/%s", orgOrTeam, repoName)
 }
 
-func get_repo_name(repopath string) string {
+func getRepoName(repopath string) string {
 	return string(repopath[strings.LastIndex(repopath, "/")+1 : len(repopath)])
 }
 
-func parse_url(clone_url string) RepoUrl {
-	var clone_url_object = RepoUrl{}
-	if !is_browser_url(clone_url) {
-		clone_url_object.Protocol = strings.Split(clone_url, "://")[0]
-		clone_url_object.HostName = strings.Split(strings.Split(clone_url, "://")[1], "/")[0]
-		clone_url_object.UrlPath = string(clone_url[strings.Index(clone_url, clone_url_object.HostName)+len(clone_url_object.HostName) : len(clone_url)])
-		clone_url_object.ScmProvider = get_scm_provider(clone_url_object.HostName)
-		clone_url_object.RepoPath = get_repo_path(clone_url, clone_url_object.UrlPath, clone_url_object.ScmProvider)
-		clone_url_object.RepoName = get_repo_name(clone_url_object.RepoPath)
+func parseUrl(repoUrl string) RepoUrl {
+	var repoUrlObject = RepoUrl{}
+	if (isGitSshUrl(repoUrl)) {
+		repoUrlObject.Protocol = "https"
+		repoUrlObject.HostName = strings.Split(strings.Split(repoUrl, "@")[1], ":")[0]
+		repoUrlObject.UrlPath = string(repoUrl[strings.Index(repoUrl, repoUrlObject.HostName)+len(repoUrlObject.HostName)+1 : strings.Index(repoUrl, ".git")])
+	} else {
+		repoUrlObject.Protocol = strings.Split(repoUrl, "://")[0]
+		repoUrlObject.HostName = strings.Split(strings.Split(repoUrl, "://")[1], "/")[0]
+		repoUrlObject.UrlPath = string(repoUrl[strings.Index(repoUrl, repoUrlObject.HostName)+1+len(repoUrlObject.HostName):])
 	}
-	return clone_url_object
+	repoUrlObject.ScmProvider = getScmProvider(repoUrlObject.HostName)
+	repoUrlObject.RepoPath = getRepoPath(repoUrlObject.UrlPath)
+	repoUrlObject.RepoName = getRepoName(repoUrlObject.RepoPath)
+	return repoUrlObject
 }
 
-func Parse(url string) RepoUrl {
-	return parse_url(url)
+func Parse(repoUrl string) RepoUrl {
+	return parseUrl(repoUrl)
 }
