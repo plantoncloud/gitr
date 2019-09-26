@@ -14,7 +14,7 @@ var cloneCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			log.Fatal("Requires SSH or HTTP URL for the repo")
+			log.Fatal("Requires Git or Browser URL to clone the repo")
 			os.Exit(3)
 		} else {
 			clone.CloneRepo(args[0])

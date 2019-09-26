@@ -17,9 +17,9 @@ var prsCmd = &cobra.Command{
 		repo := util.GetGitRepo(pwd)
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
-			repoUrl := url.Parse(remoteUrl)
-			if repoUrl.GetPrsUrl() != "" {
-				open.Run(repoUrl.GetPrsUrl())
+			gitrRepo := url.ParseGitRemoteUrl(remoteUrl)
+			if gitrRepo.GetPrsUrl() != "" {
+				open.Run(gitrRepo.GetPrsUrl())
 			}
 		}
 	},
