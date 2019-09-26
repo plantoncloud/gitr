@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	url "gitr/src/pkg"
 	util "gitr/src/pkg"
 	"os"
@@ -18,11 +19,14 @@ var pipelinesCmd = &cobra.Command{
 		repo := util.GetGitRepo(pwd)
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
-			repoUrl := url.ParseGitRemoteUrl(remoteUrl)
-			if(repoUrl.ScmProvider != url.GitHub) {
-				open.Run(repoUrl.GetPipelinesUrl())
+			gitrRepo := url.ParseGitRemoteUrl(remoteUrl)
+			if viper.GetBool("debug") {
+				println(gitrRepo.ToString())
+			}
+			if gitrRepo.GetPipelinesUrl() != "" {
+				open.Run(gitrRepo.GetPipelinesUrl())
 			} else {
-				println(fmt.Sprintf("SCM Provider %s does not support Pipelines", repoUrl.ScmProvider))
+				println(fmt.Sprintf("SCM Provider %s does not support Pipelines", gitrRepo.ScmProvider))
 			}
 		}
 	},

@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"errors"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"os"
@@ -64,7 +65,9 @@ func httpClone(clone_url_object GitrRepo) error {
 
 func CloneRepo(cloneUrl string) {
 	gitrRepo := ParseUrl(cloneUrl)
-
+	if viper.GetBool("debug") {
+		println(gitrRepo.ToString())
+	}
 	if gitrRepo.GitRemSshUrl == "" && gitrRepo.ScmProvider == GitLab {
 		println("Clone operation using Browser URLs for Gitlab repos is currently not supported by gitr. Working on it")
 		os.Exit(0)

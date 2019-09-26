@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	url "gitr/src/pkg"
 	util "gitr/src/pkg"
 	"os"
@@ -18,9 +19,12 @@ var remCmd = &cobra.Command{
 		repo := util.GetGitRepo(pwd)
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
-			repoUrl := url.ParseGitRemoteUrl(remoteUrl)
-			if repoUrl.GetWebUrl() != "" {
-				open.Run(repoUrl.GetWebUrl())
+			gitrRepo := url.ParseGitRemoteUrl(remoteUrl)
+			if viper.GetBool("debug") {
+				println(gitrRepo.ToString())
+			}
+			if gitrRepo.GetWebUrl() != "" {
+				open.Run(gitrRepo.GetWebUrl())
 			} else {
 				fmt.Println("No remote Web URL found for git remote url " + remoteUrl)
 			}

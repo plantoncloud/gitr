@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	url "gitr/src/pkg"
 	util "gitr/src/pkg"
 	"os"
@@ -17,9 +18,12 @@ var commitsCmd = &cobra.Command{
 		repo := util.GetGitRepo(pwd)
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
-			repoUrl := url.ParseGitRemoteUrl(remoteUrl)
-			if repoUrl.GetCommitsUrl() != "" {
-				open.Run(repoUrl.GetCommitsUrl())
+			gitrRepo := url.ParseGitRemoteUrl(remoteUrl)
+			if viper.GetBool("debug") {
+				println(gitrRepo.ToString())
+			}
+			if gitrRepo.GetCommitsUrl() != "" {
+				open.Run(gitrRepo.GetCommitsUrl())
 			}
 		}
 	},
