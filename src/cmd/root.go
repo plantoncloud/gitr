@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/mitchellh/go-homedir"
@@ -74,6 +73,5 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal("Error reading config file:", viper.ConfigFileUsed())
 	}
 }
