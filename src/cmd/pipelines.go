@@ -18,7 +18,7 @@ var pipelinesCmd = &cobra.Command{
 		repo := util.GetGitRepo(pwd)
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
-			repoUrl := url.Parse(remoteUrl)
+			repoUrl := url.ParseGitRemoteUrl(remoteUrl)
 			if(repoUrl.ScmProvider != url.GitHub) {
 				open.Run(repoUrl.GetPipelinesUrl())
 			} else {

@@ -15,28 +15,42 @@ const (
 	BitBucket ScmProvider = "BitBucket"
 )
 
-type RepoUrl struct {
-	Protocol    string
-	HostName    string
-	UrlPath     string
-	ScmProvider ScmProvider
-	RepoPath    string
-	RepoName    string
+type GitrRepo struct {
+	Protocol      string
+	HostName      string
+	UrlPath       string
+	ScmProvider   ScmProvider
+	RepoPath      string
+	RepoName      string
+	GitRemSshUrl  string
+	GitRemHttpUrl string
 }
 
-func (c RepoUrl) GetSshCloneUrl() string {
-	return fmt.Sprintf("git@%s:%s.git", c.HostName, c.RepoPath)
+func (c GitrRepo) ToString() string {
+	return fmt.Sprintf("ScmProvider\t: \t%s" +
+		"\nProtocol\t: \t%s" +
+		"\nHostName\t: \t%s" +
+		"\nUrlPath\t\t: \t%s" +
+		"\nRepoPath\t: \t%s" +
+		"\nGitRemSshUrl\t: \t%s" +
+		"\nGitRemHttpUrl\t: \t%s" +
+		"\nWeb\t\t: \t%s" +
+		"\nPRs\t\t: \t%s" +
+		"\nBranches\t: \t%s" +
+		"\nCommits\t\t: \t%s" +
+		"\nIssues\t\t: \t%s" +
+		"\nReleases\t: \t%s" +
+		"\nPipelines\t: \t%s",
+		c.ScmProvider, c.Protocol, c.HostName, c.UrlPath, c.RepoPath, c.GitRemSshUrl,
+		c.GitRemHttpUrl, c.GetWebUrl(), c.GetPrsUrl(), c.GetBranchesUrl(), c.GetCommitsUrl(),
+		c.GetIssuesUrl(), c.GetReleasesUrl(), c.GetPipelinesUrl())
 }
 
-func (c RepoUrl) GetHttpCloneUrl() string {
-	return fmt.Sprintf("%s://%s/%s.git", c.Protocol, c.HostName, c.RepoPath)
-}
-
-func (c RepoUrl) GetWebUrl() string {
+func (c GitrRepo) GetWebUrl() string {
 	return fmt.Sprintf("%s://%s/%s", c.Protocol, c.HostName, c.RepoPath)
 }
 
-func (c RepoUrl) GetPrsUrl() string {
+func (c GitrRepo) GetPrsUrl() string {
 	switch c.ScmProvider {
 	case GitHub:
 		return fmt.Sprintf("%s/pulls", c.GetWebUrl())
@@ -49,7 +63,7 @@ func (c RepoUrl) GetPrsUrl() string {
 	}
 }
 
-func (c RepoUrl) GetBranchesUrl() string {
+func (c GitrRepo) GetBranchesUrl() string {
 	switch c.ScmProvider {
 	case GitLab:
 		return fmt.Sprintf("%s/-/branches", c.GetWebUrl())
@@ -58,7 +72,7 @@ func (c RepoUrl) GetBranchesUrl() string {
 	}
 }
 
-func (c RepoUrl) GetCommitsUrl() string {
+func (c GitrRepo) GetCommitsUrl() string {
 	switch c.ScmProvider {
 	case GitLab:
 		return fmt.Sprintf("%s/-/commits", c.GetWebUrl())
@@ -67,7 +81,7 @@ func (c RepoUrl) GetCommitsUrl() string {
 	}
 }
 
-func (c RepoUrl) GetIssuesUrl() string {
+func (c GitrRepo) GetIssuesUrl() string {
 	switch c.ScmProvider {
 	case BitBucket:
 		return ""
@@ -76,7 +90,7 @@ func (c RepoUrl) GetIssuesUrl() string {
 	}
 }
 
-func (c RepoUrl) GetReleasesUrl() string {
+func (c GitrRepo) GetReleasesUrl() string {
 	switch c.ScmProvider {
 	case GitHub:
 		return fmt.Sprintf("%s/releases", c.GetWebUrl())
@@ -85,7 +99,7 @@ func (c RepoUrl) GetReleasesUrl() string {
 	}
 }
 
-func (c RepoUrl) GetPipelinesUrl() string {
+func (c GitrRepo) GetPipelinesUrl() string {
 	switch c.ScmProvider {
 	case GitLab:
 		return fmt.Sprintf("%s/pipelines", c.GetWebUrl())
@@ -117,7 +131,7 @@ func getScmProvider(hostname string) ScmProvider {
 	switch hostname {
 	case "github.com":
 		return GitHub
-	case "gitlab.com":
+	case "gitlab.com", "gitlab.zgtools.net":
 		return GitLab
 	case "bitbucket.org":
 		return BitBucket
@@ -126,36 +140,66 @@ func getScmProvider(hostname string) ScmProvider {
 	}
 }
 
-func getRepoPath(url_path string) string {
-	orgOrTeam := strings.Split(url_path, "/")[0]
-	repoName := strings.Split(url_path, "/")[1]
+func getGitRemSshUrl(gitrRepo GitrRepo) string {
+	return fmt.Sprintf("git@%s:%s.git", gitrRepo.HostName, gitrRepo.RepoPath)
+}
+
+func getGitRemHttpUrl(gitrRepo GitrRepo) string {
+	return fmt.Sprintf("%s://%s/%s.git", gitrRepo.Protocol, gitrRepo.HostName, gitrRepo.RepoPath)
+}
+
+func getRepoPath(urlPath string) string {
+	orgOrTeam := strings.Split(urlPath, "/")[0]
+	repoName := strings.Split(urlPath, "/")[1]
 	return fmt.Sprintf("%s/%s", orgOrTeam, repoName)
 }
 
-func getRepoName(repopath string) string {
-	return string(repopath[strings.LastIndex(repopath, "/")+1 : len(repopath)])
+func getRepoName(repoPath string) string {
+	return string(repoPath[strings.LastIndex(repoPath, "/")+1 : len(repoPath)])
 }
 
-func Parse(repoUrl string) RepoUrl {
-	var repoUrlObject = RepoUrl{}
-
-	if isGitUrl(repoUrl) {
-		if isGitSshUrl(repoUrl) {
-			repoUrlObject.Protocol = "https"
-			repoUrlObject.HostName = strings.Split(strings.Split(repoUrl, "@")[1], ":")[0]
-		} else {
-			repoUrlObject.Protocol = strings.Split(repoUrl, "://")[0]
-			repoUrlObject.HostName = strings.Split(strings.Split(repoUrl, "://")[1], "/")[0]
-		}
-		repoUrlObject.UrlPath = string(repoUrl[strings.Index(repoUrl, repoUrlObject.HostName)+1+len(repoUrlObject.HostName) : strings.Index(repoUrl, ".git")])
+func ParseGitRemoteUrl(repoUrl string) GitrRepo {
+	var gitrRepo = GitrRepo{}
+	if isGitSshUrl(repoUrl) {
+		gitrRepo.Protocol = "https"
+		gitrRepo.HostName = strings.Split(strings.Split(repoUrl, "@")[1], ":")[0]
 	} else {
-		repoUrlObject.Protocol = strings.Split(repoUrl, "://")[0]
-		repoUrlObject.HostName = strings.Split(strings.Split(repoUrl, "://")[1], "/")[0]
-		repoUrlObject.UrlPath = string(repoUrl[strings.Index(repoUrl, repoUrlObject.HostName)+1+len(repoUrlObject.HostName):])
+		gitrRepo.Protocol = strings.Split(repoUrl, "://")[0]
+		gitrRepo.HostName = strings.Split(strings.Split(repoUrl, "://")[1], "/")[0]
 	}
+	gitrRepo.UrlPath = string(repoUrl[strings.Index(repoUrl, gitrRepo.HostName)+1+len(gitrRepo.HostName) : strings.Index(repoUrl, ".git")])
+	gitrRepo.ScmProvider = getScmProvider(gitrRepo.HostName)
+	gitrRepo.RepoPath = gitrRepo.UrlPath
+	gitrRepo.RepoName = getRepoName(gitrRepo.RepoPath)
+	gitrRepo.GitRemSshUrl = getGitRemSshUrl(gitrRepo)
+	gitrRepo.GitRemHttpUrl = getGitRemHttpUrl(gitrRepo)
+	return gitrRepo
+}
 
-	repoUrlObject.ScmProvider = getScmProvider(repoUrlObject.HostName)
-	repoUrlObject.RepoPath = getRepoPath(repoUrlObject.UrlPath)
-	repoUrlObject.RepoName = getRepoName(repoUrlObject.RepoPath)
-	return repoUrlObject
+func ParseBrowserUrl(browserUrl string) GitrRepo {
+	var gitrRepo = GitrRepo{}
+	gitrRepo.Protocol = strings.Split(browserUrl, "://")[0]
+	gitrRepo.HostName = strings.Split(strings.Split(browserUrl, "://")[1], "/")[0]
+	gitrRepo.UrlPath = string(browserUrl[strings.Index(browserUrl, gitrRepo.HostName)+1+len(gitrRepo.HostName):])
+	gitrRepo.ScmProvider = getScmProvider(gitrRepo.HostName)
+	gitrRepo.RepoPath = getRepoPath(gitrRepo.UrlPath)
+	gitrRepo.RepoName = getRepoName(gitrRepo.RepoPath)
+	if gitrRepo.ScmProvider != GitLab {
+		gitrRepo.GitRemSshUrl = getGitRemSshUrl(gitrRepo)
+		gitrRepo.GitRemHttpUrl = getGitRemHttpUrl(gitrRepo)
+	} else {
+		gitrRepo.GitRemSshUrl = ""
+		gitrRepo.GitRemHttpUrl = ""
+	}
+	return gitrRepo
+}
+
+func ParseUrl(url string) GitrRepo {
+	var gitrRepo GitrRepo
+	if isGitUrl(url) {
+		gitrRepo = ParseGitRemoteUrl(url)
+	} else {
+		gitrRepo = ParseBrowserUrl(url)
+	}
+	return gitrRepo
 }
