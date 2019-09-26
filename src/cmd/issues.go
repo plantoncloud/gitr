@@ -18,8 +18,8 @@ var issuesCmd = &cobra.Command{
 		repo := util.GetGitRepo(pwd)
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
-			repoUrl := url.Parse(remoteUrl)
-			if repoUrl.GetIssuesUrl() != "" {
+			repoUrl := url.ParseGitRemoteUrl(remoteUrl)
+			if(repoUrl.ScmProvider != url.BitBucket) {
 				open.Run(repoUrl.GetIssuesUrl())
 			} else {
 				println(fmt.Sprintf("SCM Provider %s does not support Issues", repoUrl.ScmProvider))

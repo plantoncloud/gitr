@@ -21,12 +21,12 @@ func fileExists(filename string) bool {
 	return !info.IsDir()
 }
 
-func set_up_ssh_auth(hostname string) (*ssh2.PublicKeys, error) {
+func setUpSshAuth(hostname string) (*ssh2.PublicKeys, error) {
 	pkeyfilepath := ssh_config.Get(hostname, "IdentityFile")
 	if strings.HasSuffix(pkeyfilepath, "identity") {
 		var defaultSshKey = "~/.ssh/id_rsa"
 		if fileExists(getAbsolutePath(defaultSshKey)) {
-			pkeyfilepath = ("~/.ssh/id_rsa")
+			pkeyfilepath = "~/.ssh/id_rsa"
 		} else {
 			return nil, errors.New("ssh auth not found")
 		}
@@ -37,41 +37,45 @@ func set_up_ssh_auth(hostname string) (*ssh2.PublicKeys, error) {
 	return &ssh2.PublicKeys{User: "git", Signer: signer}, nil
 }
 
-func ssh_clone(clone_url_object RepoUrl) error {
-	auth, ssh_err := set_up_ssh_auth(clone_url_object.HostName)
+func sshClone(gitrRepo GitrRepo) error {
+	auth, sshErr := setUpSshAuth(gitrRepo.HostName)
 
-	if ssh_err != nil {
-		return ssh_err
+	if sshErr != nil {
+		return sshErr
 	}
 
-	os.Mkdir(clone_url_object.RepoName, os.ModePerm)
-	_, err := git.PlainClone(clone_url_object.RepoName, false, &git.CloneOptions{
-		URL:      clone_url_object.GetSshCloneUrl(),
+	os.Mkdir(gitrRepo.RepoName, os.ModePerm)
+	_, err := git.PlainClone(gitrRepo.RepoName, false, &git.CloneOptions{
+		URL:      gitrRepo.GitRemSshUrl,
 		Progress: os.Stdout,
 		Auth:     auth,
 	})
 	return err
 }
 
-func http_clone(clone_url_object RepoUrl) error {
+func httpClone(clone_url_object GitrRepo) error {
 	os.Mkdir(clone_url_object.RepoName, os.ModePerm)
 	_, err := git.PlainClone(clone_url_object.RepoName, false, &git.CloneOptions{
-		URL:      clone_url_object.GetHttpCloneUrl(),
+		URL:      clone_url_object.GitRemHttpUrl,
 		Progress: os.Stdout,
 	})
 	return err
 }
 
-func CloneRepo(clone_url string) {
-	gitrRepo := Parse(clone_url)
-	print(gitrRepo.
-	errSsh := ssh_clone(gitrRepo)
+func CloneRepo(cloneUrl string) {
+	gitrRepo := ParseUrl(cloneUrl)
 
-	if errSsh != nil {
-		println("Failed SSH. Trying HTTP Clone")
-		err_http := http_clone(gitrRepo)
-		if err_http != nil {
-			log.Fatal(err_http)
+	if gitrRepo.GitRemSshUrl == "" && gitrRepo.ScmProvider == GitLab {
+		println("Clone operation using Browser URLs for Gitlab repos is currently not supported by gitr. Working on it")
+		os.Exit(0)
+	} else {
+		errSsh := sshClone(gitrRepo)
+		if errSsh != nil {
+			println("Failed SSH. Trying HTTP Clone")
+			errHttp := httpClone(gitrRepo)
+			if errHttp != nil {
+				log.Fatal(errHttp)
+			}
 		}
 	}
 }
