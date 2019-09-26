@@ -19,7 +19,7 @@ var releasesCmd = &cobra.Command{
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
 			repoUrl := url.ParseGitRemoteUrl(remoteUrl)
-			if(repoUrl.ScmProvider == url.GitHub) {
+			if repoUrl.GetReleasesUrl() != "" {
 				open.Run(repoUrl.GetReleasesUrl())
 			} else {
 				println(fmt.Sprintf("SCM Provider %s does not support Releases", repoUrl.ScmProvider))

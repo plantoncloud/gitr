@@ -19,7 +19,7 @@ var pipelinesCmd = &cobra.Command{
 		if repo != nil {
 			remoteUrl := util.GetGitRemoteUrl(repo)
 			repoUrl := url.ParseGitRemoteUrl(remoteUrl)
-			if(repoUrl.ScmProvider != url.GitHub) {
+			if repoUrl.GetPipelinesUrl() != "" {
 				open.Run(repoUrl.GetPipelinesUrl())
 			} else {
 				println(fmt.Sprintf("SCM Provider %s does not support Pipelines", repoUrl.ScmProvider))

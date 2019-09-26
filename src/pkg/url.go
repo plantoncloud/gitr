@@ -2,18 +2,13 @@ package pkg
 
 import (
 	"fmt"
+	"log"
 	"os/user"
 	"path/filepath"
 	"strings"
 )
 
-type ScmProvider string
-
-const (
-	GitHub    ScmProvider = "GitHub"
-	GitLab    ScmProvider = "GitLab"
-	BitBucket ScmProvider = "BitBucket"
-)
+var err error
 
 type GitrRepo struct {
 	Protocol      string
@@ -127,19 +122,6 @@ func isGitSshUrl(repoUrl string) bool {
 	return strings.HasPrefix(repoUrl, "git@")
 }
 
-func getScmProvider(hostname string) ScmProvider {
-	switch hostname {
-	case "github.com":
-		return GitHub
-	case "gitlab.com", "gitlab.zgtools.net":
-		return GitLab
-	case "bitbucket.org":
-		return BitBucket
-	default:
-		return GitHub
-	}
-}
-
 func getGitRemSshUrl(gitrRepo GitrRepo) string {
 	return fmt.Sprintf("git@%s:%s.git", gitrRepo.HostName, gitrRepo.RepoPath)
 }
@@ -168,7 +150,13 @@ func ParseGitRemoteUrl(repoUrl string) GitrRepo {
 		gitrRepo.HostName = strings.Split(strings.Split(repoUrl, "://")[1], "/")[0]
 	}
 	gitrRepo.UrlPath = string(repoUrl[strings.Index(repoUrl, gitrRepo.HostName)+1+len(gitrRepo.HostName) : strings.Index(repoUrl, ".git")])
-	gitrRepo.ScmProvider = getScmProvider(gitrRepo.HostName)
+
+	gitrRepo.ScmProvider,err = getScmProvider(gitrRepo.HostName)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	gitrRepo.RepoPath = gitrRepo.UrlPath
 	gitrRepo.RepoName = getRepoName(gitrRepo.RepoPath)
 	gitrRepo.GitRemSshUrl = getGitRemSshUrl(gitrRepo)
@@ -181,7 +169,12 @@ func ParseBrowserUrl(browserUrl string) GitrRepo {
 	gitrRepo.Protocol = strings.Split(browserUrl, "://")[0]
 	gitrRepo.HostName = strings.Split(strings.Split(browserUrl, "://")[1], "/")[0]
 	gitrRepo.UrlPath = string(browserUrl[strings.Index(browserUrl, gitrRepo.HostName)+1+len(gitrRepo.HostName):])
-	gitrRepo.ScmProvider = getScmProvider(gitrRepo.HostName)
+	gitrRepo.ScmProvider,err = getScmProvider(gitrRepo.HostName)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	gitrRepo.RepoPath = getRepoPath(gitrRepo.UrlPath)
 	gitrRepo.RepoName = getRepoName(gitrRepo.RepoPath)
 	if gitrRepo.ScmProvider != GitLab {

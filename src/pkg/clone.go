@@ -64,7 +64,8 @@ func httpClone(clone_url_object GitrRepo) error {
 
 func CloneRepo(cloneUrl string) {
 	gitrRepo := ParseUrl(cloneUrl)
-
+	println(gitrRepo.ToString())
+	os.Exit(0)
 	if gitrRepo.GitRemSshUrl == "" && gitrRepo.ScmProvider == GitLab {
 		println("Clone operation using Browser URLs for Gitlab repos is currently not supported by gitr. Working on it")
 		os.Exit(0)

@@ -16,8 +16,8 @@ const (
 )
 
 type ScmSystem struct {
-	hostname string
-	scm      ScmProvider
+	Hostname string
+	Scm      ScmProvider
 }
 
 func getScmSystems() []ScmSystem {
@@ -32,9 +32,9 @@ func getScmSystems() []ScmSystem {
 func getScmProvider(hostname string) (ScmProvider, error) {
 	var scmSystems = getScmSystems()
 	for _,scmSystem := range scmSystems {
-		if scmSystem.hostname ==  hostname {
-			return scmSystem.scm, nil
+		if scmSystem.Hostname ==  hostname {
+			return scmSystem.Scm, nil
 		}
 	}
-	return "", errors.New("NotFound")
+	return "", errors.New("SCM Provider Not Found for hostname " + hostname + " in ~/.gitr.yaml")
 }
