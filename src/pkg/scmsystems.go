@@ -44,7 +44,7 @@ func getScmSystems() []ScmSystem {
 	scmSystems = append(scmSystems, github)
 	scmSystems = append(scmSystems, gitlab)
 	scmSystems = append(scmSystems, bitbucketCloud)
-	
+
 	return scmSystems
 }
 

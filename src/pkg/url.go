@@ -42,7 +42,12 @@ func (c GitrRepo) ToString() string {
 }
 
 func (c GitrRepo) GetWebUrl() string {
-	return fmt.Sprintf("%s://%s/%s", c.Protocol, c.HostName, c.RepoPath)
+	switch c.ScmProvider {
+	case BitBucketDatacenter:
+		return fmt.Sprintf("%s://%s/projects/%s", c.Protocol, c.HostName, c.RepoPath)
+	default:
+		return fmt.Sprintf("%s://%s/%s", c.Protocol, c.HostName, c.RepoPath)
+	}
 }
 
 func (c GitrRepo) GetPrsUrl() string {
