@@ -1,4 +1,4 @@
-# gitr
+# gitr(Git Rapid): The missing link between Git CLI and SCM Providers
 
 Open the following of your repo in Github, Gitlab and Bitbucket in the browser right from the command line.
 
