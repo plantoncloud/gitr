@@ -63,12 +63,13 @@ func http_clone(clone_url_object RepoUrl) error {
 }
 
 func CloneRepo(clone_url string) {
-	clone_url_object := Parse(clone_url)
-	err_ssh := ssh_clone(clone_url_object)
+	gitrRepo := Parse(clone_url)
+	print(gitrRepo.
+	errSsh := ssh_clone(gitrRepo)
 
-	if err_ssh != nil {
+	if errSsh != nil {
 		println("Failed SSH. Trying HTTP Clone")
-		err_http := http_clone(clone_url_object)
+		err_http := http_clone(gitrRepo)
 		if err_http != nil {
 			log.Fatal(err_http)
 		}

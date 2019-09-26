@@ -7,14 +7,6 @@ import (
 	"strings"
 )
 
-type ScmProvider string
-
-const (
-	GitHub    ScmProvider = "GitHub"
-	GitLab    ScmProvider = "GitLab"
-	BitBucket ScmProvider = "BitBucket"
-)
-
 type RepoUrl struct {
 	Protocol    string
 	HostName    string
@@ -42,7 +34,7 @@ func (c RepoUrl) GetPrsUrl() string {
 		return fmt.Sprintf("%s/pulls", c.GetWebUrl())
 	case GitLab:
 		return fmt.Sprintf("%s/merge_requests", c.GetWebUrl())
-	case BitBucket:
+	case BitBucketDatacenter, BitBucketCloud:
 		return fmt.Sprintf("%s/pull-requests", c.GetWebUrl())
 	default:
 		return ""
@@ -69,7 +61,7 @@ func (c RepoUrl) GetCommitsUrl() string {
 
 func (c RepoUrl) GetIssuesUrl() string {
 	switch c.ScmProvider {
-	case BitBucket:
+	case BitBucketDatacenter, BitBucketCloud:
 		return ""
 	default:
 		return fmt.Sprintf("%s/issues", c.GetWebUrl())
@@ -89,7 +81,7 @@ func (c RepoUrl) GetPipelinesUrl() string {
 	switch c.ScmProvider {
 	case GitLab:
 		return fmt.Sprintf("%s/pipelines", c.GetWebUrl())
-	case BitBucket:
+	case BitBucketCloud:
 		return fmt.Sprintf("%s/addon/pipelines/home", c.GetWebUrl())
 	default:
 		return ""
@@ -111,19 +103,6 @@ func isGitUrl(repoUrl string) bool {
 
 func isGitSshUrl(repoUrl string) bool {
 	return strings.HasPrefix(repoUrl, "git@")
-}
-
-func getScmProvider(hostname string) ScmProvider {
-	switch hostname {
-	case "github.com":
-		return GitHub
-	case "gitlab.com":
-		return GitLab
-	case "bitbucket.org":
-		return BitBucket
-	default:
-		return GitHub
-	}
 }
 
 func getRepoPath(url_path string) string {
@@ -154,7 +133,8 @@ func Parse(repoUrl string) RepoUrl {
 		repoUrlObject.UrlPath = string(repoUrl[strings.Index(repoUrl, repoUrlObject.HostName)+1+len(repoUrlObject.HostName):])
 	}
 
-	repoUrlObject.ScmProvider = getScmProvider(repoUrlObject.HostName)
+	repoUrlObject.ScmProvider,_ = getScmProvider(repoUrlObject.HostName)
+
 	repoUrlObject.RepoPath = getRepoPath(repoUrlObject.UrlPath)
 	repoUrlObject.RepoName = getRepoName(repoUrlObject.RepoPath)
 	return repoUrlObject
