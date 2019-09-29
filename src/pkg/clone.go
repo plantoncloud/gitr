@@ -76,14 +76,14 @@ func CloneRepo(cloneUrl string) {
 		if errSsh != nil && viper.GetBool("debug") {
 			println(errSsh.Error())
 		}
-		if errSsh != nil && strings.Contains(errSsh.Error(), "handshake failed"){
-			println("SSH Handshake Failed. Trying "+ strings.ToUpper(gitrRepo.Protocol) +" Clone")
-			errHttp := httpClone(gitrRepo)
-			if errHttp != nil {
-				log.Fatal(errHttp)
-			}
-		} else {
-			if strings.Contains(errSsh.Error(), "remote repository is empty") {
+		if errSsh != nil {
+			if strings.Contains(errSsh.Error(), "handshake failed") {
+				println("SSH Handshake Failed. Trying " + strings.ToUpper(gitrRepo.Protocol) + " Clone")
+				errHttp := httpClone(gitrRepo)
+				if errHttp != nil {
+					log.Fatal(errHttp)
+				}
+			} else if strings.Contains(errSsh.Error(), "remote repository is empty") {
 				println("warning: You appear to have cloned an empty repository.")
 			} else {
 				println(errSsh.Error())
