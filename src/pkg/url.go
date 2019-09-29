@@ -6,6 +6,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+	"regexp"
 )
 
 var err error
@@ -148,6 +149,16 @@ func isGitSshUrl(repoUrl string) bool {
 	return strings.HasPrefix(repoUrl, "ssh://") || strings.HasPrefix(repoUrl, "git@")
 }
 
+func isGitHttpUrlHasUsername(repoUrl string) bool {
+	matched, err := regexp.MatchString("https*:\\/\\/.*@+.*",repoUrl)
+	if err != nil {
+		println(err.Error())
+		return false
+	} else {
+		return matched
+	}
+}
+
 func getGitRemSshUrl(gitrRepo GitrRepo) string {
 	switch gitrRepo.ScmProvider {
 	case BitBucketDatacenter:
@@ -174,8 +185,11 @@ func getHostName(url string) string {
 		} else {
 			return strings.Split(strings.Split(url, "@")[1], ":")[0]
 		}
+	} else if isGitHttpUrlHasUsername(url) {
+		return strings.Split(strings.Split(url, "@")[1], "/")[0]
+	} else {
+		return strings.Split(strings.Split(url, "://")[1], "/")[0]
 	}
-	return strings.Split(strings.Split(url, "://")[1], "/")[0]
 }
 
 func getLevels(urlPath string) []string {

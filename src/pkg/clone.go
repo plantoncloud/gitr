@@ -54,10 +54,10 @@ func sshClone(gitrRepo GitrRepo) error {
 	return err
 }
 
-func httpClone(clone_url_object GitrRepo) error {
-	os.Mkdir(clone_url_object.RepoName, os.ModePerm)
-	_, err := git.PlainClone(clone_url_object.RepoName, false, &git.CloneOptions{
-		URL:      clone_url_object.GitRemHttpUrl,
+func httpClone(gitrRepo GitrRepo) error {
+	os.Mkdir(gitrRepo.RepoName, os.ModePerm)
+	_, err := git.PlainClone(gitrRepo.RepoName, false, &git.CloneOptions{
+		URL:      gitrRepo.GitRemHttpUrl,
 		Progress: os.Stdout,
 	})
 	return err
@@ -73,11 +73,20 @@ func CloneRepo(cloneUrl string) {
 		os.Exit(0)
 	} else {
 		errSsh := sshClone(gitrRepo)
-		if errSsh != nil {
-			println("Failed SSH. Trying HTTP Clone")
+		if errSsh != nil && viper.GetBool("debug") {
+			println(errSsh.Error())
+		}
+		if errSsh != nil && strings.Contains(errSsh.Error(), "handshake failed"){
+			println("SSH Handshake Failed. Trying "+ strings.ToUpper(gitrRepo.Protocol) +" Clone")
 			errHttp := httpClone(gitrRepo)
 			if errHttp != nil {
 				log.Fatal(errHttp)
+			}
+		} else {
+			if strings.Contains(errSsh.Error(), "remote repository is empty") {
+				println("warning: You appear to have cloned an empty repository.")
+			} else {
+				println(errSsh.Error())
 			}
 		}
 	}
