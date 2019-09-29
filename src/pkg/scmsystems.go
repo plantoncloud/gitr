@@ -12,7 +12,7 @@ const (
 	GitHub              ScmProvider = "github"
 	GitLab              ScmProvider = "gitlab"
 	BitBucketCloud      ScmProvider = "bitbucket-cloud"
-	BitBucketDatacenter ScmProvider = "bitbucket-datacenter"
+	BitBucketDatacenter ScmProvider = "bitbucket"
 )
 
 type ScmSystem struct {
