@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/spf13/viper"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 
@@ -81,10 +80,10 @@ func CloneRepo(cloneUrl string) {
 				println("SSH Handshake Failed. Trying " + strings.ToUpper(gitrRepo.Protocol) + " Clone")
 				errHttp := httpClone(gitrRepo)
 				if errHttp != nil {
-					log.Fatal(errHttp)
+					println("Gitr failed to clone using " + gitrRepo.GitRemHttpUrl + " url. Error : " + errHttp.Error() + ". Use the below command to clone.\n git clone " + gitrRepo.GitRemHttpUrl)
 				}
 			} else if strings.Contains(errSsh.Error(), "remote repository is empty") {
-				println("warning: You appear to have cloned an empty repository.")
+				println("Gitr can not clone empty repositories. Run the below command to clone. \n git clone " + gitrRepo.GitRemSshUrl)
 			} else {
 				println(errSsh.Error())
 			}
