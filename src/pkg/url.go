@@ -198,8 +198,14 @@ func getLevels(urlPath string) []string {
 }
 
 func getRepoName(inputUrlType InputUrlType, scmProvider ScmProvider, levels []string) string {
-	if scmProvider == BitBucketDatacenter && inputUrlType == GitRemoteHttp {
-		return levels[2]
+	if scmProvider == BitBucketDatacenter {
+		if inputUrlType == GitRemoteHttp {
+			return levels[2]
+		} else if inputUrlType == Browser {
+			return levels[3]
+		} else {
+			return levels[1]
+		}
 	} else {
 		return levels[1]
 	}
