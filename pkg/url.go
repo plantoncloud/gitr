@@ -103,6 +103,15 @@ func (c GitrRepo) GetCommitsUrl() string {
 	}
 }
 
+func (c GitrRepo) GetTagsUrl() string {
+	switch c.ScmProvider {
+	case GitLab:
+		return fmt.Sprintf("%s/-/tags", c.GetWebUrl())
+	default:
+		return fmt.Sprintf("%s/tags", c.GetWebUrl())
+	}
+}
+
 func (c GitrRepo) GetIssuesUrl() string {
 	switch c.ScmProvider {
 	case BitBucketDatacenter, BitBucketCloud:

@@ -12,7 +12,7 @@ import (
 
 var releasesCmd = &cobra.Command{
 	Use:   "releases",
-	Short: "Open Releases on SCM Web Interface",
+	Short: "open releases on scm web interface",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, _ := os.Getwd()

@@ -14,9 +14,9 @@ var debug bool
 
 var rootCmd = &cobra.Command{
 	Use:   "gitr",
-	Short: "GitRapid - The missing link b/w Git CLI & SCM Providers",
-	Long: `Tool to navigate to important features of SCM efficiently right from the command line.
-No more searching for clone url, simply use the browser url to clone repos.`,
+	Short: "git rapid - the missing link b/w git cli & scm providers",
+	Long: `tool to navigate to important features of scm efficiently right from the command line.
+no more searching for clone url, simply use the browser url to clone repos.`,
 }
 
 func Execute() {

@@ -12,7 +12,7 @@ import (
 
 var issuesCmd = &cobra.Command{
 	Use:   "issues",
-	Short: "Open Issues on SCM Web Interface",
+	Short: "open issues on scm web interface",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, _ := os.Getwd()
