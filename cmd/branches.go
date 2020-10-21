@@ -11,8 +11,8 @@ import (
 
 var branchesCmd = &cobra.Command{
 	Use:   "branches",
-	Short: "Open branches on SCM Web Interface",
-	Long: ``,
+	Short: "open branches on scm web interface",
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, _ := os.Getwd()
 		repo := util.GetGitRepo(pwd)

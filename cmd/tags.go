@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -10,9 +9,9 @@ import (
 	"os"
 )
 
-var pipelinesCmd = &cobra.Command{
-	Use:   "pipelines",
-	Short: "open pipelines on scm web interface",
+var tagsCmd = &cobra.Command{
+	Use:   "tags",
+	Short: "open tags on scm web interface",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, _ := os.Getwd()
@@ -23,15 +22,13 @@ var pipelinesCmd = &cobra.Command{
 			if viper.GetBool("debug") {
 				println(gitrRepo.ToString())
 			}
-			if gitrRepo.GetPipelinesUrl() != "" {
-				open.Run(gitrRepo.GetPipelinesUrl())
-			} else {
-				println(fmt.Sprintf("SCM Provider %s does not support Pipelines", gitrRepo.ScmProvider))
+			if gitrRepo.GetTagsUrl() != "" {
+				open.Run(gitrRepo.GetTagsUrl())
 			}
 		}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(pipelinesCmd)
+	rootCmd.AddCommand(tagsCmd)
 }

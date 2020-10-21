@@ -12,7 +12,7 @@ import (
 
 var remCmd = &cobra.Command{
 	Use:   "rem",
-	Short: "Opens the repo on the SCM Web interface",
+	Short: "opens the repo on the scm web interface",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, _ := os.Getwd()
