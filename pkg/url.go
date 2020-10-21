@@ -5,8 +5,8 @@ import (
 	"log"
 	"os/user"
 	"path/filepath"
-	"strings"
 	"regexp"
+	"strings"
 )
 
 var err error
@@ -33,8 +33,8 @@ type GitrRepo struct {
 }
 
 func (c GitrRepo) ToString() string {
-	return fmt.Sprintf("InputURL\t: \t%s" +
-		"\nInputURLType\t: \t%s" +
+	return fmt.Sprintf("InputURL\t: \t%s"+
+		"\nInputURLType\t: \t%s"+
 		"\nScmProvider\t: \t%s"+
 		"\nProtocol\t: \t%s"+
 		"\nHostName\t: \t%s"+
@@ -61,7 +61,7 @@ func (gitrRepo GitrRepo) GetWebUrl() string {
 	switch gitrRepo.ScmProvider {
 	case BitBucketDatacenter:
 		var project string
-		if  gitrRepo.InputUrlType == GitRemoteHttp {
+		if gitrRepo.InputUrlType == GitRemoteHttp {
 			project = gitrRepo.levels[1]
 		} else {
 			project = gitrRepo.levels[0]
@@ -150,7 +150,7 @@ func isGitSshUrl(repoUrl string) bool {
 }
 
 func isGitHttpUrlHasUsername(repoUrl string) bool {
-	matched, err := regexp.MatchString("https*:\\/\\/.*@+.*",repoUrl)
+	matched, err := regexp.MatchString("https*:\\/\\/.*@+.*", repoUrl)
 	if err != nil {
 		println(err.Error())
 		return false

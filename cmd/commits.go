@@ -12,7 +12,7 @@ import (
 var commitsCmd = &cobra.Command{
 	Use:   "commits",
 	Short: "Open commits on SCM Web Interface",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, _ := os.Getwd()
 		repo := util.GetGitRepo(pwd)

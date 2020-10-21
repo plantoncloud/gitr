@@ -13,7 +13,7 @@ import (
 var issuesCmd = &cobra.Command{
 	Use:   "issues",
 	Short: "Open Issues on SCM Web Interface",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, _ := os.Getwd()
 		repo := util.GetGitRepo(pwd)

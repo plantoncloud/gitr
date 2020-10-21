@@ -20,7 +20,6 @@ type ScmSystem struct {
 	Scm      ScmProvider
 }
 
-
 func getScmSystems() []ScmSystem {
 	var scmSystems []ScmSystem
 
@@ -50,8 +49,8 @@ func getScmSystems() []ScmSystem {
 
 func getScmProvider(hostname string) (ScmProvider, error) {
 	var scmSystems = getScmSystems()
-	for _,scmSystem := range scmSystems {
-		if scmSystem.Hostname ==  hostname {
+	for _, scmSystem := range scmSystems {
+		if scmSystem.Hostname == hostname {
 			return scmSystem.Scm, nil
 		}
 	}

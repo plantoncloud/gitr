@@ -12,7 +12,7 @@ import (
 var prsCmd = &cobra.Command{
 	Use:   "prs",
 	Short: "Open Pull Requests on SCM Web Interface",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, _ := os.Getwd()
 		repo := util.GetGitRepo(pwd)

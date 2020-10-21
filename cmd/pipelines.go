@@ -13,7 +13,7 @@ import (
 var pipelinesCmd = &cobra.Command{
 	Use:   "pipelines",
 	Short: "Open Pipelines on SCM Web Interface",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, _ := os.Getwd()
 		repo := util.GetGitRepo(pwd)

@@ -13,7 +13,7 @@ import (
 var releasesCmd = &cobra.Command{
 	Use:   "releases",
 	Short: "Open Releases on SCM Web Interface",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, _ := os.Getwd()
 		repo := util.GetGitRepo(pwd)
