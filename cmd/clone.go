@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	clone "leftbin.com/tools/gitr/pkg"
+	clone "github.com/swarupdonepudi/gitr/pkg"
 	"log"
 	"os"
 

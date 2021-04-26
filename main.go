@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "leftbin.com/tools/gitr/cmd"
+import "github.com/swarupdonepudi/gitr/cmd"
 
 func main() {
 	cmd.Execute()

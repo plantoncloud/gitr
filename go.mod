@@ -1,4 +1,4 @@
-module leftbin.com/tools/gitr
+module github.com/swarupdonepudi/gitr
 
 go 1.13
 

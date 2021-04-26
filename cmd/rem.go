@@ -5,8 +5,8 @@ import (
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	url "leftbin.com/tools/gitr/pkg"
-	util "leftbin.com/tools/gitr/pkg"
+	url "github.com/swarupdonepudi/gitr/pkg"
+	util "github.com/swarupdonepudi/gitr/pkg"
 	"os"
 )
 
