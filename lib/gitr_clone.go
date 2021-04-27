@@ -43,12 +43,12 @@ func (c *GitrClone) Clone() {
 	gru := &GitrUtil{}
 	if gru.IsGitUrl(c.Url) {
 		if gru.IsGitSshUrl(c.Url) {
-			print("ssh clone not implemented yet")
+			err = c.sshClone()
 		} else {
 			err = c.httpClone()
-			if err != nil {
-				log.Fatal("error cloning the repo", err)
-			}
+		}
+		if err != nil {
+			log.Fatal("error cloning the repo", err)
 		}
 	} else {
 		print("ssh clone using browser urls not implemented yet")
@@ -72,6 +72,22 @@ func (c *GitrClone) httpClone() error {
 	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
 		URL:      c.Url,
 		Progress: os.Stdout,
+	})
+	return err
+}
+
+func (c *GitrClone) sshClone() error {
+	gru := &GitrUtil{}
+	auth, sshErr := gru.SetUpSshAuth(gru.GetHost(c.Url))
+
+	if sshErr != nil {
+		return sshErr
+	}
+	clonePath := c.setupClonePath()
+	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
+		URL:      c.Url,
+		Progress: os.Stdout,
+		Auth:     auth,
 	})
 	return err
 }
