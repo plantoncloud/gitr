@@ -2,9 +2,15 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"os"
 )
 
-var h = &cmdHandler{}
+func getPwd() string {
+	pwd, _ := os.Getwd()
+	return pwd
+}
+
+var h = &cmdHandler{dir: getPwd()}
 
 var branches = &cobra.Command{
 	Use:   "branches",
@@ -23,6 +29,7 @@ var issues = &cobra.Command{
 	Short: "open issues on scm web interface",
 	Run:   h.remoteRepoHandler(h.issues),
 }
+
 var pipelines = &cobra.Command{
 	Use:     "pipelines",
 	Short:   "open pipelines on scm web interface",
