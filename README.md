@@ -1,14 +1,13 @@
 # gitr(Git Rapid): The missing link between Git CLI and SCM Providers
 
+[![](https://github.com/swarupdonepudi/gitr/workflows/build_n_test/badge.svg)](https://github.com/swarupdonepudi/gitr/actions?query=workflow%3A%22build_n_push%22)
+
 Tool to navigate to important features of SCM efficiently right from the command line.
 
-Did you ever hate searching for clone URL for a repo and then use your mouse pointer to copy the link?
-
-`gitr` solves that problem by cloning git repositories using `browser urls`
 
 ### Supported Platforms
 
-`gitr` can be installed on any operating system and it is written in golang
+`gitr` can be installed on any operating system, and it is written in golang
 
 ### Install
 
@@ -26,15 +25,7 @@ Coming Soon.
 
 ### Examples
 
-Clone repo using Browser URL
-
-```
-gitr clone https://github.com/silvermullet/hyper-kube-config/issues
-```
-
-> Note that the URL is not a typical git url. This URL is copied from browser's url bar
-
-You can also open the following features of your git repo on SCM Web Interface right from the command line
+You can open the following features of your git repo on SCM Web Interface right from the command line
 
 * branches
 * prs
@@ -42,6 +33,7 @@ You can also open the following features of your git repo on SCM Web Interface r
 * issues
 * pipelines
 * releases
+* tags
 
 > The below commands will only work when executed from inside the git repo folder
 
@@ -78,13 +70,19 @@ gitr issues
 Open the Pipelines on SCM Web Interface
 
 ```
-gitr pipelines
+gitr pipe
 ```
 
 Open the Releases on SCM Web Interface
 
 ```
 gitr releases
+```
+
+Open the Tags on SCM Web Interface
+
+```
+gitr tags
 ```
 
 ### Support for Enterprise Editions
