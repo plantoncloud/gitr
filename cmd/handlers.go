@@ -8,7 +8,7 @@ import (
 )
 
 type cmdHandler struct {
-	r   *gitr.RemoteRepo
+	r   *gitr.GitrWeb
 	dir string
 }
 
@@ -31,6 +31,14 @@ func (h *cmdHandler) remoteRepoHandler(handler func(cmd *cobra.Command, args []s
 func (h *cmdHandler) branches(cmd *cobra.Command, args []string) {
 	r := gitr.ScanRepo(h.dir)
 	openBrowser(r.GetBranchesUrl())
+}
+
+func (h *cmdHandler) clone(cmd *cobra.Command, args []string) {
+	c := gitr.ParseCloneReq(args, viper.GetBool("create-dir"))
+	if viper.GetBool("debug") {
+		c.PrintInfo()
+	}
+	c.Clone()
 }
 
 func (h *cmdHandler) commits(cmd *cobra.Command, args []string) {
@@ -61,6 +69,11 @@ func (h *cmdHandler) releases(cmd *cobra.Command, args []string) {
 func (h *cmdHandler) rem(cmd *cobra.Command, args []string) {
 	r := gitr.ScanRepo(h.dir)
 	openBrowser(r.GetRemUrl())
+}
+
+func (h *cmdHandler) remHome(cmd *cobra.Command, args []string) {
+	r := gitr.ScanRepo(h.dir)
+	openBrowser(r.GetWebUrl())
 }
 
 func (h *cmdHandler) tags(cmd *cobra.Command, args []string) {
