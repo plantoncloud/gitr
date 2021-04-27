@@ -4,4 +4,4 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - make test
+      - run: "make test"
