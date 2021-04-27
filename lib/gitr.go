@@ -18,10 +18,10 @@ const (
 )
 
 type RemoteRepo struct {
-	url      string
-	scheme   GitRemoteScheme // http, https or ssh
-	provider ScmProvider
-	branch   string
+	Url      string
+	Scheme   GitRemoteScheme // http, https or ssh
+	Provider ScmProvider
+	Branch   string
 }
 
 func ScanRepo(dir string) *RemoteRepo {
@@ -30,11 +30,11 @@ func ScanRepo(dir string) *RemoteRepo {
 	repo := gu.GetGitRepo(dir)
 	if repo != nil {
 		remoteUrl := gu.GetGitRemoteUrl(repo)
-		r.url = remoteUrl
-		r.scheme = Https
-		r.branch = gu.GetGitBranch(repo)
+		r.Url = remoteUrl
+		r.Scheme = Https
+		r.Branch = gu.GetGitBranch(repo)
 		c := &GitrConfig{}
-		r.provider, err = c.GetScmProvider(r.getHost())
+		r.Provider, err = c.GetScmProvider(r.getHost())
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -46,11 +46,11 @@ func (r *RemoteRepo) PrintInfo() {
 	println("")
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.AppendRow(table.Row{"remote", r.url})
+	t.AppendRow(table.Row{"remote", r.Url})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"provider", r.provider})
+	t.AppendRow(table.Row{"Provider", r.Provider})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"scheme", r.scheme})
+	t.AppendRow(table.Row{"Scheme", r.Scheme})
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"host", r.getHost()})
 	t.AppendSeparator()
@@ -58,42 +58,42 @@ func (r *RemoteRepo) PrintInfo() {
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"repoName", r.getRepoName()})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"branch", r.branch})
+	t.AppendRow(table.Row{"Branch", r.Branch})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-home", r.getWebUrl()})
+	t.AppendRow(table.Row{"Url-home", r.getWebUrl()})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-remote", r.GetRemUrl()})
+	t.AppendRow(table.Row{"Url-remote", r.GetRemUrl()})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-commits", r.GetCommitsUrl()})
+	t.AppendRow(table.Row{"Url-commits", r.GetCommitsUrl()})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-tags", r.GetTagsUrl()})
+	t.AppendRow(table.Row{"Url-tags", r.GetTagsUrl()})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-releases", r.GetReleasesUrl()})
+	t.AppendRow(table.Row{"Url-releases", r.GetReleasesUrl()})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-pipelines", r.GetPipelinesUrl()})
+	t.AppendRow(table.Row{"Url-pipelines", r.GetPipelinesUrl()})
 	t.AppendSeparator()
 	t.Render()
 	println("")
 }
 
 func (r *RemoteRepo) getWebUrl() string {
-	switch r.provider {
+	switch r.Provider {
 	default:
-		return fmt.Sprintf("%s://%s/%s", r.scheme, r.getHost(), r.getRepoPath())
+		return fmt.Sprintf("%s://%s/%s", r.Scheme, r.getHost(), r.getRepoPath())
 	}
 }
 
 func (r *RemoteRepo) GetRemUrl() string {
-	switch r.provider {
+	switch r.Provider {
 	case GitLab:
-		return fmt.Sprintf("%s://%s/%s/-/tree/%s", r.scheme, r.getHost(), r.getRepoPath(), r.branch)
+		return fmt.Sprintf("%s://%s/%s/-/tree/%s", r.Scheme, r.getHost(), r.getRepoPath(), r.Branch)
 	default:
-		return fmt.Sprintf("%s://%s/%s/tree/%s", r.scheme, r.getHost(), r.getRepoPath(), r.branch)
+		return fmt.Sprintf("%s://%s/%s/tree/%s", r.Scheme, r.getHost(), r.getRepoPath(), r.Branch)
 	}
 }
 
 func (r *RemoteRepo) GetPrsUrl() string {
-	switch r.provider {
+	switch r.Provider {
 	case GitHub:
 		return fmt.Sprintf("%s/pulls", r.getWebUrl())
 	case GitLab:
@@ -106,7 +106,7 @@ func (r *RemoteRepo) GetPrsUrl() string {
 }
 
 func (r *RemoteRepo) GetBranchesUrl() string {
-	switch r.provider {
+	switch r.Provider {
 	case GitLab:
 		return fmt.Sprintf("%s/-/branches", r.getWebUrl())
 	default:
@@ -115,16 +115,16 @@ func (r *RemoteRepo) GetBranchesUrl() string {
 }
 
 func (r *RemoteRepo) GetCommitsUrl() string {
-	switch r.provider {
+	switch r.Provider {
 	case GitLab:
-		return fmt.Sprintf("%s://%s/%s/-/commits/%s", r.scheme, r.getHost(), r.getRepoPath(), r.branch)
+		return fmt.Sprintf("%s://%s/%s/-/commits/%s", r.Scheme, r.getHost(), r.getRepoPath(), r.Branch)
 	default:
-		return fmt.Sprintf("%s://%s/%s/commits/%s", r.scheme, r.getHost(), r.getRepoPath(), r.branch)
+		return fmt.Sprintf("%s://%s/%s/commits/%s", r.Scheme, r.getHost(), r.getRepoPath(), r.Branch)
 	}
 }
 
 func (r *RemoteRepo) GetTagsUrl() string {
-	switch r.provider {
+	switch r.Provider {
 	case GitLab:
 		return fmt.Sprintf("%s/-/tags", r.getWebUrl())
 	default:
@@ -133,7 +133,7 @@ func (r *RemoteRepo) GetTagsUrl() string {
 }
 
 func (r *RemoteRepo) GetIssuesUrl() string {
-	switch r.provider {
+	switch r.Provider {
 	case BitBucketDatacenter, BitBucketCloud:
 		return ""
 	default:
@@ -142,7 +142,7 @@ func (r *RemoteRepo) GetIssuesUrl() string {
 }
 
 func (r *RemoteRepo) GetReleasesUrl() string {
-	switch r.provider {
+	switch r.Provider {
 	case GitHub:
 		return fmt.Sprintf("%s/releases", r.getWebUrl())
 	default:
@@ -151,7 +151,7 @@ func (r *RemoteRepo) GetReleasesUrl() string {
 }
 
 func (r *RemoteRepo) GetPipelinesUrl() string {
-	switch r.provider {
+	switch r.Provider {
 	case GitLab:
 		return fmt.Sprintf("%s/pipelines", r.getWebUrl())
 	case GitHub:
@@ -164,17 +164,17 @@ func (r *RemoteRepo) GetPipelinesUrl() string {
 }
 
 func (r *RemoteRepo) getHost() string {
-	if r.url != "" {
-		if isGitSshUrl(r.url) {
-			if strings.HasPrefix(r.url, "ssh://") {
-				return strings.Split(strings.Split(r.url, "@")[1], "/")[0]
+	if r.Url != "" {
+		if isGitSshUrl(r.Url) {
+			if strings.HasPrefix(r.Url, "ssh://") {
+				return strings.Split(strings.Split(r.Url, "@")[1], "/")[0]
 			} else {
-				return strings.Split(strings.Split(r.url, "@")[1], ":")[0]
+				return strings.Split(strings.Split(r.Url, "@")[1], ":")[0]
 			}
-		} else if isGitHttpUrlHasUsername(r.url) {
-			return strings.Split(strings.Split(r.url, "@")[1], "/")[0]
+		} else if isGitHttpUrlHasUsername(r.Url) {
+			return strings.Split(strings.Split(r.Url, "@")[1], "/")[0]
 		} else {
-			return strings.Split(strings.Split(r.url, "://")[1], "/")[0]
+			return strings.Split(strings.Split(r.Url, "://")[1], "/")[0]
 		}
 	} else {
 		return ""
@@ -194,5 +194,5 @@ func (r *RemoteRepo) getRepoName() string {
 }
 
 func (r *RemoteRepo) getRepoPath() string {
-	return r.url[strings.Index(r.url, r.getHost())+1+len(r.getHost()) : strings.Index(r.url, ".git")]
+	return r.Url[strings.Index(r.Url, r.getHost())+1+len(r.getHost()) : strings.Index(r.Url, ".git")]
 }
