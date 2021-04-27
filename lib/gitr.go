@@ -18,31 +18,34 @@ const (
 	Http GitOriginScheme = "http"
 )
 
-type GitOrigin struct {
-	url      string
+type GitRepo struct {
+	origin   string
 	scheme   GitOriginScheme // http, https or ssh
 	host     string
 	repoPath string
 	provider ScmProvider
 	levels   []string
 	repoName string
+	branch   string
 }
 
-func (o *GitOrigin) ScanOrigin() {
+func (o *GitRepo) Scan() {
 	pwd, _ := os.Getwd()
-	repo := GetGitRepo(pwd)
+	gu := &GitUtil{}
+	repo := gu.GetGitRepo(pwd)
 	if repo != nil {
-		remoteUrl := GetGitRemoteUrl(repo)
+		remoteUrl := gu.GetGitRemoteUrl(repo)
+		o.branch = gu.GetGitBranch(repo)
 		o.parseGitRemoteUrl(remoteUrl)
 		o.PrintTable()
 	}
 }
 
-func (o *GitOrigin) PrintTable() {
+func (o *GitRepo) PrintTable() {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	println("")
-	t.AppendRow(table.Row{"url", o.url})
+	t.AppendRow(table.Row{"origin", o.origin})
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"provider", o.provider})
 	t.AppendSeparator()
@@ -54,7 +57,9 @@ func (o *GitOrigin) PrintTable() {
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"repoName", o.repoName})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-remote", o.GetWebUrl()})
+	t.AppendRow(table.Row{"branch", o.branch})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"url-remote", o.getWebUrl()})
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"url-commits", o.GetCommitsUrl()})
 	t.AppendSeparator()
@@ -67,7 +72,7 @@ func (o *GitOrigin) PrintTable() {
 	t.Render()
 }
 
-func (o *GitOrigin) GetWebUrl() string {
+func (o *GitRepo) getWebUrl() string {
 	switch o.provider {
 	case BitBucketDatacenter:
 		var project string
@@ -82,72 +87,90 @@ func (o *GitOrigin) GetWebUrl() string {
 	}
 }
 
-func (o *GitOrigin) GetPrsUrl() string {
+func (o *GitRepo) GetRemUrl() string {
+	switch o.provider {
+	case BitBucketDatacenter:
+		var project string
+		if o.scheme == Http {
+			project = o.levels[1]
+		} else {
+			project = o.levels[0]
+		}
+		return fmt.Sprintf("%s://%s/projects/%s/repos/%s", o.scheme, o.host, project, o.repoName)
+	case GitLab:
+		return fmt.Sprintf("%s://%s/%s/-/tree/%s", o.scheme, o.host, o.repoPath, o.branch)
+	default:
+		return fmt.Sprintf("%s://%s/%s/tree/%s", o.scheme, o.host, o.repoPath, o.branch)
+
+	}
+}
+
+func (o *GitRepo) GetPrsUrl() string {
 	switch o.provider {
 	case GitHub:
-		return fmt.Sprintf("%s/pulls", o.GetWebUrl())
+		return fmt.Sprintf("%s/pulls", o.getWebUrl())
 	case GitLab:
-		return fmt.Sprintf("%s/merge_requests", o.GetWebUrl())
+		return fmt.Sprintf("%s/merge_requests", o.getWebUrl())
 	case BitBucketDatacenter, BitBucketCloud:
-		return fmt.Sprintf("%s/pull-requests", o.GetWebUrl())
+		return fmt.Sprintf("%s/pull-requests", o.getWebUrl())
 	default:
 		return ""
 	}
 }
 
-func (o *GitOrigin) GetBranchesUrl() string {
+func (o *GitRepo) GetBranchesUrl() string {
 	switch o.provider {
 	case GitLab:
-		return fmt.Sprintf("%s/-/branches", o.GetWebUrl())
+		return fmt.Sprintf("%s/-/branches", o.getWebUrl())
 	default:
-		return fmt.Sprintf("%s/branches", o.GetWebUrl())
+		return fmt.Sprintf("%s/branches", o.getWebUrl())
 	}
 }
 
-func (o *GitOrigin) GetCommitsUrl() string {
+func (o *GitRepo) GetCommitsUrl() string {
 	switch o.provider {
 	case GitLab:
-		return fmt.Sprintf("%s/-/commits", o.GetWebUrl())
+		return fmt.Sprintf("%s/-/commits", o.getWebUrl())
 	default:
-		return fmt.Sprintf("%s/commits", o.GetWebUrl())
+		return fmt.Sprintf("%s/commits", o.getWebUrl())
 	}
 }
 
-func (o *GitOrigin) GetTagsUrl() string {
+func (o *GitRepo) GetTagsUrl() string {
 	switch o.provider {
 	case GitLab:
-		return fmt.Sprintf("%s/-/tags", o.GetWebUrl())
+		return fmt.Sprintf("%s/-/tags", o.getWebUrl())
 	default:
-		return fmt.Sprintf("%s/tags", o.GetWebUrl())
+		return fmt.Sprintf("%s/tags", o.getWebUrl())
 	}
 }
 
-func (o *GitOrigin) GetIssuesUrl() string {
+func (o *GitRepo) GetIssuesUrl() string {
 	switch o.provider {
 	case BitBucketDatacenter, BitBucketCloud:
 		return ""
 	default:
-		return fmt.Sprintf("%s/issues", o.GetWebUrl())
+		return fmt.Sprintf("%s/issues", o.getWebUrl())
 	}
 }
 
-func (o *GitOrigin) GetReleasesUrl() string {
+func (o *GitRepo) GetReleasesUrl() string {
 	switch o.provider {
 	case GitHub:
-		return fmt.Sprintf("%s/releases", o.GetWebUrl())
+		return fmt.Sprintf("%s/releases", o.getWebUrl())
 	default:
 		return ""
 	}
 }
 
-func (o *GitOrigin) GetPipelinesUrl() string {
+func (o *GitRepo) GetPipelinesUrl() string {
 	switch o.provider {
 	case GitLab:
-		return fmt.Sprintf("%s/pipelines", o.GetWebUrl())
+		return fmt.Sprintf("%s/pipelines", o.getWebUrl())
 	case GitHub:
-		return fmt.Sprintf("%s/actions", o.GetWebUrl())
+		return fmt.Sprintf("%s/actions", o.getWebUrl())
 	case BitBucketCloud:
-		return fmt.Sprintf("%s/addon/pipelines/home", o.GetWebUrl())
+		return fmt.Sprintf("%s/addon/pipelines/home", o.getWebUrl())
 	default:
 		return ""
 	}
@@ -198,20 +221,16 @@ func getRepoName(scheme GitOriginScheme, scmProvider ScmProvider, levels []strin
 	}
 }
 
-func (o *GitOrigin) parseGitRemoteUrl(repoUrl string) {
-	o.url = repoUrl
+func (o *GitRepo) parseGitRemoteUrl(repoUrl string) {
+	o.origin = repoUrl
 	o.scheme = Http
 	o.host = getHostName(repoUrl)
-
 	o.repoPath = repoUrl[strings.Index(repoUrl, o.host)+1+len(o.host) : strings.Index(repoUrl, ".git")]
-
 	c := &GitrConfig{}
 	o.provider, err = c.GetScmProvider(o.host)
-
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	o.levels = getLevels(o.repoPath)
 	o.repoName = getRepoName(o.scheme, o.provider, o.levels)
 }

@@ -20,8 +20,9 @@ type GitrConfig struct {
 }
 
 type ScmSystem struct {
-	Hostname string
-	Provider ScmProvider
+	Hostname      string
+	Provider      ScmProvider
+	DefaultBranch string `default:"main"`
 }
 
 func (g *GitrConfig) loadScmSystems() {
@@ -31,9 +32,9 @@ func (g *GitrConfig) loadScmSystems() {
 	}
 
 	g.scmSystems = append(g.scmSystems,
-		ScmSystem{"github.com", GitHub},
-		ScmSystem{"gitlab.com", GitLab},
-		ScmSystem{"bitbucket.org", BitBucketCloud})
+		ScmSystem{"github.com", GitHub, "master"},
+		ScmSystem{"gitlab.com", GitLab, "main"},
+		ScmSystem{"bitbucket.org", BitBucketCloud, "master"})
 }
 
 func (g *GitrConfig) GetScmProvider(hostname string) (ScmProvider, error) {
