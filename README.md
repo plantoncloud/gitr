@@ -1,9 +1,6 @@
 # gitr(Git Rapid): The missing link between Git CLI and SCM Providers
 
-[![](https://github.com/swarupdonepudi/gitr/workflows/build_n_test/badge.svg)](https://github.com/swarupdonepudi/gitr/actions?query=workflow%3A%22build_n_test%22)
-
 Tool to navigate to important features of SCM efficiently right from the command line.
-
 
 ### Supported Platforms
 

@@ -11,5 +11,3 @@ jobs:
           ls ${{ github.workspace }}
           cd ${{ github.workspace }}
           make test
-          make setup-tests
-          go test -short -cover -coverpkg github.com/swarupdonepudi/gitr/lib github.com/swarupdonepudi/gitr/lib_test | grep "^.*coverage:.*of statements$" | python -c "import os,re,sys; cover_rpt = sys.stdin.read(); print(cover_rpt) if len(cover_rpt) != 0 and len(cover_rpt.splitlines()) == 1 else sys.exit(1); min_cover = 20; cover = float(re.findall(r'\d*\.\d+|\d+', cover_rpt)[0]); sys.exit(1) if (cover > 100) or (cover < min_cover) else sys.exit(0)"
