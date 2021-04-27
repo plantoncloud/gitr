@@ -97,7 +97,7 @@ func (r *RemoteRepo) GetPrsUrl() string {
 	case GitHub:
 		return fmt.Sprintf("%s/pulls", r.getWebUrl())
 	case GitLab:
-		return fmt.Sprintf("%s/merge_requests", r.getWebUrl())
+		return fmt.Sprintf("%s/-/merge_requests", r.getWebUrl())
 	case BitBucketDatacenter, BitBucketCloud:
 		return fmt.Sprintf("%s/pull-requests", r.getWebUrl())
 	default:
@@ -136,6 +136,8 @@ func (r *RemoteRepo) GetIssuesUrl() string {
 	switch r.Provider {
 	case BitBucketDatacenter, BitBucketCloud:
 		return ""
+	case GitLab:
+		return fmt.Sprintf("%s/-/issues", r.getWebUrl())
 	default:
 		return fmt.Sprintf("%s/issues", r.getWebUrl())
 	}
@@ -145,6 +147,8 @@ func (r *RemoteRepo) GetReleasesUrl() string {
 	switch r.Provider {
 	case GitHub:
 		return fmt.Sprintf("%s/releases", r.getWebUrl())
+	case GitLab:
+		return fmt.Sprintf("%s/-/releases", r.getWebUrl())
 	default:
 		return ""
 	}
@@ -153,7 +157,7 @@ func (r *RemoteRepo) GetReleasesUrl() string {
 func (r *RemoteRepo) GetPipelinesUrl() string {
 	switch r.Provider {
 	case GitLab:
-		return fmt.Sprintf("%s/pipelines", r.getWebUrl())
+		return fmt.Sprintf("%s/-/pipelines", r.getWebUrl())
 	case GitHub:
 		return fmt.Sprintf("%s/actions", r.getWebUrl())
 	case BitBucketCloud:

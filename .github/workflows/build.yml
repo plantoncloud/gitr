@@ -1,7 +1,7 @@
-name: tests
+name: build & test
 on: [push]
 jobs:
-  tests:
+  build_n_test:
     runs-on: ubuntu-latest
     steps:
       - name: clone repo
@@ -10,4 +10,5 @@ jobs:
         run: |
           ls ${{ github.workspace }}
           cd ${{ github.workspace }}
+          make build
           make test

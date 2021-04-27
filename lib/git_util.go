@@ -31,8 +31,10 @@ func (g *GitUtil) GetGitRemoteUrl(repo *git.Repository) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	remoteUrl := remotes[0].Config().URLs[0]
-	return remoteUrl
+	if len(remotes) == 0 {
+		return ""
+	}
+	return remotes[0].Config().URLs[0]
 }
 
 func (g *GitUtil) GetGitBranch(repo *git.Repository) string {
