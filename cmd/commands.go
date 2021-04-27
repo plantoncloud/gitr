@@ -18,6 +18,12 @@ var branches = &cobra.Command{
 	Run:   h.remoteRepoHandler(h.branches),
 }
 
+var clone = &cobra.Command{
+	Use:   "clone",
+	Short: "clones repo using clone and browser urls",
+	Run:   h.clone,
+}
+
 var commits = &cobra.Command{
 	Use:   "commits",
 	Short: "open commits on scm web interface",
@@ -51,8 +57,15 @@ var releases = &cobra.Command{
 
 var rem = &cobra.Command{
 	Use:   "rem",
-	Short: "opens the repo on the scm web interface",
+	Short: "opens the local branch of the repo on the scm web interface",
 	Run:   h.remoteRepoHandler(h.rem),
+}
+
+var remHome = &cobra.Command{
+	Use:     "rem-home",
+	Aliases: []string{"remh"},
+	Short:   "opens the home page of the repo on the scm web interface",
+	Run:     h.remoteRepoHandler(h.remHome),
 }
 
 var tags = &cobra.Command{
@@ -62,5 +75,5 @@ var tags = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(branches, commits, issues, pipelines, prs, releases, rem, tags)
+	rootCmd.AddCommand(branches, clone, commits, issues, pipelines, prs, releases, rem, remHome, tags)
 }

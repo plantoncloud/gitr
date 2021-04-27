@@ -32,7 +32,9 @@ func init() {
 	cobra.OnInitialize(readConfig(i))
 	rootCmd.PersistentFlags().StringVar(&i.cfgFile, "config", "", "config file (default is $HOME/.gitr.yaml)")
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "verbose logging")
+	rootCmd.PersistentFlags().BoolP("create-dir", "c", false, "create directories")
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
+	viper.BindPFlag("create-dir", rootCmd.PersistentFlags().Lookup("create-dir"))
 }
 
 func readConfig(i *input) func() {
