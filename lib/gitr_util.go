@@ -1,16 +1,21 @@
 package lib
 
 import (
-	"log"
 	"regexp"
 	"strings"
 )
 
-func IsGitSshUrl(repoUrl string) bool {
+type GitrUtil struct{}
+
+func (gru *GitrUtil) IsGitUrl(repoUrl string) bool {
+	return strings.HasSuffix(repoUrl, ".git")
+}
+
+func (gru *GitrUtil) IsGitSshUrl(repoUrl string) bool {
 	return strings.HasPrefix(repoUrl, "ssh://") || strings.HasPrefix(repoUrl, "git@")
 }
 
-func IsGitHttpUrlHasUsername(repoUrl string) bool {
+func (gru *GitrUtil) IsGitHttpUrlHasUsername(repoUrl string) bool {
 	matched, err := regexp.MatchString("https*:\\/\\/.*@+.*", repoUrl)
 	if err != nil {
 		println(err.Error())
@@ -20,27 +25,19 @@ func IsGitHttpUrlHasUsername(repoUrl string) bool {
 	}
 }
 
-func GetRepoName(repoPath string) string {
-	if repoPath != "" {
-		levels := strings.Split(repoPath, "/")
-		if len(levels) < 2 {
-			log.Fatal("failed to parse repo name")
-		}
-		return levels[1]
-	} else {
-		return ""
-	}
+func (gru *GitrUtil) GetRepoName(repoPath string) string {
+	return strings.Split(repoPath, "/")[strings.Count(repoPath, "/")]
 }
 
-func GetHost(url string) string {
+func (gru *GitrUtil) GetHost(url string) string {
 	if url != "" {
-		if IsGitSshUrl(url) {
+		if gru.IsGitSshUrl(url) {
 			if strings.HasPrefix(url, "ssh://") {
 				return strings.Split(strings.Split(url, "@")[1], "/")[0]
 			} else {
 				return strings.Split(strings.Split(url, "@")[1], ":")[0]
 			}
-		} else if IsGitHttpUrlHasUsername(url) {
+		} else if gru.IsGitHttpUrlHasUsername(url) {
 			return strings.Split(strings.Split(url, "@")[1], "/")[0]
 		} else {
 			return strings.Split(strings.Split(url, "://")[1], "/")[0]
@@ -50,6 +47,6 @@ func GetHost(url string) string {
 	}
 }
 
-func GetRepoPath(url string) string {
-	return url[strings.Index(url, GetHost(url))+1+len(GetHost(url)) : strings.Index(url, ".git")]
+func (gru *GitrUtil) GetRepoPath(url string) string {
+	return url[strings.Index(url, gru.GetHost(url))+1+len(gru.GetHost(url)) : strings.Index(url, ".git")]
 }

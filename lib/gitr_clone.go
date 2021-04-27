@@ -3,6 +3,7 @@ package lib
 import (
 	"github.com/go-git/go-git/v5"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"log"
 	"os"
 )
 
@@ -39,13 +40,36 @@ func (c *GitrClone) PrintInfo() {
 }
 
 func (c *GitrClone) Clone() {
-	c.httpClone()
+	gru := &GitrUtil{}
+	if gru.IsGitUrl(c.Url) {
+		if gru.IsGitSshUrl(c.Url) {
+			print("ssh clone not implemented yet")
+		} else {
+			err = c.httpClone()
+			if err != nil {
+				log.Fatal("error cloning the repo", err)
+			}
+		}
+	} else {
+		print("ssh clone using browser urls not implemented yet")
+	}
+}
+
+func (c *GitrClone) setupClonePath() string {
+	gru := &GitrUtil{}
+	if c.CreDir {
+		os.MkdirAll(gru.GetRepoPath(c.Url), os.ModePerm)
+		return gru.GetRepoPath(c.Url)
+	} else {
+		repoName := gru.GetRepoName(gru.GetRepoPath(c.Url))
+		os.Mkdir(repoName, os.ModePerm)
+		return repoName
+	}
 }
 
 func (c *GitrClone) httpClone() error {
-	repoName := GetRepoName(GetRepoPath(c.Url))
-	os.Mkdir(repoName, os.ModePerm)
-	_, err := git.PlainClone(repoName, false, &git.CloneOptions{
+	clonePath := c.setupClonePath()
+	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
 		URL:      c.Url,
 		Progress: os.Stdout,
 	})

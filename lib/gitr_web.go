@@ -25,6 +25,7 @@ type GitrWeb struct {
 
 func ScanRepo(dir string) *GitrWeb {
 	gu := &GitUtil{}
+	gtu := &GitrUtil{}
 	r := &GitrWeb{}
 	repo := gu.GetGitRepo(dir)
 	if repo != nil {
@@ -33,7 +34,7 @@ func ScanRepo(dir string) *GitrWeb {
 		r.Scheme = Https
 		r.Branch = gu.GetGitBranch(repo)
 		c := &GitrConfig{}
-		r.Provider, err = c.GetScmProvider(GetHost(r.Url))
+		r.Provider, err = c.GetScmProvider(gtu.GetHost(r.Url))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -42,6 +43,7 @@ func ScanRepo(dir string) *GitrWeb {
 }
 
 func (r *GitrWeb) PrintInfo() {
+	gru := &GitrUtil{}
 	println("")
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
@@ -51,15 +53,15 @@ func (r *GitrWeb) PrintInfo() {
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"Scheme", r.Scheme})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"host", GetHost(r.Url)})
+	t.AppendRow(table.Row{"host", gru.GetHost(r.Url)})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"repoPath", GetRepoPath(r.Url)})
+	t.AppendRow(table.Row{"repoPath", gru.GetRepoPath(r.Url)})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"repoName", GetRepoName(GetRepoPath(r.Url))})
+	t.AppendRow(table.Row{"repoName", gru.GetRepoName(gru.GetRepoPath(r.Url))})
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"Branch", r.Branch})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"Url-home", r.GetWebUrl()})
+	t.AppendRow(table.Row{"Url-web", r.GetWebUrl()})
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"Url-remote", r.GetRemUrl()})
 	t.AppendSeparator()
@@ -78,18 +80,20 @@ func (r *GitrWeb) PrintInfo() {
 }
 
 func (r *GitrWeb) GetWebUrl() string {
+	gru := &GitrUtil{}
 	switch r.Provider {
 	default:
-		return fmt.Sprintf("%s://%s/%s", r.Scheme, GetHost(r.Url), GetRepoPath(r.Url))
+		return fmt.Sprintf("%s://%s/%s", r.Scheme, gru.GetHost(r.Url), gru.GetRepoPath(r.Url))
 	}
 }
 
 func (r *GitrWeb) GetRemUrl() string {
+	gru := &GitrUtil{}
 	switch r.Provider {
 	case GitLab:
-		return fmt.Sprintf("%s://%s/%s/-/tree/%s", r.Scheme, GetHost(r.Url), GetRepoPath(r.Url), r.Branch)
+		return fmt.Sprintf("%s://%s/%s/-/tree/%s", r.Scheme, gru.GetHost(r.Url), gru.GetRepoPath(r.Url), r.Branch)
 	default:
-		return fmt.Sprintf("%s://%s/%s/tree/%s", r.Scheme, GetHost(r.Url), GetRepoPath(r.Url), r.Branch)
+		return fmt.Sprintf("%s://%s/%s/tree/%s", r.Scheme, gru.GetHost(r.Url), gru.GetRepoPath(r.Url), r.Branch)
 	}
 }
 
@@ -116,11 +120,12 @@ func (r *GitrWeb) GetBranchesUrl() string {
 }
 
 func (r *GitrWeb) GetCommitsUrl() string {
+	gru := &GitrUtil{}
 	switch r.Provider {
 	case GitLab:
-		return fmt.Sprintf("%s://%s/%s/-/commits/%s", r.Scheme, GetHost(r.Url), GetRepoPath(r.Url), r.Branch)
+		return fmt.Sprintf("%s://%s/%s/-/commits/%s", r.Scheme, gru.GetHost(r.Url), gru.GetRepoPath(r.Url), r.Branch)
 	default:
-		return fmt.Sprintf("%s://%s/%s/commits/%s", r.Scheme, GetHost(r.Url), GetRepoPath(r.Url), r.Branch)
+		return fmt.Sprintf("%s://%s/%s/commits/%s", r.Scheme, gru.GetHost(r.Url), gru.GetRepoPath(r.Url), r.Branch)
 	}
 }
 
