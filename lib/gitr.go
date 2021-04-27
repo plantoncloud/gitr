@@ -66,6 +66,8 @@ func (r *RemoteRepo) PrintInfo() {
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"Url-commits", r.GetCommitsUrl()})
 	t.AppendSeparator()
+	t.AppendRow(table.Row{"Url-branches", r.GetBranchesUrl()})
+	t.AppendSeparator()
 	t.AppendRow(table.Row{"Url-tags", r.GetTagsUrl()})
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"Url-releases", r.GetReleasesUrl()})
