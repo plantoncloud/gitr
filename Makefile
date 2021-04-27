@@ -9,3 +9,5 @@ build: deps fmt
 checksum: build
 	openssl dgst -sha256 bin/gitr-darwin
 	openssl dgst -sha256 bin/gitr-linux
+test:
+	go test -v ./...
