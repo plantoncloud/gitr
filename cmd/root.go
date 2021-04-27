@@ -2,15 +2,16 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
 )
 
-var cfgFile string
-var debug bool
+type input struct {
+	cfgFile string
+	debug   bool
+}
 
 var rootCmd = &cobra.Command{
 	Use:   "gitr",
@@ -27,28 +28,31 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gitr.yaml)")
+	i := &input{}
+	cobra.OnInitialize(readConfig(i))
+	rootCmd.PersistentFlags().StringVar(&i.cfgFile, "config", "", "config file (default is $HOME/.gitr.yaml)")
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "verbose logging")
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
 }
 
-func initConfig() {
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-	} else {
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+func readConfig(i *input) func() {
+	return func() {
+		if i.cfgFile != "" {
+			viper.SetConfigFile(i.cfgFile)
+		} else {
+			home, err := homedir.Dir()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			viper.AddConfigPath(home)
+			viper.SetConfigName(".gitr")
 		}
 
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".gitr")
-	}
+		viper.AutomaticEnv()
 
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
+		if err := viper.ReadInConfig(); err != nil {
+		}
 	}
 }

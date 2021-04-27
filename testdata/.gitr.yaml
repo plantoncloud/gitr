@@ -1,0 +1,5 @@
+scmSystems:
+  - hostname: gitlab.mycompany.com
+    scm: gitlab
+  - hostname: bitbucket.mycompany.com
+    scm: bitbucket
