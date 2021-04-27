@@ -1,0 +1,14 @@
+name: build
+on: [push]
+jobs:
+  build_n_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v2
+      - name: run tests
+        run: |
+          ls ${{ github.workspace }}
+          cd ${{ github.workspace }}
+          make build
+          make test

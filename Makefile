@@ -10,4 +10,4 @@ checksum: build
 	openssl dgst -sha256 bin/gitr-darwin
 	openssl dgst -sha256 bin/gitr-linux
 test:
-	go test -v ./...
+	go test -v github.com/swarupdonepudi/gitr/lib_test
