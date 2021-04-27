@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"log"
 	"os"
 	"regexp"
@@ -10,45 +11,21 @@ import (
 
 var err error
 
-type GitOriginType string
+type GitOriginScheme string
 
 const (
-	Browser GitOriginType = "browser"
-	Ssh     GitOriginType = "ssh"
-	Http    GitOriginType = "http"
+	Ssh  GitOriginScheme = "ssh"
+	Http GitOriginScheme = "http"
 )
 
 type GitOrigin struct {
-	urlType  GitOriginType
 	url      string
-	scheme   string // http, https or ssh
+	scheme   GitOriginScheme // http, https or ssh
 	host     string
 	repoPath string
 	provider ScmProvider
 	levels   []string
 	repoName string
-}
-
-func (o *GitOrigin) ToString() string {
-	return fmt.Sprintf("originUrlType\t: \t%s"+
-		"\noriginUrl\t: \t%s"+
-		"\nprovider\t: \t%s"+
-		"\nscheme\t: \t%s"+
-		"\nhost\t: \t%s"+
-		"\nrepoPath\t\t: \t%s"+
-		"\nrepoName\t: \t%s"+
-		"\nweb\t\t: \t%s"+
-		"\nprs\t\t: \t%s"+
-		"\nbranches\t: \t%s"+
-		"\ncommits\t\t: \t%s"+
-		"\nissues\t\t: \t%s"+
-		"\nreleases\t: \t%s"+
-		"\npipelines\t: \t%s"+
-		"\ntags\t: \t%s",
-		o.urlType, o.url, o.provider, o.scheme, o.host,
-		o.repoName, o.repoName,
-		o.GetWebUrl(), o.GetPrsUrl(), o.GetBranchesUrl(),
-		o.GetCommitsUrl(), o.GetIssuesUrl(), o.GetReleasesUrl(), o.GetPipelinesUrl(), o.GetTagsUrl())
 }
 
 func (o *GitOrigin) ScanOrigin() {
@@ -57,15 +34,44 @@ func (o *GitOrigin) ScanOrigin() {
 	if repo != nil {
 		remoteUrl := GetGitRemoteUrl(repo)
 		o.parseGitRemoteUrl(remoteUrl)
-		print(o.ToString())
+		o.PrintTable()
 	}
+}
+
+func (o *GitOrigin) PrintTable() {
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	println("")
+	t.AppendRow(table.Row{"url", o.url})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"provider", o.provider})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"scheme", o.scheme})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"host", o.host})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"repoPath", o.repoPath})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"repoName", o.repoName})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"url-remote", o.GetWebUrl()})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"url-commits", o.GetCommitsUrl()})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"url-tags", o.GetTagsUrl()})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"url-releases", o.GetReleasesUrl()})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"url-pipelines", o.GetPipelinesUrl()})
+	t.AppendSeparator()
+	t.Render()
 }
 
 func (o *GitOrigin) GetWebUrl() string {
 	switch o.provider {
 	case BitBucketDatacenter:
 		var project string
-		if o.urlType == Http {
+		if o.scheme == Http {
 			project = o.levels[1]
 		} else {
 			project = o.levels[0]
@@ -138,6 +144,8 @@ func (o *GitOrigin) GetPipelinesUrl() string {
 	switch o.provider {
 	case GitLab:
 		return fmt.Sprintf("%s/pipelines", o.GetWebUrl())
+	case GitHub:
+		return fmt.Sprintf("%s/actions", o.GetWebUrl())
 	case BitBucketCloud:
 		return fmt.Sprintf("%s/addon/pipelines/home", o.GetWebUrl())
 	default:
@@ -178,12 +186,10 @@ func getLevels(urlPath string) []string {
 	return levels
 }
 
-func getRepoName(inputUrlType GitOriginType, scmProvider ScmProvider, levels []string) string {
+func getRepoName(scheme GitOriginScheme, scmProvider ScmProvider, levels []string) string {
 	if scmProvider == BitBucketDatacenter {
-		if inputUrlType == Http {
+		if scheme == Http {
 			return levels[2]
-		} else if inputUrlType == Browser {
-			return levels[3]
 		} else {
 			return levels[1]
 		}
@@ -193,16 +199,8 @@ func getRepoName(inputUrlType GitOriginType, scmProvider ScmProvider, levels []s
 }
 
 func (o *GitOrigin) parseGitRemoteUrl(repoUrl string) {
-	o = &GitOrigin{
-		url: repoUrl,
-	}
-	if isGitSshUrl(repoUrl) {
-		o.urlType = Ssh
-		o.scheme = "https"
-	} else {
-		o.urlType = Http
-		o.scheme = strings.Split(repoUrl, "://")[0]
-	}
+	o.url = repoUrl
+	o.scheme = Http
 	o.host = getHostName(repoUrl)
 
 	o.repoPath = repoUrl[strings.Index(repoUrl, o.host)+1+len(o.host) : strings.Index(repoUrl, ".git")]
@@ -215,5 +213,5 @@ func (o *GitOrigin) parseGitRemoteUrl(repoUrl string) {
 	}
 
 	o.levels = getLevels(o.repoPath)
-	o.repoName = getRepoName(o.urlType, o.provider, o.levels)
+	o.repoName = getRepoName(o.scheme, o.provider, o.levels)
 }

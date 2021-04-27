@@ -27,10 +27,11 @@ var issues = &cobra.Command{
 	Run:   h.issues,
 }
 var pipelines = &cobra.Command{
-	Use:   "pipelines",
-	Short: "open pipelines on scm web interface",
-	Long:  ``,
-	Run:   h.pipelines,
+	Use:     "pipelines",
+	Short:   "open pipelines on scm web interface",
+	Long:    ``,
+	Aliases: []string{"pipe"},
+	Run:     h.pipelines,
 }
 
 var prs = &cobra.Command{
