@@ -45,7 +45,7 @@ var pipelines = &cobra.Command{
 
 var prs = &cobra.Command{
 	Use:   "prs",
-	Short: "open pull requests on scm web interface",
+	Short: "open prs/mrs on scm web interface",
 	Run:   h.remoteRepoHandler(h.prs),
 }
 
@@ -61,19 +61,18 @@ var rem = &cobra.Command{
 	Run:   h.remoteRepoHandler(h.rem),
 }
 
-var remHome = &cobra.Command{
-	Use:     "rem-home",
-	Aliases: []string{"remh"},
-	Short:   "opens the home page of the repo on the scm web interface",
-	Run:     h.remoteRepoHandler(h.remHome),
-}
-
 var tags = &cobra.Command{
 	Use:   "tags",
 	Short: "open tags on scm web interface",
 	Run:   h.remoteRepoHandler(h.tags),
 }
 
+var web = &cobra.Command{
+	Use:   "web",
+	Short: "open repo on scm web interface",
+	Run:   h.remoteRepoHandler(h.web),
+}
+
 func init() {
-	rootCmd.AddCommand(branches, clone, commits, issues, pipelines, prs, releases, rem, remHome, tags)
+	rootCmd.AddCommand(branches, clone, commits, issues, pipelines, prs, releases, rem, tags, web)
 }

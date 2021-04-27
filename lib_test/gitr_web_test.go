@@ -210,7 +210,7 @@ func TestCommitsUrls(t *testing.T) {
 	})
 }
 
-func TestRemHomeUrls(t *testing.T) {
+func TestWebUrls(t *testing.T) {
 	var urlTests = []struct {
 		provider    gitr.ScmProvider
 		branch      string
@@ -227,7 +227,7 @@ func TestRemHomeUrls(t *testing.T) {
 	r := gitr.GitrWeb{
 		Scheme: "https",
 	}
-	t.Run("validate remote-home urls", func(t *testing.T) {
+	t.Run("validate web urls", func(t *testing.T) {
 		for _, u := range urlTests {
 			r.Url = u.remote
 			r.Branch = u.branch

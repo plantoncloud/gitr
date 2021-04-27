@@ -71,7 +71,7 @@ func (h *cmdHandler) rem(cmd *cobra.Command, args []string) {
 	openBrowser(r.GetRemUrl())
 }
 
-func (h *cmdHandler) remHome(cmd *cobra.Command, args []string) {
+func (h *cmdHandler) web(cmd *cobra.Command, args []string) {
 	r := gitr.ScanRepo(h.dir)
 	openBrowser(r.GetWebUrl())
 }
