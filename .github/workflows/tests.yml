@@ -6,7 +6,8 @@ jobs:
     steps:
       - name: clone repo
         uses: actions/checkout@v2
-      - run: |
+      - name: run tests
+        run: |
           ls ${{ github.workspace }}
           cd ${{ github.workspace }}
           make test
