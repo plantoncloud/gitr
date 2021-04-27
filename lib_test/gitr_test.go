@@ -19,14 +19,16 @@ func TestRemUrls(t *testing.T) {
 	r := lib.RemoteRepo{
 		Scheme: "https",
 	}
-	for _, u := range urlTests {
-		r.Url = u.remote
-		r.Provider = u.provider
-		r.Branch = u.branch
-		if r.GetRemUrl() != u.expectedUrl {
-			t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetRemUrl())
+	t.Run("validate remote urls", func(t *testing.T) {
+		for _, u := range urlTests {
+			r.Url = u.remote
+			r.Provider = u.provider
+			r.Branch = u.branch
+			if r.GetRemUrl() != u.expectedUrl {
+				t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetRemUrl())
+			}
 		}
-	}
+	})
 }
 
 func TestPrsUrls(t *testing.T) {
@@ -43,13 +45,15 @@ func TestPrsUrls(t *testing.T) {
 	r := lib.RemoteRepo{
 		Scheme: "https",
 	}
-	for _, u := range urlTests {
-		r.Url = u.remote
-		r.Provider = u.provider
-		if r.GetPrsUrl() != u.expectedUrl {
-			t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetPrsUrl())
+	t.Run("validate mr/pr urls", func(t *testing.T) {
+		for _, u := range urlTests {
+			r.Url = u.remote
+			r.Provider = u.provider
+			if r.GetPrsUrl() != u.expectedUrl {
+				t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetPrsUrl())
+			}
 		}
-	}
+	})
 }
 
 func TestIssuesUrls(t *testing.T) {
@@ -66,13 +70,15 @@ func TestIssuesUrls(t *testing.T) {
 	r := lib.RemoteRepo{
 		Scheme: "https",
 	}
-	for _, u := range urlTests {
-		r.Url = u.remote
-		r.Provider = u.provider
-		if r.GetIssuesUrl() != u.expectedUrl {
-			t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetIssuesUrl())
+	t.Run("validate issues urls", func(t *testing.T) {
+		for _, u := range urlTests {
+			r.Url = u.remote
+			r.Provider = u.provider
+			if r.GetIssuesUrl() != u.expectedUrl {
+				t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetIssuesUrl())
+			}
 		}
-	}
+	})
 }
 
 func TestTagsUrls(t *testing.T) {
@@ -89,13 +95,15 @@ func TestTagsUrls(t *testing.T) {
 	r := lib.RemoteRepo{
 		Scheme: "https",
 	}
-	for _, u := range urlTests {
-		r.Url = u.remote
-		r.Provider = u.provider
-		if r.GetTagsUrl() != u.expectedUrl {
-			t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetTagsUrl())
+	t.Run("validate tags urls", func(t *testing.T) {
+		for _, u := range urlTests {
+			r.Url = u.remote
+			r.Provider = u.provider
+			if r.GetTagsUrl() != u.expectedUrl {
+				t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetTagsUrl())
+			}
 		}
-	}
+	})
 }
 
 func TestReleasesUrls(t *testing.T) {
@@ -112,13 +120,15 @@ func TestReleasesUrls(t *testing.T) {
 	r := lib.RemoteRepo{
 		Scheme: "https",
 	}
-	for _, u := range urlTests {
-		r.Url = u.remote
-		r.Provider = u.provider
-		if r.GetReleasesUrl() != u.expectedUrl {
-			t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetReleasesUrl())
+	t.Run("validate releases urls", func(t *testing.T) {
+		for _, u := range urlTests {
+			r.Url = u.remote
+			r.Provider = u.provider
+			if r.GetReleasesUrl() != u.expectedUrl {
+				t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetReleasesUrl())
+			}
 		}
-	}
+	})
 }
 
 func TestPipelinesUrls(t *testing.T) {
@@ -135,13 +145,15 @@ func TestPipelinesUrls(t *testing.T) {
 	r := lib.RemoteRepo{
 		Scheme: "https",
 	}
-	for _, u := range urlTests {
-		r.Url = u.remote
-		r.Provider = u.provider
-		if r.GetPipelinesUrl() != u.expectedUrl {
-			t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetPipelinesUrl())
+	t.Run("validate pipelines urls", func(t *testing.T) {
+		for _, u := range urlTests {
+			r.Url = u.remote
+			r.Provider = u.provider
+			if r.GetPipelinesUrl() != u.expectedUrl {
+				t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetPipelinesUrl())
+			}
 		}
-	}
+	})
 }
 
 func TestBranchesUrls(t *testing.T) {
@@ -158,13 +170,15 @@ func TestBranchesUrls(t *testing.T) {
 	r := lib.RemoteRepo{
 		Scheme: "https",
 	}
-	for _, u := range urlTests {
-		r.Url = u.remote
-		r.Provider = u.provider
-		if r.GetBranchesUrl() != u.expectedUrl {
-			t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetBranchesUrl())
+	t.Run("validate branches urls", func(t *testing.T) {
+		for _, u := range urlTests {
+			r.Url = u.remote
+			r.Provider = u.provider
+			if r.GetBranchesUrl() != u.expectedUrl {
+				t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetBranchesUrl())
+			}
 		}
-	}
+	})
 }
 
 func TestCommitsUrls(t *testing.T) {
@@ -184,12 +198,14 @@ func TestCommitsUrls(t *testing.T) {
 	r := lib.RemoteRepo{
 		Scheme: "https",
 	}
-	for _, u := range urlTests {
-		r.Url = u.remote
-		r.Branch = u.branch
-		r.Provider = u.provider
-		if r.GetCommitsUrl() != u.expectedUrl {
-			t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetCommitsUrl())
+	t.Run("validate commits urls", func(t *testing.T) {
+		for _, u := range urlTests {
+			r.Url = u.remote
+			r.Branch = u.branch
+			r.Provider = u.provider
+			if r.GetCommitsUrl() != u.expectedUrl {
+				t.Errorf("expecting %s but got %s", u.expectedUrl, r.GetCommitsUrl())
+			}
 		}
-	}
+	})
 }
