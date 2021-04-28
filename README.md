@@ -2,7 +2,7 @@
 
 **tl;dr** in short, gitr does this:
 
-if you are in iterm inside a subdirectory of a git repo and you want to see the pull requests on that repo?
+if you are in iterm inside a subdirectory of a git repo, and you want to see the pull requests on that repo?
 
 *before gitr:*
 
@@ -13,6 +13,8 @@ if you are in iterm inside a subdirectory of a git repo and you want to see the 
 5. after the home page is loaded then locate the icon the page to go to the pull requests section.
 
 *with gitr:*
+
+in iterm, from any subdirectory under any git repo
 
 1. gitr prs
 
