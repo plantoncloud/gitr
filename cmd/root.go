@@ -10,7 +10,7 @@ import (
 
 type input struct {
 	cfgFile string
-	debug   bool
+	dry     bool
 }
 
 var rootCmd = &cobra.Command{
@@ -31,9 +31,9 @@ func init() {
 	i := &input{}
 	cobra.OnInitialize(readConfig(i))
 	rootCmd.PersistentFlags().StringVar(&i.cfgFile, "config", "", "config file (default is $HOME/.gitr.yaml)")
-	rootCmd.PersistentFlags().BoolP("debug", "d", false, "verbose logging")
+	rootCmd.PersistentFlags().BoolP("dry", "d", false, "dry run")
 	rootCmd.PersistentFlags().BoolP("create-dir", "c", false, "create directories")
-	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
+	viper.BindPFlag("dry", rootCmd.PersistentFlags().Lookup("dry"))
 	viper.BindPFlag("create-dir", rootCmd.PersistentFlags().Lookup("create-dir"))
 }
 

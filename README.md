@@ -128,6 +128,68 @@ scmSystems:
     defaultBranch: main
 ```
 
+### Dry Run
+
+Currently `gitr` only supports `github`, `gitlab` and `bitbucket`. Each provider has slight differences in the urls to access different parts of a repo. `gitr` could just work out of the box for a different cloud provider ex: AWS CodeCommit or it may not behave as expected.
+
+So, if `gitr` does not work as you expect it to, both for supported providers and other providers, you will be able to see what urls `gitr` produces but using `--dry` option. This option is available for both web and clone features.
+
+> Note: When `--dry` or `-d` flags are used, gitr will not open up the repo or clone the repo. It simply displays the info to the console that it would use in non-dry mode
+
+Here is an example of the output when `--dry or -d` flag is passed to gitr
+
+```shell
+> gitr rem -d
+
++---------------+-------------------------------------------------------+
+| remote        | git@github.com:swarupdonepudi/gitr.git                |
++---------------+-------------------------------------------------------+
+| provider      | github                                                |
++---------------+-------------------------------------------------------+
+| host          | github.com                                            |
++---------------+-------------------------------------------------------+
+| repo-path     | swarupdonepudi/gitr                                   |
++---------------+-------------------------------------------------------+
+| repo-name     | gitr                                                  |
++---------------+-------------------------------------------------------+
+| branch        | master                                                |
++---------------+-------------------------------------------------------+
+| url-web       | https://github.com/swarupdonepudi/gitr                |
++---------------+-------------------------------------------------------+
+| url-remote    | https://github.com/swarupdonepudi/gitr/tree/master    |
++---------------+-------------------------------------------------------+
+| url-commits   | https://github.com/swarupdonepudi/gitr/commits/master |
++---------------+-------------------------------------------------------+
+| url-branches  | https://github.com/swarupdonepudi/gitr/branches       |
++---------------+-------------------------------------------------------+
+| url-tags      | https://github.com/swarupdonepudi/gitr/tags           |
++---------------+-------------------------------------------------------+
+| url-releases  | https://github.com/swarupdonepudi/gitr/releases       |
++---------------+-------------------------------------------------------+
+| url-pipelines | https://github.com/swarupdonepudi/gitr/actions        |
++---------------+-------------------------------------------------------+
+```
+
+Here is a sample output of the `--dry` options passed to clone command
+
+```shell
+> gitr clone git@github.com:swarupdonepudi/gitr.git -d
+
++------------+---------------------------------------------------+
+| remote     | git@github.com:swarupdonepudi/gitr.git            |
++------------+---------------------------------------------------+
+| provider   | github                                            |
++------------+---------------------------------------------------+
+| host       | github.com                                        |
++------------+---------------------------------------------------+
+| repo-name  | gitr                                              |
++------------+---------------------------------------------------+
+| create-dir | true                                              |
++------------+---------------------------------------------------+
+| clone-path | /Users/swarupd/scm/github.com/swarupdonepudi/gitr |
++------------+---------------------------------------------------+
+```
+
 ### Support for Enterprise Editions
 
 `gitr` can work with enterprise deployments of Github, Gitlab and Bitbucket(Datacenter) editions as well.

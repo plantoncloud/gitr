@@ -13,7 +13,7 @@ type cmdHandler struct {
 }
 
 func openBrowser(url string) {
-	if url != "" && !viper.GetBool("debug") {
+	if url != "" && !viper.GetBool("dry") {
 		_ = open.Run(url)
 	}
 }
@@ -21,7 +21,7 @@ func openBrowser(url string) {
 func (h *cmdHandler) gitrWebHandler(handler func(cmd *cobra.Command, args []string)) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		h.r = gitr.ScanRepo(h.dir)
-		if viper.GetBool("debug") {
+		if viper.GetBool("dry") {
 			h.r.PrintInfo()
 		}
 		handler(cmd, args)
@@ -35,7 +35,7 @@ func (h *cmdHandler) branches(cmd *cobra.Command, args []string) {
 
 func (h *cmdHandler) clone(cmd *cobra.Command, args []string) {
 	c := gitr.ParseCloneReq(args, viper.GetBool("create-dir"))
-	if viper.GetBool("debug") {
+	if viper.GetBool("dry") {
 		c.PrintInfo()
 	} else {
 		c.Clone()
