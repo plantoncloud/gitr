@@ -232,3 +232,7 @@ Below is the list of valid values for `scmSystems[].scm` in `~/.gitr.yaml`
 brew uninstall gitr
 brew untap swarupdonepudi/homebrew-gitr
 ```
+
+### Contributions
+
+I built `gitr` to share my passion for extreme productivity with other productivity geeks. Life is too short, and I ain't wasting time clicking and typing around that does not return any value. `gitr` just does that, reduces a ton of clicking and waiting for the page to load by taking you directly to the page that you would like to see right from the command line. For those of you who share the same passion, I hope you find this project both useful and interesting. I am also pretty sure that productivity geeks are never content and will always look for more. So, if you see opportunities to improve this, I will be a happy man to see new issues and pull-requests.
