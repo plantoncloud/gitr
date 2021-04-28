@@ -97,13 +97,13 @@ This might not be very useful for repositories hosted on github but is very hand
 clone a repo without creating the directories in the url path
 
 ```shell
-gitr clone clone git@gitlab.zgtools.net:devex/cicd/bitbucket-archiver.git
+gitr clone clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git
 ```
 
 clone a repo creating the directories in the url path
 
 ```shell
-gitr clone clone git@gitlab.zgtools.net:devex/cicd/bitbucket-archiver.git -c
+gitr clone clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git -c
 ```
 
 ### Support for Enterprise Editions
