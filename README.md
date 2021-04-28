@@ -1,4 +1,4 @@
-# gitr(Git Rapid): The missing link between Git CLI and SCM Providers
+# gitr(Git Rapid): The missing link between Git CLI and Web Browsers
 
 `gitr` reduces a ton of clicking and waiting for the git repo web pages to load by **taking you directly** to the page that you would like to see right from the command line. You may think that it's not a lot of waiting but trust me, you will notice the difference once you start using `gitr`.
 
