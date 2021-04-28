@@ -22,16 +22,17 @@ func ParseCloneReq(args []string, creDir bool) *GitrClone {
 func (c *GitrClone) PrintInfo() {
 	gc := &GitrConfig{}
 	gru := &GitrUtil{}
-	scmProvider, err := gc.GetScmProvider(gru.GetHost(c.Url))
-	if err != nil {
-		scmProvider = "error"
+	var provider ScmProvider
+	scmSystem, err := gc.GetScmSystem(gru.GetHost(c.Url))
+	if err == nil {
+		provider = scmSystem.Provider
 	}
 	println("")
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendRow(table.Row{"remote", c.Url})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"provider", scmProvider})
+	t.AppendRow(table.Row{"provider", provider})
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"host", gru.GetHost(c.Url)})
 	t.AppendSeparator()
@@ -39,7 +40,7 @@ func (c *GitrClone) PrintInfo() {
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"create-dir", gc.Clone.AlwaysCreDir || c.CreDir})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"clone-path", c.setupClonePath()})
+	t.AppendRow(table.Row{"clone-path", c.GetClonePath(gc)})
 	t.AppendSeparator()
 	t.Render()
 	println("")
@@ -61,8 +62,7 @@ func (c *GitrClone) Clone() {
 	}
 }
 
-func (c *GitrClone) setupClonePath() string {
-	gc := &GitrConfig{}
+func (c *GitrClone) GetClonePath(gc *GitrConfig) string {
 	gru := &GitrUtil{}
 	clonePath := ""
 	if gc.Get().Clone.AlwaysCreDir {
@@ -79,12 +79,12 @@ func (c *GitrClone) setupClonePath() string {
 	if gc.Get().Clone.ScmHome != "" {
 		clonePath = fmt.Sprintf("%s/%s", gc.Get().Clone.ScmHome, clonePath)
 	}
-	os.MkdirAll(clonePath, os.ModePerm)
 	return clonePath
 }
 
 func (c *GitrClone) httpClone() error {
-	clonePath := c.setupClonePath()
+	clonePath := c.GetClonePath(&GitrConfig{})
+	os.MkdirAll(clonePath, os.ModePerm)
 	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
 		URL:      c.Url,
 		Progress: os.Stdout,
@@ -99,7 +99,8 @@ func (c *GitrClone) sshClone() error {
 	if sshErr != nil {
 		return sshErr
 	}
-	clonePath := c.setupClonePath()
+	clonePath := c.GetClonePath(&GitrConfig{})
+	os.MkdirAll(clonePath, os.ModePerm)
 	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
 		URL:      c.Url,
 		Progress: os.Stdout,
