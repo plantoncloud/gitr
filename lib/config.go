@@ -16,33 +16,53 @@ const (
 )
 
 type GitrConfig struct {
-	scmSystems []ScmSystem
+	ScmSystems []ScmSystem
+	Clone      GitrCloneConfig
+}
+
+type GitrCloneConfig struct {
+	ScmHome              string
+	AlwaysCreDir         bool
+	IncludeHostForCreDir bool
 }
 
 type ScmSystem struct {
 	Hostname      string
 	Provider      ScmProvider
-	DefaultBranch string `default:"main"`
+	DefaultBranch string
+}
+
+func (g *GitrConfig) loadConfig() {
+	err := viper.UnmarshalKey("Clone", &g.Clone)
+	if err != nil {
+		log.Fatalf("unable to decode Clone config from config file, %v", err)
+	}
+	g.loadScmSystems()
 }
 
 func (g *GitrConfig) loadScmSystems() {
-	err := viper.UnmarshalKey("scmSystems", &g.scmSystems)
+	err := viper.UnmarshalKey("ScmSystems", &g.ScmSystems)
 	if err != nil {
 		log.Fatalf("unable to decode scm systems into array of struct, %v", err)
 	}
 
-	g.scmSystems = append(g.scmSystems,
+	g.ScmSystems = append(g.ScmSystems,
 		ScmSystem{"github.com", GitHub, "master"},
 		ScmSystem{"gitlab.com", GitLab, "main"},
 		ScmSystem{"bitbucket.org", BitBucketCloud, "master"})
 }
 
+func (g *GitrConfig) Get() *GitrConfig {
+	g.loadConfig()
+	return g
+}
+
 func (g *GitrConfig) GetScmProvider(hostname string) (ScmProvider, error) {
-	g.loadScmSystems()
-	for _, scmSystem := range g.scmSystems {
+	g.loadConfig()
+	for _, scmSystem := range g.ScmSystems {
 		if scmSystem.Hostname == hostname {
 			return scmSystem.Provider, nil
 		}
 	}
-	return "", errors.New("SCM Provider Not Found for hostname " + hostname + " in ~/.gitr.yaml")
+	return "", errors.New("scm provider not found for hostname " + hostname + " in ~/.gitr.yaml")
 }

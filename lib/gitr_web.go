@@ -9,16 +9,9 @@ import (
 
 var err error
 
-type GitRemoteScheme string
-
-const (
-	Ssh   GitRemoteScheme = "ssh"
-	Https GitRemoteScheme = "https"
-)
-
 type GitrWeb struct {
 	Url      string
-	Scheme   GitRemoteScheme // http, https or ssh
+	Scheme   string //TODO: is this really needed?
 	Provider ScmProvider
 	Branch   string
 }
@@ -31,8 +24,8 @@ func ScanRepo(dir string) *GitrWeb {
 	if repo != nil {
 		remoteUrl := gu.GetGitRemoteUrl(repo)
 		r.Url = remoteUrl
-		r.Scheme = Https
 		r.Branch = gu.GetGitBranch(repo)
+		r.Scheme = "https"
 		c := &GitrConfig{}
 		r.Provider, err = c.GetScmProvider(gtu.GetHost(r.Url))
 		if err != nil {
@@ -49,31 +42,29 @@ func (r *GitrWeb) PrintInfo() {
 	t.SetOutputMirror(os.Stdout)
 	t.AppendRow(table.Row{"remote", r.Url})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"Provider", r.Provider})
-	t.AppendSeparator()
-	t.AppendRow(table.Row{"Scheme", r.Scheme})
+	t.AppendRow(table.Row{"provider", r.Provider})
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"host", gru.GetHost(r.Url)})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"repoPath", gru.GetRepoPath(r.Url)})
+	t.AppendRow(table.Row{"repo-path", gru.GetRepoPath(r.Url)})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"repoName", gru.GetRepoName(gru.GetRepoPath(r.Url))})
+	t.AppendRow(table.Row{"repo-name", gru.GetRepoName(gru.GetRepoPath(r.Url))})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"Branch", r.Branch})
+	t.AppendRow(table.Row{"branch", r.Branch})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"Url-web", r.GetWebUrl()})
+	t.AppendRow(table.Row{"url-web", r.GetWebUrl()})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"Url-remote", r.GetRemUrl()})
+	t.AppendRow(table.Row{"url-remote", r.GetRemUrl()})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"Url-commits", r.GetCommitsUrl()})
+	t.AppendRow(table.Row{"url-commits", r.GetCommitsUrl()})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"Url-branches", r.GetBranchesUrl()})
+	t.AppendRow(table.Row{"url-branches", r.GetBranchesUrl()})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"Url-tags", r.GetTagsUrl()})
+	t.AppendRow(table.Row{"url-tags", r.GetTagsUrl()})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"Url-releases", r.GetReleasesUrl()})
+	t.AppendRow(table.Row{"url-releases", r.GetReleasesUrl()})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"Url-pipelines", r.GetPipelinesUrl()})
+	t.AppendRow(table.Row{"url-pipelines", r.GetPipelinesUrl()})
 	t.AppendSeparator()
 	t.Render()
 	println("")
