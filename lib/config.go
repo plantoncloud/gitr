@@ -57,12 +57,12 @@ func (g *GitrConfig) Get() *GitrConfig {
 	return g
 }
 
-func (g *GitrConfig) GetScmProvider(hostname string) (ScmProvider, error) {
+func (g *GitrConfig) GetScmSystem(hostname string) (*ScmSystem, error) {
 	g.loadConfig()
 	for _, scmSystem := range g.ScmSystems {
 		if scmSystem.Hostname == hostname {
-			return scmSystem.Provider, nil
+			return &scmSystem, nil
 		}
 	}
-	return "", errors.New("scm provider not found for hostname " + hostname + " in ~/.gitr.yaml")
+	return nil, errors.New("scm provider not found for hostname " + hostname + " in ~/.gitr.yaml")
 }

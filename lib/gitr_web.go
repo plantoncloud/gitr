@@ -27,10 +27,11 @@ func ScanRepo(dir string) *GitrWeb {
 		r.Branch = gu.GetGitBranch(repo)
 		r.Scheme = "https"
 		c := &GitrConfig{}
-		r.Provider, err = c.GetScmProvider(gtu.GetHost(r.Url))
+		scmSystem, err := c.GetScmSystem(gtu.GetHost(r.Url))
 		if err != nil {
 			log.Fatal(err)
 		}
+		r.Provider = scmSystem.Provider
 	}
 	return r
 }
