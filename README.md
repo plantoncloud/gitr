@@ -1,6 +1,6 @@
 # gitr(Git Rapid): The missing link between Git CLI and SCM Providers
 
-Tool to navigate to important features of SCM efficiently right from the command line.
+`gitr` reduces a ton of clicking and waiting for the git repo web pages to load by **taking you directly** to the page that you would like to see right from the command line. You may think that it's not a lot of waiting but trust me, you will notice the difference once you start using `gitr`.
 
 ### Supported Platforms
 
@@ -235,4 +235,4 @@ brew untap swarupdonepudi/homebrew-gitr
 
 ### Contributions
 
-I built `gitr` to share my passion for extreme productivity with other productivity geeks. Life is too short, and I ain't wasting time clicking and typing around that does not return any value. `gitr` just does that, reduces a ton of clicking and waiting for the page to load by taking you directly to the page that you would like to see right from the command line. For those of you who share the same passion, I hope you find this project both useful and interesting. I am also pretty sure that productivity geeks are never content and will always look for more. So, if you see opportunities to improve this, I will be a happy man to see new issues and pull-requests.
+I built `gitr` to share my passion for extreme productivity with other productivity geeks. Life is too short, and I ain't wasting time clicking and typing around that does not return any value. For those of you who share the same passion, I hope you find this project both useful and interesting. I am also pretty sure that productivity geeks are never content and will always look for more. So, if you see opportunities to improve this, I will be a happy man to see new issues and pull-requests.
