@@ -18,7 +18,7 @@ func openBrowser(url string) {
 	}
 }
 
-func (h *cmdHandler) remoteRepoHandler(handler func(cmd *cobra.Command, args []string)) func(cmd *cobra.Command, args []string) {
+func (h *cmdHandler) gitrWebHandler(handler func(cmd *cobra.Command, args []string)) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		h.r = gitr.ScanRepo(h.dir)
 		if viper.GetBool("debug") {

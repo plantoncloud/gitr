@@ -15,7 +15,7 @@ var h = &cmdHandler{dir: getPwd()}
 var branches = &cobra.Command{
 	Use:   "branches",
 	Short: "open branches on scm web interface",
-	Run:   h.remoteRepoHandler(h.branches),
+	Run:   h.gitrWebHandler(h.branches),
 }
 
 var clone = &cobra.Command{
@@ -27,50 +27,50 @@ var clone = &cobra.Command{
 var commits = &cobra.Command{
 	Use:   "commits",
 	Short: "open commits on scm web interface",
-	Run:   h.remoteRepoHandler(h.commits),
+	Run:   h.gitrWebHandler(h.commits),
 }
 
 var issues = &cobra.Command{
 	Use:   "issues",
 	Short: "open issues on scm web interface",
-	Run:   h.remoteRepoHandler(h.issues),
+	Run:   h.gitrWebHandler(h.issues),
 }
 
 var pipelines = &cobra.Command{
 	Use:     "pipelines",
 	Short:   "open pipelines on scm web interface",
 	Aliases: []string{"pipe"},
-	Run:     h.remoteRepoHandler(h.pipelines),
+	Run:     h.gitrWebHandler(h.pipelines),
 }
 
 var prs = &cobra.Command{
 	Use:   "prs",
 	Short: "open prs/mrs on scm web interface",
-	Run:   h.remoteRepoHandler(h.prs),
+	Run:   h.gitrWebHandler(h.prs),
 }
 
 var releases = &cobra.Command{
 	Use:   "releases",
 	Short: "open releases on scm web interface",
-	Run:   h.remoteRepoHandler(h.releases),
+	Run:   h.gitrWebHandler(h.releases),
 }
 
 var rem = &cobra.Command{
 	Use:   "rem",
 	Short: "opens the local branch of the repo on the scm web interface",
-	Run:   h.remoteRepoHandler(h.rem),
+	Run:   h.gitrWebHandler(h.rem),
 }
 
 var tags = &cobra.Command{
 	Use:   "tags",
 	Short: "open tags on scm web interface",
-	Run:   h.remoteRepoHandler(h.tags),
+	Run:   h.gitrWebHandler(h.tags),
 }
 
 var web = &cobra.Command{
 	Use:   "web",
 	Short: "open repo on scm web interface",
-	Run:   h.remoteRepoHandler(h.web),
+	Run:   h.gitrWebHandler(h.web),
 }
 
 func init() {
