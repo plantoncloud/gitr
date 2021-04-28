@@ -1,5 +1,23 @@
 # gitr(git rapid): the missing link between git cli and web browsers
 
+**tl;dr** in short, gitr does this:
+
+if you are in iterm inside a subdirectory of a git repo and you want to see the pull requests on that repo?
+
+*before gitr:*
+
+1. open the web browser
+2. go to gitlab.yourcompany.com
+3. search for that repo or visually locate the repo on the starred projects
+4. click on the repo
+5. after the home page is loaded then locate the icon the page to go to the pull requests section.
+
+*with gitr:*
+
+1. gitr prs
+
+> same for tags, releases, pipelines, issues, branches, commits etc...
+
 `gitr` reduces a ton of clicking and waiting for the git repo web pages to load by **taking you directly** to the page that you would like to see right from the command line. You may think that it's not a lot of waiting but trust me, you will notice the difference once you start using `gitr`.
 
 `gitr` relies on the contents of `.git` folder and combines it with the provider(think of gitlab, github and bitbucket) knowledge that is built into it to smartly navigate you to the right web page of your repo right from the command line.
@@ -15,7 +33,7 @@ brew tap swarupdonepudi/homebrew-gitr
 brew install gitr
 ```
 
-#### windows
+#### windows & linux
 
 You can download the binary directly from the [releases section of this repo](https://github.com/swarupdonepudi/gitr/releases)
 
