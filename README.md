@@ -2,6 +2,8 @@
 
 `gitr` reduces a ton of clicking and waiting for the git repo web pages to load by **taking you directly** to the page that you would like to see right from the command line. You may think that it's not a lot of waiting but trust me, you will notice the difference once you start using `gitr`.
 
+`gitr` relies on the contents of `.git` folder and combines it with the provider(think of gitlab, github and bitbucket) knowledge that is built into it to smartly navigate you to the right web page of your repo right from the command line.
+
 ### Supported Platforms
 
 `gitr` can run on linux, windows and mac systems
