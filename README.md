@@ -4,40 +4,48 @@ Tool to navigate to important features of SCM efficiently right from the command
 
 ### Supported Platforms
 
-`gitr` can be installed on any operating system, and it is written in golang
+`gitr` can run on linux, windows and mac systems
 
 ### Install
 
-#### Mac
-
+#### mac
 
 ```
 brew tap swarupdonepudi/homebrew-gitr
 brew install gitr
 ```
 
-#### Windows
+#### windows
 
 Coming Soon.
 
-### Examples
+### Features
+
+`gitr` has two features
+
+1. Open a repo and different parts of a repo in web browser from command line
+2. Clone a repository by creating the directories in the clone url
+
+#### Examples for Opening repo in web browser
 
 You can open the following features of your git repo on SCM Web Interface right from the command line
 
-* branches
-* prs
-* commits
-* issues
-* pipelines
-* releases
-* tags
+* web - open the repo home page on web
+* rem - open the local branch on web
+* prs - open prs/mrs on web
+* branches - open branches on web
+* commits - open the commits of the local branch on web
+* issues - open issues on web
+* pipelines - open pipelines/actions on web
+* releases - open releases on web
+* tags - open tags on web
 
 > The below commands will only work when executed from inside the git repo folder
 
 Open the home page of the repo on SCM Web Interface
 
 ```
-gitr rem
+gitr web
 ```
 
 Open the Pull Requests on SCM Web Interface
@@ -82,6 +90,22 @@ Open the Tags on SCM Web Interface
 gitr tags
 ```
 
+#### Examples for cloning repo
+
+This might not be very useful for repositories hosted on github but is very handy for repositories hosted on gitlab.
+
+clone a repo without creating the directories in the url path
+
+```shell
+gitr clone clone git@gitlab.zgtools.net:devex/cicd/bitbucket-archiver.git
+```
+
+clone a repo creating the directories in the url path
+
+```shell
+gitr clone clone git@gitlab.zgtools.net:devex/cicd/bitbucket-archiver.git -c
+```
+
 ### Support for Enterprise Editions
 
 `gitr` can work with enterprise deployments of Github, Gitlab and Bitbucket(Datacenter) editions as well. 
@@ -90,20 +114,26 @@ You need to help `gitr` figure out what SCM system you are using. You can do so 
 
 Example:
 
-```
+```yaml
 scmSystems:
-  - hostname: code.mycompany.net
-    scm: gitlab
+  - hostname: gitlab.mycompany.net
+    provider: gitlab
+    defaultBranch: main
 ```
 
-If you are working with differrent SCM enterprise deployments, you can add all of them to `~/.gitr.yaml` file
+If you are working with different SCM enterprise deployments, you can add all of them to `~/.gitr.yaml` file
 
-```
+```yaml
 scmSystems:
   - hostname: github.mycompany.com
-    scm: github
-  - hostname: stash.code.mycompany.net
-    scm: bitbucket
+    provider: github
+    defaultBranch: master
+  - hostname: bitbucket.mycompany.com
+    provider: bitbucket
+    defaultBranch: master
+  - hostname: gitlab.mycompany.com
+    provider: gitlab
+    defaultBranch: main
 ```
 
 Below is the list of valid values for `scmSystems[].scm` in `~/.gitr.yaml` 
@@ -111,6 +141,29 @@ Below is the list of valid values for `scmSystems[].scm` in `~/.gitr.yaml`
 * gitlab
 * github
 * bitbucket
+
+Config also support few additional options for cloning repos
+
+| config                     | default | description                                                                                          |
+|----------------------------|---------|------------------------------------------------------------------------------------------------------|
+| clone.scmHome              |  ""     | if this value is set, then gitr clone will always clone the repos to this path                |
+| clone.alwaysCreDir         |  false  | if this is set to true, then gitr clone will always create the directories present in the clone url  |
+| clone.includeHostForCreDir |  false  | if this is set to true, then gitr clone will always prefix the hostname to the clone path            |
+
+```yaml
+clone:
+  scmHome: /Users/swarupd/scm
+  alwaysCreDir: true
+  includeHostForCreDir: false
+scmSystems:
+  - hostname: github.mycompany.com
+    provider: github
+    defaultBranch: master
+  - hostname: gitlab.mycompany.com
+    provider: gitlab
+    defaultBranch: main
+```
+
 
 ### Cleanup
 

@@ -1,39 +1,45 @@
 package lib
 
 import (
+	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/jedib0t/go-pretty/v6/table"
-	"log"
 	"os"
 )
 
 type GitrClone struct {
-	Url      string
-	Scheme   GitRemoteScheme // http, https or ssh
-	Provider ScmProvider
-	CreDir   bool
+	Url    string
+	CreDir bool
 }
 
 func ParseCloneReq(args []string, creDir bool) *GitrClone {
 	return &GitrClone{
-		Url:      args[0],
-		Scheme:   "some-scheme",
-		Provider: "some-provider",
-		CreDir:   creDir,
+		Url:    args[0],
+		CreDir: creDir,
 	}
 }
 
 func (c *GitrClone) PrintInfo() {
+	gc := &GitrConfig{}
+	gru := &GitrUtil{}
+	scmProvider, err := gc.GetScmProvider(gru.GetHost(c.Url))
+	if err != nil {
+		scmProvider = "error"
+	}
 	println("")
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendRow(table.Row{"url", c.Url})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"create-dir", c.CreDir})
+	t.AppendRow(table.Row{"create-dir", gc.Clone.AlwaysCreDir || c.CreDir})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"Provider", c.Provider})
+	t.AppendRow(table.Row{"scm-provider", scmProvider})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"Scheme", c.Scheme})
+	t.AppendRow(table.Row{"scm-host", gru.GetHost(c.Url)})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"repo-name", gru.GetRepoName(gru.GetRepoPath(c.Url))})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"clone-path", c.setupClonePath()})
 	t.AppendSeparator()
 	t.Render()
 	println("")
@@ -48,23 +54,33 @@ func (c *GitrClone) Clone() {
 			err = c.httpClone()
 		}
 		if err != nil {
-			log.Fatal("error cloning the repo", err)
+			fmt.Printf("error cloning the repo. %v\n", err)
 		}
 	} else {
-		print("ssh clone using browser urls not implemented yet")
+		print("ssh clone using browser urls not support")
 	}
 }
 
 func (c *GitrClone) setupClonePath() string {
+	gc := &GitrConfig{}
 	gru := &GitrUtil{}
-	if c.CreDir {
-		os.MkdirAll(gru.GetRepoPath(c.Url), os.ModePerm)
-		return gru.GetRepoPath(c.Url)
+	clonePath := ""
+	if gc.Get().Clone.AlwaysCreDir {
+		if gc.Get().Clone.IncludeHostForCreDir {
+			clonePath = fmt.Sprintf("%s/%s", gru.GetHost(c.Url), gru.GetRepoPath(c.Url))
+		} else {
+			clonePath = gru.GetRepoPath(c.Url)
+		}
+	} else if c.CreDir {
+		clonePath = gru.GetRepoPath(c.Url)
 	} else {
-		repoName := gru.GetRepoName(gru.GetRepoPath(c.Url))
-		os.Mkdir(repoName, os.ModePerm)
-		return repoName
+		clonePath = gru.GetRepoName(gru.GetRepoPath(c.Url))
 	}
+	if gc.Get().Clone.ScmHome != "" {
+		clonePath = fmt.Sprintf("%s/%s", gc.Get().Clone.ScmHome, clonePath)
+	}
+	os.MkdirAll(clonePath, os.ModePerm)
+	return clonePath
 }
 
 func (c *GitrClone) httpClone() error {
