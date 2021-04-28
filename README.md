@@ -4,8 +4,6 @@
 
 `gitr` relies on the contents of `.git` folder and combines it with the provider(think of gitlab, github and bitbucket) knowledge that is built into it to smartly navigate you to the right web page of your repo right from the command line.
 
-### Supported Platforms
-
 `gitr` can run on linux, windows and mac systems
 
 ### Install
@@ -26,7 +24,7 @@ You can download the binary directly from the [releases section of this repo](ht
 `gitr` has two features
 
 1. Open a repo and different parts of a repo in web browser from command line
-2. Clone a repository by creating the directories in the clone url
+2. Clone a repository by creating the directories in the clone url. This feature is particularly very useful if you are using gitlab and gitlab supports nested groups.
 
 #### Examples for Opening repo in web browser
 
@@ -99,13 +97,13 @@ This might not be very useful for repositories hosted on github but is very hand
 clone a repo without creating the directories in the url path
 
 ```shell
-gitr clone clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git
+gitr clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git
 ```
 
 clone a repo creating the directories in the url path
 
 ```shell
-gitr clone clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git -c
+gitr clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git -c
 ```
 
 Config also support few additional options for cloning repos
