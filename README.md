@@ -17,7 +17,7 @@ brew install gitr
 
 #### windows
 
-Coming Soon.
+You can download the binary directly from the [releases section of this repo](https://github.com/swarupdonepudi/gitr/releases)
 
 ### Features
 
