@@ -106,9 +106,31 @@ clone a repo creating the directories in the url path
 gitr clone clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git -c
 ```
 
+Config also support few additional options for cloning repos
+
+| config                     | default | description                                                                                          |
+|----------------------------|---------|------------------------------------------------------------------------------------------------------|
+| clone.scmHome              |  ""     | if this value is set, then gitr clone will always clone the repos to this path                |
+| clone.alwaysCreDir         |  false  | if this is set to true, then gitr clone will always create the directories present in the clone url  |
+| clone.includeHostForCreDir |  false  | if this is set to true, then gitr clone will always prefix the hostname to the clone path            |
+
+```yaml
+clone:
+  scmHome: /Users/swarup/scm
+  alwaysCreDir: true
+  includeHostForCreDir: false
+scmSystems:
+  - hostname: github.mycompany.com
+    provider: github
+    defaultBranch: master
+  - hostname: gitlab.mycompany.com
+    provider: gitlab
+    defaultBranch: main
+```
+
 ### Support for Enterprise Editions
 
-`gitr` can work with enterprise deployments of Github, Gitlab and Bitbucket(Datacenter) editions as well. 
+`gitr` can work with enterprise deployments of Github, Gitlab and Bitbucket(Datacenter) editions as well.
 
 You need to help `gitr` figure out what SCM system you are using. You can do so by simply creating `~/.gitr.yaml` file and adding *your* SCM hostname and SCM Provider to the config file.
 
@@ -136,34 +158,11 @@ scmSystems:
     defaultBranch: main
 ```
 
-Below is the list of valid values for `scmSystems[].scm` in `~/.gitr.yaml` 
+Below is the list of valid values for `scmSystems[].scm` in `~/.gitr.yaml`
 
 * gitlab
 * github
 * bitbucket
-
-Config also support few additional options for cloning repos
-
-| config                     | default | description                                                                                          |
-|----------------------------|---------|------------------------------------------------------------------------------------------------------|
-| clone.scmHome              |  ""     | if this value is set, then gitr clone will always clone the repos to this path                |
-| clone.alwaysCreDir         |  false  | if this is set to true, then gitr clone will always create the directories present in the clone url  |
-| clone.includeHostForCreDir |  false  | if this is set to true, then gitr clone will always prefix the hostname to the clone path            |
-
-```yaml
-clone:
-  scmHome: /Users/swarup/scm
-  alwaysCreDir: true
-  includeHostForCreDir: false
-scmSystems:
-  - hostname: github.mycompany.com
-    provider: github
-    defaultBranch: master
-  - hostname: gitlab.mycompany.com
-    provider: gitlab
-    defaultBranch: main
-```
-
 
 ### Cleanup
 
