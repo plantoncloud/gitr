@@ -152,7 +152,7 @@ Config also support few additional options for cloning repos
 
 ```yaml
 clone:
-  scmHome: /Users/swarupd/scm
+  scmHome: /Users/swarup/scm
   alwaysCreDir: true
   includeHostForCreDir: false
 scmSystems:
