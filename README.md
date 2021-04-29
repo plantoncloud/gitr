@@ -2,7 +2,9 @@
 
 **tl;dr** in short, gitr does this:
 
-if you are in iterm inside a subdirectory of a git repo, and you want to see the pull requests on that repo?
+You are in your terminal inside a subdirectory of a git repo, and you just pushed a commit. Now you want to see what
+your readme looks like on the web page of the repo, or you want to see if the pipeline has been triggered for this
+commit.
 
 *before gitr:*
 
@@ -10,38 +12,47 @@ if you are in iterm inside a subdirectory of a git repo, and you want to see the
 2. go to gitlab.com
 3. search for the repo or visually locate the repo on the home page
 4. click on the repo
-5. after the home page is loaded then locate the icon on the page to go to the pull requests section and click on it
+5. after the home page is loaded then locate the icon on the page to go to the pipelines section and click on it
 
 *with gitr:*
 
 in iterm, from any subdirectory under any git repo
 
-1. gitr prs
+1. `gitr web` to check readme or `gitr pipe` to check pipeline
 
-> same for tags, releases, pipelines, issues, branches, commits etc...
+> same for prs, tags, releases, issues, branches, commits etc...
+
+* [why should i use it?](#why-should-i-use-it)
+* [install](#install)
+* [supported providers](#scm-providers)
+* [features](#features)
+    * [gitr web](#gitr-web)
+    * [gitr clone](#gitr-clone)
+* [gitr config](#config-file)
+* [on-prem scm deployments](#on-prem-scm-deployments)
+* [dry-run](#dry-run)
+* [aliases](#aliases)
+* [cleanup](#cleanup)
+* [contribute](#contribute)
+
+# why should i use it?
 
 `gitr` reduces a ton of clicking and waiting for the git repo web pages to load by **taking you directly** to the page
-that you would like to see right from the command line. You may think that it's not a lot of waiting but trust me, you
-will notice the difference once you start using `gitr`.
+that you would like to see right from the command line. You may think that it's not a lot of waiting but trust me, and
+it adds up, and you will notice the difference once you start using `gitr`.
 
 `gitr` relies on the contents of `.git` folder and combines it with the provider(think of gitlab, github and bitbucket)
 knowledge that is built into it to smartly navigate you to the right web page of your repo right from the command line.
 
-`gitr` can run on linux, windows and mac systems
-
 ### install
 
-#### mac
+`gitr` can be easily installed on mac using brew. While it can also be installed on linux, windows using
+the [binary](https://github.com/swarupdonepudi/gitr/releases), it has not been tested on those platforms.
 
 ```
 brew tap swarupdonepudi/homebrew-gitr
 brew install gitr
 ```
-
-#### windows & linux
-
-`gitr` binaries can be downloaded directly from
-the [releases section of this repo](https://github.com/swarupdonepudi/gitr/releases)
 
 ### scm providers
 
@@ -53,12 +64,10 @@ the [releases section of this repo](https://github.com/swarupdonepudi/gitr/relea
 
 ### features
 
-`gitr` has two features
-
-1. gitr web - open a repo and different parts of a repo in web browser from command line
-2. gitr clone - this features makes it possible to organize git repos cloned from different scm providers and also
-   retain their hierarchy on the scm provider on laptops which is not possible with the default `git clone <clone-url>`.
-   This is particularly useful for gitlab as it supports a nested hierarchy.
+| feature       | description                                                                           |
+|---------------|---------------------------------------------------------------------------------------|
+| gitr web      |  open a repo and different parts of a repo in web browser from command line           | 
+| gitr clone    |  organize git repos cloned from different scm providers and also retain their hierarchy on the scm provider on laptops which is not possible with the default `git clone <clone-url>`. This is particularly useful for gitlab as it supports a nested hierarchy.
 
 #### gitr web
 
@@ -155,7 +164,7 @@ github.com
         └── README.md
 ```
 
-### .gitr.yaml config file
+### config file
 
 Below is the config options supported in `~/.gitr.yaml`
 
@@ -178,6 +187,36 @@ clone:
 scmSystems:
   - hostname: github.mycompany.com
     provider: github
+    defaultBranch: master
+  - hostname: gitlab.mycompany.com
+    provider: gitlab
+    defaultBranch: main
+```
+
+### on-prem scm deployments
+
+`gitr` can work with on-prem deployments of the supported scm providers i.e github, gitlab and bitbucket.
+
+add the below shown config to `~/.gitr.yaml` file
+
+example:
+
+```yaml
+scmSystems:
+  - hostname: gitlab.mycompany.net
+    provider: gitlab
+    defaultBranch: main
+```
+
+multiple on-prem deployments can be added to `~/.gitr.yaml` file
+
+```yaml
+scmSystems:
+  - hostname: github.mycompany.com
+    provider: github
+    defaultBranch: master
+  - hostname: bitbucket.mycompany.com
+    provider: bitbucket
     defaultBranch: master
   - hostname: gitlab.mycompany.com
     provider: gitlab
@@ -245,34 +284,23 @@ available for both web and clone features.
 +------------+---------------------------------------------------+
 ```
 
-### supports on-prem deployments
+### aliases
 
-`gitr` can work with on-prem deployments of the supported scm providers i.e github, gitlab and bitbucket.
+if you are interested in typing fewer keystrokes, add the below aliases to your `.zshrc` or `.bashrc` file.
 
-add the below shown config to `~/.gitr.yaml` file
+this will obviate the need to type `gitr` everytime you want to use it, just type the sub command ex: pipe.
 
-example:
-
-```yaml
-scmSystems:
-  - hostname: gitlab.mycompany.net
-    provider: gitlab
-    defaultBranch: main
-```
-
-multiple on-prem deployments can be added to `~/.gitr.yaml` file
-
-```yaml
-scmSystems:
-  - hostname: github.mycompany.com
-    provider: github
-    defaultBranch: master
-  - hostname: bitbucket.mycompany.com
-    provider: bitbucket
-    defaultBranch: master
-  - hostname: gitlab.mycompany.com
-    provider: gitlab
-    defaultBranch: main
+```shell
+alias clone="gitr clone "
+alias web="gitr web "
+alias pipe="gitr pipe "
+alias rem="gitr rem "
+alias commits="gitr commits "
+alias prs="gitr prs "
+alias issues="gitr issues "
+alias releases="gitr releases "
+alias tags="gitr tags "
+alias branches="gitr branches "
 ```
 
 ### cleanup
@@ -282,7 +310,7 @@ brew uninstall gitr
 brew untap swarupdonepudi/homebrew-gitr
 ```
 
-### contributions
+### contribute
 
 `gitr` was built to share my passion for extreme productivity with other productivity geeks. Life is too short, and I
 ain't wasting time clicking and typing around that does not return any value. For those of you who share the same
