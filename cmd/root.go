@@ -16,8 +16,7 @@ type input struct {
 var rootCmd = &cobra.Command{
 	Use:   "gitr",
 	Short: "git rapid - the missing link b/w git cli & scm providers",
-	Long: `tool to navigate to important features of scm efficiently right from the command line.
-no more searching for clone url, simply use the browser url to clone repos.`,
+	Long:  `save time(a ton) by opening git repos on web browser right from the command line`,
 }
 
 func Execute() {

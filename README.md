@@ -66,17 +66,17 @@ the [releases section of this repo](https://github.com/swarupdonepudi/gitr/relea
 
 > note: the below commands will work only when executed from root or subdirectory of any git repo
 
-| command         |  description                                                    |
-|-----------------|-----------------------------------------------------------------|
-| gitr web        |  opens the home page of the repo in the browser                 |
-| gitr rem        |  opens the local checkout branch of the repo in the browser     |
-| gitr prs        |  opens the prs/mrs of the repo in the browser                   |
-| gitr pipe       |  opens the pipelines/actions of the repo in the browser         |
-| gitr issues     |  opens the issues of the repo in the browser                    |
-| gitr releases   |  opens the releases of the repo in the browser                  |
-| gitr tags       |  opens the tags of the repo in the browser                      |
-| gitr commits    |  opens the commits of the local branch of repo in the browser   |
-| gitr branches   |  opens the branches of the repo in the browser                  |
+| command         |  description                                               |
+|-----------------|------------------------------------------------------------|
+| gitr web        |  open home page of the repo in the browser                 |
+| gitr rem        |  open local checkout branch of the repo in the browser     |
+| gitr prs        |  open prs/mrs of the repo in the browser                   |
+| gitr pipe       |  open pipelines/actions of the repo in the browser         |
+| gitr issues     |  open issues of the repo in the browser                    |
+| gitr releases   |  open releases of the repo in the browser                  |
+| gitr tags       |  open tags of the repo in the browser                      |
+| gitr commits    |  open commits of the local branch of repo in the browser   |
+| gitr branches   |  open branches of the repo in the browser                  |
 
 #### gitr clone
 
