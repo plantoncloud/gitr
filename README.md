@@ -40,7 +40,7 @@ brew install gitr
 
 #### windows & linux
 
-You can download the binary directly from
+`gitr` binaries can be downloaded directly from
 the [releases section of this repo](https://github.com/swarupdonepudi/gitr/releases)
 
 ### scm providers
@@ -56,18 +56,17 @@ the [releases section of this repo](https://github.com/swarupdonepudi/gitr/relea
 `gitr` has two features
 
 1. gitr web - open a repo and different parts of a repo in web browser from command line
-2. gitr clone - if you are looking for a way to organize your git repos on your machine then the
-   default `git clone <clone-url>` is not very helpful. `gitr` helps you better organize the repositories that you clone
-   from different scm providers and also retain their hierarchy on the scm provider. This is particularly useful for
-   gitlab as it supports a nested hierarchy.
+2. gitr clone - this features makes it possible to organize git repos cloned from different scm providers and also
+   retain their hierarchy on the scm provider on laptops which is not possible with the default `git clone <clone-url>`.
+   This is particularly useful for gitlab as it supports a nested hierarchy.
 
 #### gitr web
 
-you can open the following parts of your git repo in the web browser right from the command line
+`gitr` opens the following parts of your git repo in the web browser right from the command line
 
-> note: the below commands will work only when executed from subdirectory of any git repo folder
+> note: the below commands will work only when executed from root or subdirectory of any git repo
 
-| command         | description                                                     |
+| command         |  description                                                    |
 |-----------------|-----------------------------------------------------------------|
 | gitr web        |  opens the home page of the repo in the browser                 |
 | gitr rem        |  opens the local checkout branch of the repo in the browser     |
@@ -81,18 +80,18 @@ you can open the following parts of your git repo in the web browser right from 
 
 #### gitr clone
 
-It may not seem like a useful feature at first. If you would like every git repo that you clone to land in a
+This may not seem like a very useful feature at first. If you would like every git repo that you clone to land in a
 deterministic location then use `gitr clone <clone-url>` instead of `git clone <clone-url>`.
 
-By default `gitr clone` does the same exact thing as `git clone`
+By default `gitr clone` does the same exact thing as `git clone`.
 
-If you want to clone the repo to the same folder structure that your repo is on the scm then
-use `gitr clone <clone-url> -c`
+To mimic the folder structure that your repo is on the scm then use `-c` flag.
 
-So if you run `gitr clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git -c` from `~/scm` folder then the repo is cloned to `~/scm/subgroup1/subgroup2/repo` location.
+Running `gitr clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git -c` command from `~/scm` folder, the
+repo is cloned to `~/scm/subgroup1/subgroup2/repo` location.
 
-If you are even more finicky about organizing the repos, you add the below configuration to `~/.gitr.yaml`, then
-every single repository that you clone will be cloned to the location that mimics your scm provider.
+Adding the below configuration to `~/.gitr.yaml`, every repo cloned using `gitr` will be cloned to the location that
+mimics scm provider.
 
 ```yaml
 clone:
@@ -110,7 +109,7 @@ the scm under `scmHome`.
 
 Because `alwaysCreDir` is set to `true`, `gitr` will clone the repo to the same path as that is in the `<clone-url>`.
 
-When you run the below command, regardless of the current location in iterm:
+example:
 
 ```shell
 gitr clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git
