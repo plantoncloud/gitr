@@ -253,10 +253,9 @@ Here is a sample output of the `--dry` options passed to clone command
 
 `gitr` can work with on-prem deployments of the supported scm providers i.e github, gitlab and bitbucket.
 
-You need to help `gitr` figure out what SCM system you are using. You can do so by simply creating `~/.gitr.yaml` file
-and adding *your* SCM hostname and SCM Provider to the config file.
+add the below shown config to `~/.gitr.yaml` file
 
-Example:
+example:
 
 ```yaml
 scmSystems:
@@ -265,7 +264,7 @@ scmSystems:
     defaultBranch: main
 ```
 
-If you are working with different SCM enterprise deployments, you can add all of them to `~/.gitr.yaml` file
+multiple on-prem deployments can be added to `~/.gitr.yaml` file
 
 ```yaml
 scmSystems:
@@ -280,12 +279,6 @@ scmSystems:
     defaultBranch: main
 ```
 
-Below is the list of valid values for `scmSystems[].scm` in `~/.gitr.yaml`
-
-* gitlab
-* github
-* bitbucket
-
 ### cleanup
 
 ```
@@ -295,8 +288,9 @@ brew untap swarupdonepudi/homebrew-gitr
 
 ### contributions
 
-I built `gitr` to share my passion for extreme productivity with other productivity geeks. Life is too short, and I
+`gitr` was built to share my passion for extreme productivity with other productivity geeks. Life is too short, and I
 ain't wasting time clicking and typing around that does not return any value. For those of you who share the same
-passion, I hope you find this project both useful and interesting. I am also pretty sure that productivity geeks are
-never content and will always look for more. So, if you see opportunities to improve this, I will be a happy man to see
-new issues and pull-requests.
+passion, I hope you find this project both useful and interesting.
+
+I am also pretty sure that productivity geeks are never content and will always look for more. So, if you see
+opportunities to improve this, I will be a happy man to see new issues and pull-requests.
