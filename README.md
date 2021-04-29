@@ -6,11 +6,11 @@ if you are in iterm inside a subdirectory of a git repo, and you want to see the
 
 *before gitr:*
 
-1. open the web browser
-2. go to gitlab.yourcompany.com
-3. search for that repo or visually locate the repo on the starred projects
+1. open web browser
+2. go to gitlab.com
+3. search for the repo or visually locate the repo on the home page
 4. click on the repo
-5. after the home page is loaded then locate the icon the page to go to the pull requests section.
+5. after the home page is loaded then locate the icon on the page to go to the pull requests section and click on it
 
 *with gitr:*
 
@@ -20,13 +20,16 @@ in iterm, from any subdirectory under any git repo
 
 > same for tags, releases, pipelines, issues, branches, commits etc...
 
-`gitr` reduces a ton of clicking and waiting for the git repo web pages to load by **taking you directly** to the page that you would like to see right from the command line. You may think that it's not a lot of waiting but trust me, you will notice the difference once you start using `gitr`.
+`gitr` reduces a ton of clicking and waiting for the git repo web pages to load by **taking you directly** to the page
+that you would like to see right from the command line. You may think that it's not a lot of waiting but trust me, you
+will notice the difference once you start using `gitr`.
 
-`gitr` relies on the contents of `.git` folder and combines it with the provider(think of gitlab, github and bitbucket) knowledge that is built into it to smartly navigate you to the right web page of your repo right from the command line.
+`gitr` relies on the contents of `.git` folder and combines it with the provider(think of gitlab, github and bitbucket)
+knowledge that is built into it to smartly navigate you to the right web page of your repo right from the command line.
 
 `gitr` can run on linux, windows and mac systems
 
-### Install
+### install
 
 #### mac
 
@@ -37,102 +40,136 @@ brew install gitr
 
 #### windows & linux
 
-You can download the binary directly from the [releases section of this repo](https://github.com/swarupdonepudi/gitr/releases)
+You can download the binary directly from
+the [releases section of this repo](https://github.com/swarupdonepudi/gitr/releases)
 
-### Features
+### scm providers
+
+`gitr` currently, supports the following scm providers. We can always add support for more if there is demand.
+
+* github
+* gitlab
+* bitbucket
+
+### features
 
 `gitr` has two features
 
-1. Open a repo and different parts of a repo in web browser from command line
-2. Clone a repository by creating the directories in the clone url. This feature is particularly very useful if you are using gitlab and gitlab supports nested groups.
+1. gitr web - open a repo and different parts of a repo in web browser from command line
+2. gitr clone - if you are looking for a way to organize your git repos on your machine then the
+   default `git clone <clone-url>` is not very helpful. `gitr` helps you better organize the repositories that you clone
+   from different scm providers and also retain their hierarchy on the scm provider. This is particularly useful for
+   gitlab as it supports a nested hierarchy.
 
-#### Examples for Opening repo in web browser
+#### gitr web
 
-You can open the following features of your git repo on SCM Web Interface right from the command line
+you can open the following parts of your git repo in the web browser right from the command line
 
-* web - open the repo home page on web
-* rem - open the local branch on web
-* prs - open prs/mrs on web
-* branches - open branches on web
-* commits - open the commits of the local branch on web
-* issues - open issues on web
-* pipelines - open pipelines/actions on web
-* releases - open releases on web
-* tags - open tags on web
+> note: the below commands will work only when executed from subdirectory of any git repo folder
 
-> The below commands will only work when executed from inside the git repo folder
+| command         | description                                                     |
+|-----------------|-----------------------------------------------------------------|
+| gitr web        |  opens the home page of the repo in the browser                 |
+| gitr rem        |  opens the local checkout branch of the repo in the browser     |
+| gitr prs        |  opens the prs/mrs of the repo in the browser                   |
+| gitr pipe       |  opens the pipelines/actions of the repo in the browser         |
+| gitr issues     |  opens the issues of the repo in the browser                    |
+| gitr releases   |  opens the releases of the repo in the browser                  |
+| gitr tags       |  opens the tags of the repo in the browser                      |
+| gitr commits    |  opens the commits of the local branch of repo in the browser   |
+| gitr branches   |  opens the branches of the repo in the browser                  |
 
-Open the home page of the repo on SCM Web Interface
+#### gitr clone
 
-```
-gitr web
-```
+It may not seem like a useful feature at first. If you would like every git repo that you clone to land in a
+deterministic location then use `gitr clone <clone-url>` instead of `git clone <clone-url>`.
 
-Open the Pull Requests on SCM Web Interface
+By default `gitr clone` does the same exact thing as `git clone`
 
-```
-gitr prs
-```
+If you want to clone the repo to the same folder structure that your repo is on the scm then
+use `gitr clone <clone-url> -c`
 
-Open the Branches on SCM Web Interface
+So if you run `gitr clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git -c` from `~/scm` folder then the repo is cloned to `~/scm/subgroup1/subgroup2/repo` location.
 
-```
-gitr branches
-```
+If you are even more finicky about organizing the repos, you add the below configuration to `~/.gitr.yaml`, then
+every single repository that you clone will be cloned to the location that mimics your scm provider.
 
-Open the Commits on SCM Web Interface
-
-```
-gitr commits
-```
-
-Open the Issues on SCM Web Interface
-
-```
-gitr issues
+```yaml
+clone:
+  scmHome: /Users/swarup/scm
+  includeHostForCreDir: false
+  alwaysCreDir: true
+## more config
 ```
 
-Open the Pipelines on SCM Web Interface
+With above config `gitr` will clone all repos to `scmHome` location, regardless of where you
+run `gitr clone <clone-url>` command.
 
-```
-gitr pipe
-```
+Because `includeHostForCreDir` is set to `true`, `gitr` will clone the repo to a folder with the name of the hostname of
+the scm under `scmHome`.
 
-Open the Releases on SCM Web Interface
+Because `alwaysCreDir` is set to `true`, `gitr` will clone the repo to the same path as that is in the `<clone-url>`.
 
-```
-gitr releases
-```
-
-Open the Tags on SCM Web Interface
-
-```
-gitr tags
-```
-
-#### Examples for cloning repo
-
-This might not be very useful for repositories hosted on github but is very handy for repositories hosted on gitlab.
-
-clone a repo without creating the directories in the url path
+When you run the below command, regardless of the current location in iterm:
 
 ```shell
 gitr clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git
 ```
 
-clone a repo creating the directories in the url path
+The repo gets cloned to `{scmHome}/{scmHostname}/{repoPath}/{repoName}`
+i.e `/Users/swarup/scm/gitlab.mycompany.net/parent/subgroup1/subgroup2/repo` location.
+
+Below is a snapshot of a nicely organized directory structure for all repos from different scm systems.
 
 ```shell
-gitr clone git@gitlab.mycompany.net:parent/subgroup1/subgroup2/repo.git -c
+> tree ~/scm
+
+gitlab.com
+└── swarup
+    └── group1
+        └── app-1
+            ├── Dockerfile
+            ├── Makefile
+            ├── README.md
+            ├── main.go
+    └── group2
+        └── sub-group
+            └──app-2
+               ├── Dockerfile
+               ├── Makefile
+               ├── README.md
+               ├── main.go       
+github.com
+└── swarupdonepudi
+    ├── gitr
+    │ ├── go.mod
+    │ ├── lib
+    │ ├── lib_test
+    │ └── main.go
+    └── homebrew-gitr
+        ├── Formula
+        └── README.md
+    ahmetb
+    └── kubectx
+        ├── kubens
+        ├── kubectx
+        └── README.md
 ```
 
-Config also support few additional options for cloning repos
+### .gitr.yaml config file
 
-| config                     | default | description                                                                                          |
-|----------------------------|---------|------------------------------------------------------------------------------------------------------|
-| clone.scmHome              |  ""     | if this value is set, then gitr clone will always clone the repos to this path                |
-| clone.alwaysCreDir         |  false  | if this is set to true, then gitr clone will always create the directories present in the clone url  |
-| clone.includeHostForCreDir |  false  | if this is set to true, then gitr clone will always prefix the hostname to the clone path            |
+Below is the config options supported in `~/.gitr.yaml`
+
+| config                      |  default  | description                                                                                                                             |
+|-----------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| clone.scmHome               |     ""    |  if this value is set, then gitr clone will always clone the repos to this path, regardles of where you run `gitr clone` command from   |
+| clone.alwaysCreDir          |     false |  if this is set to true, then gitr clone will always create the directories present in the clone url                                    |
+| clone.includeHostForCreDir  |     false |  if this is set to true, then gitr clone will always prefix the hostname to the clone path                                              |
+| scmSystems.[].hostname      |     ""    |  hostname of the on-prem deployment of scm system                                                                                       |
+| scmSystems.[].provider      |     ""    |  provider of the on-prem deployment. allowed values are github, gitlab and bitbucket                                                    |
+| scmSystems.[].defaultBranch |     ""    |  this is the value of the default branch configured on the scm                                                                          |
+
+#### example config file
 
 ```yaml
 clone:
@@ -148,11 +185,14 @@ scmSystems:
     defaultBranch: main
 ```
 
-### Dry Run
+### dry Run
 
-Currently `gitr` only supports `github`, `gitlab` and `bitbucket`. Each provider has slight differences in the urls to access different parts of a repo. `gitr` could just work out of the box for a different cloud provider ex: AWS CodeCommit or it may not behave as expected.
+Currently `gitr` only supports `github`, `gitlab` and `bitbucket`. Each provider has slight differences in the urls to
+access different parts of a repo. `gitr` could just work out of the box for a different cloud provider ex: AWS
+CodeCommit or it may not behave as expected.
 
-So, if `gitr` does not work as you expect it to, both for supported providers and other providers, you will be able to see what urls `gitr` produces but using `--dry` option. This option is available for both web and clone features.
+So, if `gitr` does not work as you expect it to, both for supported providers and other providers, you will be able to
+see what urls `gitr` produces but using `--dry` option. This option is available for both web and clone features.
 
 > Note: When `--dry` or `-d` flags are used, gitr will not open up the repo or clone the repo. It simply displays the info to the console that it would use in non-dry mode
 
@@ -210,11 +250,12 @@ Here is a sample output of the `--dry` options passed to clone command
 +------------+---------------------------------------------------+
 ```
 
-### Support for Enterprise Editions
+### supports on-prem deployments
 
-`gitr` can work with enterprise deployments of Github, Gitlab and Bitbucket(Datacenter) editions as well.
+`gitr` can work with on-prem deployments of the supported scm providers i.e github, gitlab and bitbucket.
 
-You need to help `gitr` figure out what SCM system you are using. You can do so by simply creating `~/.gitr.yaml` file and adding *your* SCM hostname and SCM Provider to the config file.
+You need to help `gitr` figure out what SCM system you are using. You can do so by simply creating `~/.gitr.yaml` file
+and adding *your* SCM hostname and SCM Provider to the config file.
 
 Example:
 
@@ -246,13 +287,17 @@ Below is the list of valid values for `scmSystems[].scm` in `~/.gitr.yaml`
 * github
 * bitbucket
 
-### Cleanup
+### cleanup
 
 ```
 brew uninstall gitr
 brew untap swarupdonepudi/homebrew-gitr
 ```
 
-### Contributions
+### contributions
 
-I built `gitr` to share my passion for extreme productivity with other productivity geeks. Life is too short, and I ain't wasting time clicking and typing around that does not return any value. For those of you who share the same passion, I hope you find this project both useful and interesting. I am also pretty sure that productivity geeks are never content and will always look for more. So, if you see opportunities to improve this, I will be a happy man to see new issues and pull-requests.
+I built `gitr` to share my passion for extreme productivity with other productivity geeks. Life is too short, and I
+ain't wasting time clicking and typing around that does not return any value. For those of you who share the same
+passion, I hope you find this project both useful and interesting. I am also pretty sure that productivity geeks are
+never content and will always look for more. So, if you see opportunities to improve this, I will be a happy man to see
+new issues and pull-requests.
