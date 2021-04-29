@@ -184,21 +184,17 @@ scmSystems:
     defaultBranch: main
 ```
 
-### dry Run
+### dry run
 
-Currently `gitr` only supports `github`, `gitlab` and `bitbucket`. Each provider has slight differences in the urls to
-access different parts of a repo. `gitr` could just work out of the box for a different cloud provider ex: AWS
-CodeCommit or it may not behave as expected.
+if `gitr` does not work as expected, it is possible to see what urls `gitr` uses by using `--dry` option. This option is
+available for both web and clone features.
 
-So, if `gitr` does not work as you expect it to, both for supported providers and other providers, you will be able to
-see what urls `gitr` produces but using `--dry` option. This option is available for both web and clone features.
+> note: when `--dry` or `-d` flags are used, gitr will not open up the repo or clone the repo. it simply displays the info to the console that it would use in non-dry mode
 
-> Note: When `--dry` or `-d` flags are used, gitr will not open up the repo or clone the repo. It simply displays the info to the console that it would use in non-dry mode
-
-Here is an example of the output when `--dry or -d` flag is passed to gitr
+* `--dry` flag passed to `gitr web` command
 
 ```shell
-> gitr rem -d
+> gitr web -d
 
 +---------------+-------------------------------------------------------+
 | remote        | git@github.com:swarupdonepudi/gitr.git                |
@@ -229,7 +225,7 @@ Here is an example of the output when `--dry or -d` flag is passed to gitr
 +---------------+-------------------------------------------------------+
 ```
 
-Here is a sample output of the `--dry` options passed to clone command
+* `--dry` flag passed to `gitr clone` command
 
 ```shell
 > gitr clone git@github.com:swarupdonepudi/gitr.git -d
