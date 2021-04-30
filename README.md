@@ -16,7 +16,7 @@ commit.
 
 *with gitr:*
 
-in iterm, from any subdirectory under any git repo
+from any subdirectory under any git repo in the terminal
 
 1. `gitr web` to check readme or `gitr pipe` to check pipeline
 

@@ -7,33 +7,15 @@ import (
 	gitr "github.com/swarupdonepudi/gitr/lib"
 )
 
-type cmdHandler struct {
-	r   *gitr.GitrWeb
-	dir string
+type webCmdHandler struct {
+	r         *gitr.GitrWeb
+	dir       string
+	urlToOpen string
 }
 
-func openBrowser(url string) {
-	if url != "" && !viper.GetBool("dry") {
-		_ = open.Run(url)
-	}
-}
+type cloneCmdHandler struct{}
 
-func (h *cmdHandler) gitrWebHandler(handler func(cmd *cobra.Command, args []string)) func(cmd *cobra.Command, args []string) {
-	return func(cmd *cobra.Command, args []string) {
-		h.r = gitr.ScanRepo(h.dir)
-		if viper.GetBool("dry") {
-			h.r.PrintInfo()
-		}
-		handler(cmd, args)
-	}
-}
-
-func (h *cmdHandler) branches(cmd *cobra.Command, args []string) {
-	r := gitr.ScanRepo(h.dir)
-	openBrowser(r.GetBranchesUrl())
-}
-
-func (h *cmdHandler) clone(cmd *cobra.Command, args []string) {
+func (ch *cloneCmdHandler) Clone(cmd *cobra.Command, args []string) {
 	c := gitr.ParseCloneReq(args, viper.GetBool("create-dir"))
 	if viper.GetBool("dry") {
 		c.PrintInfo()
@@ -42,42 +24,66 @@ func (h *cmdHandler) clone(cmd *cobra.Command, args []string) {
 	}
 }
 
-func (h *cmdHandler) commits(cmd *cobra.Command, args []string) {
-	r := gitr.ScanRepo(h.dir)
-	openBrowser(r.GetCommitsUrl())
+func openBrowser(url string) {
+	if url != "" && !viper.GetBool("dry") {
+		_ = open.Run(url)
+	}
 }
 
-func (h *cmdHandler) issues(cmd *cobra.Command, args []string) {
-	r := gitr.ScanRepo(h.dir)
-	openBrowser(r.GetIssuesUrl())
+func (h *webCmdHandler) gitrWebHandler(handler func(cmd *cobra.Command, args []string)) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
+		h.r = gitr.ScanRepo(h.dir)
+		if viper.GetBool("dry") {
+			h.r.PrintInfo()
+		}
+		handler(cmd, args)
+		if h.urlToOpen != "" {
+			openBrowser(h.urlToOpen)
+		}
+	}
 }
 
-func (h *cmdHandler) pipelines(cmd *cobra.Command, args []string) {
+func (h *webCmdHandler) branches(cmd *cobra.Command, args []string) {
 	r := gitr.ScanRepo(h.dir)
-	openBrowser(r.GetPipelinesUrl())
+	h.urlToOpen = r.GetBranchesUrl()
 }
 
-func (h *cmdHandler) prs(cmd *cobra.Command, args []string) {
+func (h *webCmdHandler) commits(cmd *cobra.Command, args []string) {
 	r := gitr.ScanRepo(h.dir)
-	openBrowser(r.GetPrsUrl())
+	h.urlToOpen = r.GetCommitsUrl()
 }
 
-func (h *cmdHandler) releases(cmd *cobra.Command, args []string) {
+func (h *webCmdHandler) issues(cmd *cobra.Command, args []string) {
 	r := gitr.ScanRepo(h.dir)
-	openBrowser(r.GetReleasesUrl())
+	h.urlToOpen = r.GetIssuesUrl()
 }
 
-func (h *cmdHandler) rem(cmd *cobra.Command, args []string) {
+func (h *webCmdHandler) pipelines(cmd *cobra.Command, args []string) {
 	r := gitr.ScanRepo(h.dir)
-	openBrowser(r.GetRemUrl())
+	h.urlToOpen = r.GetPipelinesUrl()
 }
 
-func (h *cmdHandler) web(cmd *cobra.Command, args []string) {
+func (h *webCmdHandler) prs(cmd *cobra.Command, args []string) {
 	r := gitr.ScanRepo(h.dir)
-	openBrowser(r.GetWebUrl())
+	h.urlToOpen = r.GetPrsUrl()
 }
 
-func (h *cmdHandler) tags(cmd *cobra.Command, args []string) {
+func (h *webCmdHandler) releases(cmd *cobra.Command, args []string) {
 	r := gitr.ScanRepo(h.dir)
-	openBrowser(r.GetTagsUrl())
+	h.urlToOpen = r.GetReleasesUrl()
+}
+
+func (h *webCmdHandler) rem(cmd *cobra.Command, args []string) {
+	r := gitr.ScanRepo(h.dir)
+	h.urlToOpen = r.GetRemUrl()
+}
+
+func (h *webCmdHandler) web(cmd *cobra.Command, args []string) {
+	r := gitr.ScanRepo(h.dir)
+	h.urlToOpen = r.GetWebUrl()
+}
+
+func (h *webCmdHandler) tags(cmd *cobra.Command, args []string) {
+	r := gitr.ScanRepo(h.dir)
+	h.urlToOpen = r.GetTagsUrl()
 }
