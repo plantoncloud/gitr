@@ -16,20 +16,20 @@ const (
 )
 
 type GitrConfig struct {
-	ScmSystems []ScmSystem
-	Clone      GitrCloneConfig
+	ScmSystems []ScmSystem     `yaml:"scmSystems"`
+	Clone      GitrCloneConfig `yaml:"clone"`
 }
 
 type GitrCloneConfig struct {
-	ScmHome              string
-	AlwaysCreDir         bool
-	IncludeHostForCreDir bool
+	ScmHome              string `yaml:"scmHome"`
+	AlwaysCreDir         bool   `yaml:"alwaysCreDir"`
+	IncludeHostForCreDir bool   `yaml:"includeHostForCreDir"`
 }
 
 type ScmSystem struct {
-	Hostname      string
-	Provider      ScmProvider
-	DefaultBranch string
+	Hostname      string      `yaml:"hostname"`
+	Provider      ScmProvider `yaml:"provider"`
+	DefaultBranch string      `yaml:"defaultBranch"`
 }
 
 func (g *GitrConfig) loadConfig() {
