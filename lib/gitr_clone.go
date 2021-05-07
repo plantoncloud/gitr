@@ -66,8 +66,8 @@ func (c *GitrClone) Clone() {
 func (c *GitrClone) GetClonePath() string {
 	gru := &GitrUtil{}
 	clonePath := ""
-	if c.Gc.Get().Clone.AlwaysCreDir {
-		if c.Gc.Get().Clone.IncludeHostForCreDir {
+	if c.Gc.Clone.AlwaysCreDir {
+		if c.Gc.Clone.IncludeHostForCreDir {
 			clonePath = fmt.Sprintf("%s/%s", gru.GetHost(c.Url), gru.GetRepoPath(c.Url))
 		} else {
 			clonePath = gru.GetRepoPath(c.Url)
@@ -77,8 +77,8 @@ func (c *GitrClone) GetClonePath() string {
 	} else {
 		clonePath = gru.GetRepoName(gru.GetRepoPath(c.Url))
 	}
-	if c.Gc.Get().Clone.ScmHome != "" {
-		clonePath = fmt.Sprintf("%s/%s", c.Gc.Get().Clone.ScmHome, clonePath)
+	if c.Gc.Clone.ScmHome != "" {
+		clonePath = fmt.Sprintf("%s/%s", c.Gc.Clone.ScmHome, clonePath)
 	}
 	return clonePath
 }
