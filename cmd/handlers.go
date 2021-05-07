@@ -16,7 +16,8 @@ type webCmdHandler struct {
 type cloneCmdHandler struct{}
 
 func (ch *cloneCmdHandler) Clone(cmd *cobra.Command, args []string) {
-	c := gitr.ParseCloneReq(args, viper.GetBool("create-dir"))
+	gc := &gitr.GitrConfig{}
+	c := gitr.ParseCloneReq(args, viper.GetBool("create-dir"), gc.Get())
 	if viper.GetBool("dry") {
 		c.PrintInfo()
 	} else {
