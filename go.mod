@@ -1,4 +1,4 @@
-module github.com/swarupdonepudi/gitr
+module github.com/swarupdonepudi/gitr/v2
 
 go 1.16
 
