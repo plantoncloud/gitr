@@ -35,8 +35,9 @@ func TestGetClonePath(t *testing.T) {
 			gc.Clone.AlwaysCreDir = p.creDir
 			gc.Clone.IncludeHostForCreDir = p.includeHost
 			c.Url = p.url
-			if c.GetClonePath(gc) != p.expectedPath {
-				t.Errorf("expected %s path got %s", p.expectedPath, c.GetClonePath(gc))
+			c.Gc = gc
+			if c.GetClonePath() != p.expectedPath {
+				t.Errorf("expected %s path got %s", p.expectedPath, c.GetClonePath())
 			}
 		}
 	})

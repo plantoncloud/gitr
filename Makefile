@@ -21,3 +21,5 @@ cleanup-tests:
 	mv lib_test/test_data/r2-with-remote/.git lib_test/test_data/r2-with-remote/.git-temp
 	mv lib_test/test_data/r3-with-remote-custom-branch/.git lib_test/test_data/r3-with-remote-custom-branch/.git-temp
 test: setup-tests execute-tests cleanup-tests
+local: build
+	cp bin/gitr-darwin /usr/local/bin/gitr

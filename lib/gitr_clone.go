@@ -10,20 +10,21 @@ import (
 type GitrClone struct {
 	Url    string
 	CreDir bool
+	Gc     *GitrConfig
 }
 
-func ParseCloneReq(args []string, creDir bool) *GitrClone {
+func ParseCloneReq(args []string, creDir bool, gc *GitrConfig) *GitrClone {
 	return &GitrClone{
 		Url:    args[0],
 		CreDir: creDir,
+		Gc:     gc,
 	}
 }
 
 func (c *GitrClone) PrintInfo() {
-	gc := &GitrConfig{}
 	gru := &GitrUtil{}
 	var provider ScmProvider
-	scmSystem, err := gc.GetScmSystem(gru.GetHost(c.Url))
+	scmSystem, err := c.Gc.GetScmSystem(gru.GetHost(c.Url))
 	if err == nil {
 		provider = scmSystem.Provider
 	}
@@ -38,9 +39,9 @@ func (c *GitrClone) PrintInfo() {
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"repo-name", gru.GetRepoName(gru.GetRepoPath(c.Url))})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"create-dir", gc.Clone.AlwaysCreDir || c.CreDir})
+	t.AppendRow(table.Row{"create-dir", c.Gc.Clone.AlwaysCreDir || c.CreDir})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"clone-path", c.GetClonePath(gc)})
+	t.AppendRow(table.Row{"clone-path", c.GetClonePath()})
 	t.AppendSeparator()
 	t.Render()
 	println("")
@@ -62,11 +63,11 @@ func (c *GitrClone) Clone() {
 	}
 }
 
-func (c *GitrClone) GetClonePath(gc *GitrConfig) string {
+func (c *GitrClone) GetClonePath() string {
 	gru := &GitrUtil{}
 	clonePath := ""
-	if gc.Get().Clone.AlwaysCreDir {
-		if gc.Get().Clone.IncludeHostForCreDir {
+	if c.Gc.Get().Clone.AlwaysCreDir {
+		if c.Gc.Get().Clone.IncludeHostForCreDir {
 			clonePath = fmt.Sprintf("%s/%s", gru.GetHost(c.Url), gru.GetRepoPath(c.Url))
 		} else {
 			clonePath = gru.GetRepoPath(c.Url)
@@ -76,14 +77,14 @@ func (c *GitrClone) GetClonePath(gc *GitrConfig) string {
 	} else {
 		clonePath = gru.GetRepoName(gru.GetRepoPath(c.Url))
 	}
-	if gc.Get().Clone.ScmHome != "" {
-		clonePath = fmt.Sprintf("%s/%s", gc.Get().Clone.ScmHome, clonePath)
+	if c.Gc.Get().Clone.ScmHome != "" {
+		clonePath = fmt.Sprintf("%s/%s", c.Gc.Get().Clone.ScmHome, clonePath)
 	}
 	return clonePath
 }
 
 func (c *GitrClone) httpClone() error {
-	clonePath := c.GetClonePath(&GitrConfig{})
+	clonePath := c.GetClonePath()
 	os.MkdirAll(clonePath, os.ModePerm)
 	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
 		URL:      c.Url,
@@ -99,7 +100,7 @@ func (c *GitrClone) sshClone() error {
 	if sshErr != nil {
 		return sshErr
 	}
-	clonePath := c.GetClonePath(&GitrConfig{})
+	clonePath := c.GetClonePath()
 	os.MkdirAll(clonePath, os.ModePerm)
 	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
 		URL:      c.Url,
