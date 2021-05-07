@@ -1,7 +1,7 @@
 package lib_test
 
 import (
-	gitr "github.com/swarupdonepudi/gitr/lib"
+	gitr "github.com/swarupdonepudi/gitr/v2/lib"
 	"testing"
 )
 
@@ -12,9 +12,9 @@ func TestRemUrls(t *testing.T) {
 		remote      string
 		expectedUrl string
 	}{
-		{gitr.GitHub, "master", "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/tree/master"},
-		{gitr.GitHub, "master", "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/tree/master"},
-		{gitr.GitHub, "feat/custom-branch", "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/tree/feat/custom-branch"},
+		{gitr.GitHub, "master", "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/tree/master"},
+		{gitr.GitHub, "master", "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/tree/master"},
+		{gitr.GitHub, "feat/custom-branch", "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/tree/feat/custom-branch"},
 	}
 	r := gitr.GitrWeb{
 		Scheme: "https",
@@ -37,8 +37,8 @@ func TestPrsUrls(t *testing.T) {
 		remote      string
 		expectedUrl string
 	}{
-		{gitr.GitHub, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/pulls"},
-		{gitr.GitHub, "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/pulls"},
+		{gitr.GitHub, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/pulls"},
+		{gitr.GitHub, "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/pulls"},
 		{gitr.GitLab, "git@gitlab.com:gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests"},
 		{gitr.GitLab, "https://gitlab.com/gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests"},
 	}
@@ -62,8 +62,8 @@ func TestIssuesUrls(t *testing.T) {
 		remote      string
 		expectedUrl string
 	}{
-		{gitr.GitHub, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/issues"},
-		{gitr.GitHub, "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/issues"},
+		{gitr.GitHub, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/issues"},
+		{gitr.GitHub, "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/issues"},
 		{gitr.GitLab, "git@gitlab.com:gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/issues"},
 		{gitr.GitLab, "https://gitlab.com/gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/issues"},
 	}
@@ -87,8 +87,8 @@ func TestTagsUrls(t *testing.T) {
 		remote      string
 		expectedUrl string
 	}{
-		{gitr.GitHub, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/tags"},
-		{gitr.GitHub, "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/tags"},
+		{gitr.GitHub, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/tags"},
+		{gitr.GitHub, "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/tags"},
 		{gitr.GitLab, "git@gitlab.com:gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/tags"},
 		{gitr.GitLab, "https://gitlab.com/gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/tags"},
 	}
@@ -112,8 +112,8 @@ func TestReleasesUrls(t *testing.T) {
 		remote      string
 		expectedUrl string
 	}{
-		{gitr.GitHub, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/releases"},
-		{gitr.GitHub, "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/releases"},
+		{gitr.GitHub, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/releases"},
+		{gitr.GitHub, "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/releases"},
 		{gitr.GitLab, "git@gitlab.com:gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/releases"},
 		{gitr.GitLab, "https://gitlab.com/gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/releases"},
 	}
@@ -137,8 +137,8 @@ func TestPipelinesUrls(t *testing.T) {
 		remote      string
 		expectedUrl string
 	}{
-		{gitr.GitHub, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/actions"},
-		{gitr.GitHub, "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/actions"},
+		{gitr.GitHub, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/actions"},
+		{gitr.GitHub, "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/actions"},
 		{gitr.GitLab, "git@gitlab.com:gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/pipelines"},
 		{gitr.GitLab, "https://gitlab.com/gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/pipelines"},
 	}
@@ -162,8 +162,8 @@ func TestBranchesUrls(t *testing.T) {
 		remote      string
 		expectedUrl string
 	}{
-		{gitr.GitHub, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/branches"},
-		{gitr.GitHub, "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/branches"},
+		{gitr.GitHub, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/branches"},
+		{gitr.GitHub, "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/branches"},
 		{gitr.GitLab, "git@gitlab.com:gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/branches"},
 		{gitr.GitLab, "https://gitlab.com/gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/branches"},
 	}
@@ -188,9 +188,9 @@ func TestCommitsUrls(t *testing.T) {
 		remote      string
 		expectedUrl string
 	}{
-		{gitr.GitHub, "master", "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/commits/master"},
-		{gitr.GitHub, "master", "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/commits/master"},
-		{gitr.GitHub, "feat/custom-branch", "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/commits/feat/custom-branch"},
+		{gitr.GitHub, "master", "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/commits/master"},
+		{gitr.GitHub, "master", "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/commits/master"},
+		{gitr.GitHub, "feat/custom-branch", "https://github.com/swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr/v2/commits/feat/custom-branch"},
 		{gitr.GitLab, "master", "git@gitlab.com:gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/commits/master"},
 		{gitr.GitLab, "master", "https://gitlab.com/gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/commits/master"},
 		{gitr.GitLab, "feat/custom-branch", "https://gitlab.com/gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss/-/commits/feat/custom-branch"},

@@ -47,7 +47,7 @@ knowledge that is built into it to smartly navigate you to the right web page of
 ### install
 
 `gitr` can be easily installed on mac using brew. While it can also be installed on linux, windows using
-the [binary](https://github.com/swarupdonepudi/gitr/releases), it has not been tested on those platforms.
+the [binary](https://github.com/swarupdonepudi/gitr/v2/releases), it has not been tested on those platforms.
 
 ```
 brew tap swarupdonepudi/homebrew-gitr
@@ -250,17 +250,17 @@ available for both web and clone features.
 +---------------+-------------------------------------------------------+
 | url-web       | https://github.com/swarupdonepudi/gitr                |
 +---------------+-------------------------------------------------------+
-| url-remote    | https://github.com/swarupdonepudi/gitr/tree/master    |
+| url-remote    | https://github.com/swarupdonepudi/gitr/v2/tree/master    |
 +---------------+-------------------------------------------------------+
-| url-commits   | https://github.com/swarupdonepudi/gitr/commits/master |
+| url-commits   | https://github.com/swarupdonepudi/gitr/v2/commits/master |
 +---------------+-------------------------------------------------------+
-| url-branches  | https://github.com/swarupdonepudi/gitr/branches       |
+| url-branches  | https://github.com/swarupdonepudi/gitr/v2/branches       |
 +---------------+-------------------------------------------------------+
-| url-tags      | https://github.com/swarupdonepudi/gitr/tags           |
+| url-tags      | https://github.com/swarupdonepudi/gitr/v2/tags           |
 +---------------+-------------------------------------------------------+
-| url-releases  | https://github.com/swarupdonepudi/gitr/releases       |
+| url-releases  | https://github.com/swarupdonepudi/gitr/v2/releases       |
 +---------------+-------------------------------------------------------+
-| url-pipelines | https://github.com/swarupdonepudi/gitr/actions        |
+| url-pipelines | https://github.com/swarupdonepudi/gitr/v2/actions        |
 +---------------+-------------------------------------------------------+
 ```
 

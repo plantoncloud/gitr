@@ -2,7 +2,7 @@ package lib_test
 
 import (
 	"fmt"
-	gitr "github.com/swarupdonepudi/gitr/lib"
+	gitr "github.com/swarupdonepudi/gitr/v2/lib"
 	"os"
 	"testing"
 )

@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/swarupdonepudi/gitr/cmd"
+import "github.com/swarupdonepudi/gitr/v2/cmd"
 
 func main() {
 	cmd.Execute()

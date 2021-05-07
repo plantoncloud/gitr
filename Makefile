@@ -1,8 +1,8 @@
 deps:
 	go mod download
 fmt:
-	go fmt github.com/swarupdonepudi/gitr/cmd
-	go fmt github.com/swarupdonepudi/gitr/lib
+	go fmt github.com/swarupdonepudi/gitr/v2/cmd
+	go fmt github.com/swarupdonepudi/gitr/v2/lib
 build: deps fmt
 	go build -o bin/gitr-darwin main.go
 	env GOOS=linux GOARCH=amd64 go build -o bin/gitr-linux main.go
@@ -15,7 +15,7 @@ setup-tests:
 	mv lib_test/test_data/r2-with-remote/.git-temp lib_test/test_data/r2-with-remote/.git
 	mv lib_test/test_data/r3-with-remote-custom-branch/.git-temp lib_test/test_data/r3-with-remote-custom-branch/.git
 execute-tests:
-	go test -v -cover -coverpkg github.com/swarupdonepudi/gitr/lib github.com/swarupdonepudi/gitr/lib_test || true
+	go test -v -cover -coverpkg github.com/swarupdonepudi/gitr/v2/lib github.com/swarupdonepudi/gitr/v2/lib_test || true
 cleanup-tests:
 	mv lib_test/test_data/r1-no-remote/.git lib_test/test_data/r1-no-remote/.git-temp
 	mv lib_test/test_data/r2-with-remote/.git lib_test/test_data/r2-with-remote/.git-temp

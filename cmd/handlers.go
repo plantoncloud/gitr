@@ -4,7 +4,7 @@ import (
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	gitr "github.com/swarupdonepudi/gitr/lib"
+	gitr "github.com/swarupdonepudi/gitr/v2/lib"
 )
 
 type webCmdHandler struct {
