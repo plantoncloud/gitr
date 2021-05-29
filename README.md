@@ -173,8 +173,9 @@ Below is the config options supported in `~/.gitr.yaml`
 | clone.scmHome               |     ""    |  if this value is set, then gitr clone will always clone the repos to this path, regardles of where you run `gitr clone` command from   |
 | clone.alwaysCreDir          |     false |  if this is set to true, then gitr clone will always create the directories present in the clone url                                    |
 | clone.includeHostForCreDir  |     false |  if this is set to true, then gitr clone will always prefix the hostname to the clone path                                              |
-| scmSystems.[].hostname      |     ""    |  hostname of the on-prem deployment of scm system                                                                                       |
-| scmSystems.[].provider      |     ""    |  provider of the on-prem deployment. allowed values are github, gitlab and bitbucket                                                    |
+| scmSystems.[].scheme        |     ""    |  http scheme of scm system allowed: http or https                                                                                       |
+| scmSystems.[].hostname      |     ""    |  hostname of scm system                                                                                                                 |
+| scmSystems.[].provider      |     ""    |  provider of scm system. allowed values are github, gitlab and bitbucket                                                                |
 | scmSystems.[].defaultBranch |     ""    |  this is the value of the default branch configured on the scm                                                                          |
 
 #### example config file
@@ -183,12 +184,14 @@ Below is the config options supported in `~/.gitr.yaml`
 clone:
   scmHome: /Users/swarup/scm
   alwaysCreDir: true
-  includeHostForCreDir: false
+  includeHostForCreDir: true
 scmSystems:
   - hostname: github.mycompany.com
+    scheme: https
     provider: github
     defaultBranch: master
   - hostname: gitlab.mycompany.com
+    scheme: http
     provider: gitlab
     defaultBranch: main
 ```
@@ -204,6 +207,7 @@ example:
 ```yaml
 scmSystems:
   - hostname: gitlab.mycompany.net
+    scheme: https
     provider: gitlab
     defaultBranch: main
 ```
@@ -213,12 +217,15 @@ multiple on-prem deployments can be added to `~/.gitr.yaml` file
 ```yaml
 scmSystems:
   - hostname: github.mycompany.com
+    scheme: https
     provider: github
     defaultBranch: master
   - hostname: bitbucket.mycompany.com
+    scheme: https
     provider: bitbucket
     defaultBranch: master
   - hostname: gitlab.mycompany.com
+    scheme: https
     provider: gitlab
     defaultBranch: main
 ```
@@ -275,6 +282,8 @@ available for both web and clone features.
 | provider   | github                                            |
 +------------+---------------------------------------------------+
 | host       | github.com                                        |
++------------+---------------------------------------------------+
+| scheme     | http                                              |
 +------------+---------------------------------------------------+
 | repo-name  | gitr                                              |
 +------------+---------------------------------------------------+

@@ -1,7 +1,7 @@
 package lib_test
 
 import (
-	gitr "github.com/swarupdonepudi/gitr/v2/lib"
+	gitr "github.com/swarupdonepudi/gitr/v2/pkg"
 	"testing"
 )
 

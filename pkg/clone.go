@@ -1,17 +1,12 @@
-package lib
+package pkg
 
 import (
 	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"log"
 	"os"
 )
-
-type GitrClone struct {
-	Url    string
-	CreDir bool
-	Gc     *GitrConfig
-}
 
 func ParseCloneReq(args []string, creDir bool, gc *GitrConfig) *GitrClone {
 	return &GitrClone{
@@ -21,7 +16,7 @@ func ParseCloneReq(args []string, creDir bool, gc *GitrConfig) *GitrClone {
 	}
 }
 
-func (c *GitrClone) PrintInfo() {
+func PrintCloneInfo() {
 	gru := &GitrUtil{}
 	var provider ScmProvider
 	scmSystem, err := c.Gc.GetScmSystem(gru.GetHost(c.Url))
@@ -47,7 +42,7 @@ func (c *GitrClone) PrintInfo() {
 	println("")
 }
 
-func (c *GitrClone) Clone() {
+func Clone() {
 	gru := &GitrUtil{}
 	if gru.IsGitUrl(c.Url) {
 		if gru.IsGitSshUrl(c.Url) {
@@ -59,23 +54,36 @@ func (c *GitrClone) Clone() {
 			fmt.Printf("error cloning the repo. %v\n", err)
 		}
 	} else {
-		print("ssh clone using browser urls not support")
+		scmSystem, err := c.Gc.GetScmSystem(gru.GetHost(c.Url))
+		if err != nil {
+			log.Fatal(err)
+		}
+		if scmSystem.Provider == BitBucketDatacenter {
+			println("clone using browser urls for bitbucket-datacenter is not supported")
+			return
+		}
+		inputUrl := c.Url
+		c.Url = fmt.Sprintf("git@%s:%s.git", gru.GetHost(c.Url), gru.GetRepoPath(c.Url))
+		err = c.sshClone()
+		if err != nil {
+
+		}
 	}
 }
 
-func (c *GitrClone) GetClonePath() string {
+func GetClonePath(url string) string {
 	gru := &GitrUtil{}
 	clonePath := ""
 	if c.Gc.Clone.AlwaysCreDir {
 		if c.Gc.Clone.IncludeHostForCreDir {
-			clonePath = fmt.Sprintf("%s/%s", gru.GetHost(c.Url), gru.GetRepoPath(c.Url))
+			clonePath = fmt.Sprintf("%s/%s", gru.GetHost(url), gru.GetRepoPath(url))
 		} else {
-			clonePath = gru.GetRepoPath(c.Url)
+			clonePath = gru.GetRepoPath(url)
 		}
 	} else if c.CreDir {
-		clonePath = gru.GetRepoPath(c.Url)
+		clonePath = gru.GetRepoPath(url)
 	} else {
-		clonePath = gru.GetRepoName(gru.GetRepoPath(c.Url))
+		clonePath = gru.GetRepoName(gru.GetRepoPath(url))
 	}
 	if c.Gc.Clone.ScmHome != "" {
 		clonePath = fmt.Sprintf("%s/%s", c.Gc.Clone.ScmHome, clonePath)
@@ -83,19 +91,19 @@ func (c *GitrClone) GetClonePath() string {
 	return clonePath
 }
 
-func (c *GitrClone) httpClone() error {
-	clonePath := c.GetClonePath()
+func httpClone(url string) error {
+	clonePath := c.GetClonePath(url)
 	os.MkdirAll(clonePath, os.ModePerm)
 	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
-		URL:      c.Url,
+		URL:      url,
 		Progress: os.Stdout,
 	})
 	return err
 }
 
-func (c *GitrClone) sshClone() error {
+func sshClone(url string) error {
 	gru := &GitrUtil{}
-	auth, sshErr := gru.SetUpSshAuth(gru.GetHost(c.Url))
+	auth, sshErr := gru.SetUpSshAuth(gru.GetHost(url))
 
 	if sshErr != nil {
 		return sshErr
@@ -103,7 +111,7 @@ func (c *GitrClone) sshClone() error {
 	clonePath := c.GetClonePath()
 	os.MkdirAll(clonePath, os.ModePerm)
 	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
-		URL:      c.Url,
+		URL:      url,
 		Progress: os.Stdout,
 		Auth:     auth,
 	})

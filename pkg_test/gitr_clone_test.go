@@ -1,7 +1,7 @@
 package lib_test
 
 import (
-	gitr "github.com/swarupdonepudi/gitr/v2/lib"
+	gitr "github.com/swarupdonepudi/gitr/v2/pkg"
 	"testing"
 )
 
@@ -36,8 +36,8 @@ func TestGetClonePath(t *testing.T) {
 			gc.Clone.IncludeHostForCreDir = p.includeHost
 			c.Url = p.url
 			c.Gc = gc
-			if c.GetClonePath() != p.expectedPath {
-				t.Errorf("expected %s path got %s", p.expectedPath, c.GetClonePath())
+			if c.GetClonePath(c.Url) != p.expectedPath {
+				t.Errorf("expected %s path got %s", p.expectedPath, c.GetClonePath(c.Url))
 			}
 		}
 	})
