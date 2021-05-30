@@ -174,7 +174,7 @@ github.com
 
 ### config file
 
-The first you run any `gitr` comand, `gitr` will automatically create a config file and stores it at `${HOME}/.gitr.yaml` location with the below config if the config file does not already exist.
+The first time you run any `gitr` comand, `gitr` will automatically create a config file and stores it at `${HOME}/.gitr.yaml` location with the below config if the config file does not already exist.
 
 ```yaml
 scm:
