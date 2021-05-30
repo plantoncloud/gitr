@@ -1,4 +1,4 @@
-package pkg
+package config
 
 import (
 	"errors"
@@ -46,11 +46,7 @@ func defaultScmSystems() []ScmSystem {
 	}
 }
 
-func GetScmSystem(hostname string) (*ScmSystem, error) {
-	cfg, err := ReadGitrConfig()
-	if err != nil {
-		return nil, err
-	}
+func GetScmSystem(cfg *GitrConfig, hostname string) (*ScmSystem, error) {
 	//return the scm system from config file
 	for _, scmSystem := range cfg.ScmSystems {
 		if scmSystem.Hostname == hostname {
@@ -76,12 +72,12 @@ func LoadViperConfig() {
 	}
 }
 
-func ReadGitrConfig() (*GitrConfig, error) {
+func GetGitrConfig() *GitrConfig {
 	LoadViperConfig()
 	cfg := &GitrConfig{}
 	err := viper.Unmarshal(cfg)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
-	return cfg, nil
+	return cfg
 }

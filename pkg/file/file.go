@@ -1,4 +1,4 @@
-package internal
+package file
 
 import (
 	"os"
@@ -15,7 +15,7 @@ func IsFileExists(f string) bool {
 	return !info.IsDir()
 }
 
-func getAbsPath(f string) string {
+func GetAbsPath(f string) string {
 	usr, _ := user.Current()
 	dir := usr.HomeDir
 	if strings.HasPrefix(f, "~/") {

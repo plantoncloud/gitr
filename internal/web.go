@@ -3,13 +3,14 @@ package internal
 import (
 	"fmt"
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/swarupdonepudi/gitr/v2/pkg"
+	"github.com/swarupdonepudi/gitr/v2/pkg/config"
+	"github.com/swarupdonepudi/gitr/v2/pkg/url"
 	"os"
 )
 
-func PrintGitrWebInfo(scmSystem *pkg.ScmSystem, remoteUrl, branch string) {
-	repoPath := getRepoPath(remoteUrl)
-	repoName := getRepoName(remoteUrl)
+func PrintGitrWebInfo(scmSystem *config.ScmSystem, remoteUrl, branch string) {
+	repoPath := url.GetRepoPath(remoteUrl)
+	repoName := url.GetRepoName(remoteUrl)
 	webUrl := GetWebUrl(scmSystem.Provider, remoteUrl)
 	println("")
 	t := table.NewWriter()
@@ -30,7 +31,7 @@ func PrintGitrWebInfo(scmSystem *pkg.ScmSystem, remoteUrl, branch string) {
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"url-remote", GetRemUrl(scmSystem.Provider, webUrl, branch)})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-commits", GetCommitsUrl(scmSystem, repoPath, branch)})
+	t.AppendRow(table.Row{"url-commits", GetCommitsUrl(scmSystem.Provider, repoPath, branch)})
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"url-branches", GetBranchesUrl(scmSystem.Provider, webUrl)})
 	t.AppendSeparator()
@@ -44,91 +45,91 @@ func PrintGitrWebInfo(scmSystem *pkg.ScmSystem, remoteUrl, branch string) {
 	println("")
 }
 
-func GetWebUrl(p pkg.ScmProvider, remoteUrl string) string {
+func GetWebUrl(p config.ScmProvider, remoteUrl string) string {
 	switch p {
 	default:
-		return fmt.Sprintf("https://%s/%s", getHost(remoteUrl), getRepoPath(remoteUrl))
+		return fmt.Sprintf("https://%s/%s", url.GetHost(remoteUrl), url.GetRepoPath(remoteUrl))
 	}
 }
 
-func GetRemUrl(p pkg.ScmProvider, webUrl, repoBranch string) string {
+func GetRemUrl(p config.ScmProvider, webUrl, repoBranch string) string {
 	switch p {
-	case pkg.GitLab:
+	case config.GitLab:
 		return fmt.Sprintf("%s/-/tree/%s", webUrl, repoBranch)
 	default:
 		return fmt.Sprintf("%s/tree/%s", webUrl, repoBranch)
 	}
 }
 
-func GetPrsUrl(p pkg.ScmProvider, webUrl string) string {
+func GetPrsUrl(p config.ScmProvider, webUrl string) string {
 	switch p {
-	case pkg.GitHub:
+	case config.GitHub:
 		return fmt.Sprintf("%s/pulls", webUrl)
-	case pkg.GitLab:
+	case config.GitLab:
 		return fmt.Sprintf("%s/-/merge_requests", webUrl)
-	case pkg.BitBucketDatacenter, pkg.BitBucketCloud:
+	case config.BitBucketDatacenter, config.BitBucketCloud:
 		return fmt.Sprintf("%s/pull-requests", webUrl)
 	default:
 		return ""
 	}
 }
 
-func GetBranchesUrl(p pkg.ScmProvider, webUrl string) string {
+func GetBranchesUrl(p config.ScmProvider, webUrl string) string {
 	switch p {
-	case pkg.GitLab:
+	case config.GitLab:
 		return fmt.Sprintf("%s/-/branches", webUrl)
 	default:
 		return fmt.Sprintf("%s/branches", webUrl)
 	}
 }
 
-func GetCommitsUrl(s *pkg.ScmSystem, webUrl, repoBranch string) string {
-	switch s.Provider {
-	case pkg.GitLab:
+func GetCommitsUrl(p config.ScmProvider, webUrl, repoBranch string) string {
+	switch p {
+	case config.GitLab:
 		return fmt.Sprintf("%s/-/commits/%s", webUrl, repoBranch)
 	default:
 		return fmt.Sprintf("%s/commits/%s", webUrl, repoBranch)
 	}
 }
 
-func GetTagsUrl(p pkg.ScmProvider, webUrl string) string {
+func GetTagsUrl(p config.ScmProvider, webUrl string) string {
 	switch p {
-	case pkg.GitLab:
+	case config.GitLab:
 		return fmt.Sprintf("%s/-/tags", webUrl)
 	default:
 		return fmt.Sprintf("%s/tags", webUrl)
 	}
 }
 
-func GetIssuesUrl(p pkg.ScmProvider, webUrl string) string {
+func GetIssuesUrl(p config.ScmProvider, webUrl string) string {
 	switch p {
-	case pkg.BitBucketDatacenter, pkg.BitBucketCloud:
+	case config.BitBucketDatacenter, config.BitBucketCloud:
 		return ""
-	case pkg.GitLab:
+	case config.GitLab:
 		return fmt.Sprintf("%s/-/issues", webUrl)
 	default:
 		return fmt.Sprintf("%s/issues", webUrl)
 	}
 }
 
-func GetReleasesUrl(p pkg.ScmProvider, webUrl string) string {
+func GetReleasesUrl(p config.ScmProvider, webUrl string) string {
 	switch p {
-	case pkg.GitHub:
+	case config.GitHub:
 		return fmt.Sprintf("%s/releases", webUrl)
-	case pkg.GitLab:
+	case config.GitLab:
 		return fmt.Sprintf("%s/-/releases", webUrl)
 	default:
 		return ""
 	}
 }
 
-func GetPipelinesUrl(p pkg.ScmProvider, webUrl string) string {
+func GetPipelinesUrl(p config.ScmProvider, webUrl string) string {
 	switch p {
-	case pkg.GitLab:
+	case config.GitLab:
 		return fmt.Sprintf("%s/-/pipelines", webUrl)
-	case pkg.GitHub:
+	case config.GitHub:
 		return fmt.Sprintf("%s/actions", webUrl)
-	case pkg.BitBucketCloud:
+	case config.BitBucketCloud:
 		return fmt.Sprintf("%s/addon/pipelines/home", webUrl)
 	default:
 		return ""
