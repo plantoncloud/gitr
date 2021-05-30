@@ -1,20 +1,11 @@
-package lib_test
+package clone_test
 
 import (
-	gitr "github.com/swarupdonepudi/gitr/v2/pkg"
+	"github.com/swarupdonepudi/gitr/v2/pkg/clone"
 	"testing"
 )
 
 func TestGetClonePath(t *testing.T) {
-	c := gitr.GitrClone{}
-	gc := &gitr.GitrConfig{
-		Clone: gitr.GitrCloneConfig{
-			ScmHome:              "/User/john",
-			AlwaysCreDir:         true,
-			IncludeHostForCreDir: false,
-		},
-	}
-
 	testClonePaths := []struct {
 		url          string
 		scmHome      string
@@ -31,13 +22,9 @@ func TestGetClonePath(t *testing.T) {
 
 	t.Run("test clone paths should be as per the clone config", func(t *testing.T) {
 		for _, p := range testClonePaths {
-			gc.Clone.ScmHome = p.scmHome
-			gc.Clone.AlwaysCreDir = p.creDir
-			gc.Clone.IncludeHostForCreDir = p.includeHost
-			c.Url = p.url
-			c.Gc = gc
-			if c.GetClonePath(c.Url) != p.expectedPath {
-				t.Errorf("expected %s path got %s", p.expectedPath, c.GetClonePath(c.Url))
+			cp := clone.GetClonePath(p.url, p.scmHome, p.creDir, p.includeHost)
+			if cp != p.expectedPath {
+				t.Errorf("expected %s path got %s", p.expectedPath, cp)
 			}
 		}
 	})

@@ -51,7 +51,7 @@ func WebHandler(cmd *cobra.Command, args []string) {
 		PrintGitrWebInfo(scmSystem, remoteUrl, branch)
 		return
 	}
-	webUrl := GetWebUrl(scmSystem.Provider, remoteUrl)
+	webUrl := GetWebUrl(scmSystem.Provider, scmSystem.Scheme, remoteUrl)
 	url.OpenInBrowser(urlToOpen)
 	switch CmdName(cmd.Name()) {
 	case Branches:

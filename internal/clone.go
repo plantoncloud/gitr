@@ -33,4 +33,3 @@ func PrintCloneInfo(inputUrl string, creDir bool, cfg *config.GitrConfig) {
 	t.Render()
 	println("")
 }
-

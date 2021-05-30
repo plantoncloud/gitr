@@ -1,25 +1,39 @@
+.PHONY: deps
 deps:
 	go mod download
+.PHONY: vet
+vet:
+	go vet ./...
+
+.PHONY: fmt
 fmt:
-	go fmt github.com/swarupdonepudi/gitr/v2/cmd
-	go fmt github.com/swarupdonepudi/gitr/v2/pkg
-build: deps fmt
-	go build -o bin/gitr-darwin main.go
+	go fmt ./...
+.PHONY: build
+build: deps vet fmt
+	env GOOS=darwin GOARCH=amd64 go build -o bin/gitr-darwin main.go
 	env GOOS=linux GOARCH=amd64 go build -o bin/gitr-linux main.go
 	env GOOS=windows GOARCH=386  go build -o bin/gitr-windows-386.exe main.go
+.PHONY: checksum
 checksum: build
 	openssl dgst -sha256 bin/gitr-darwin
-	openssl dgst -sha256 bin/gitr-linux
+.PHONY: setup-tests
 setup-tests:
-	mv lib_test/test_data/r1-no-remote/.git-temp lib_test/test_data/r1-no-remote/.git
-	mv lib_test/test_data/r2-with-remote/.git-temp lib_test/test_data/r2-with-remote/.git
-	mv lib_test/test_data/r3-with-remote-custom-branch/.git-temp lib_test/test_data/r3-with-remote-custom-branch/.git
+	mv internal/git_test_data/r1-no-remote/.git-temp internal/git_test_data/r1-no-remote/.git
+	mv internal/git_test_data/r2-with-remote/.git-temp internal/git_test_data/r2-with-remote/.git
+	mv internal/git_test_data/r3-with-remote-custom-branch/.git-temp internal/git_test_data/r3-with-remote-custom-branch/.git
+.PHONY: execute-tests
 execute-tests:
-	go test -v -cover -coverpkg github.com/swarupdonepudi/gitr/v2/pkg github.com/swarupdonepudi/gitr/v2/pkg_test || true
+	go test -v -cover ./... -coverprofile=coverage.out || true
+.PHONY: cleanup-tests
 cleanup-tests:
-	mv lib_test/test_data/r1-no-remote/.git lib_test/test_data/r1-no-remote/.git-temp
-	mv lib_test/test_data/r2-with-remote/.git lib_test/test_data/r2-with-remote/.git-temp
-	mv lib_test/test_data/r3-with-remote-custom-branch/.git lib_test/test_data/r3-with-remote-custom-branch/.git-temp
+	mv internal/git_test_data/r1-no-remote/.git internal/git_test_data/r1-no-remote/.git-temp
+	mv internal/git_test_data/r2-with-remote/.git internal/git_test_data/r2-with-remote/.git-temp
+	mv internal/git_test_data/r3-with-remote-custom-branch/.git internal/git_test_data/r3-with-remote-custom-branch/.git-temp
+.PHONY: test
 test: setup-tests execute-tests cleanup-tests
+.PHONY: analyze-tests
+analyze-tests:
+	go tool cover -func=coverage.out
+.PHONY: local
 local: build
 	cp bin/gitr-darwin /usr/local/bin/gitr

@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/swarupdonepudi/gitr/v2/internal"
-	"github.com/swarupdonepudi/gitr/v2/pkg"
+	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"os"
 )
 
@@ -27,7 +27,7 @@ func init() {
 		tagsCmd,
 		webCmd,
 	)
-	cobra.OnInitialize(pkg.LoadViperConfig)
+	cobra.OnInitialize(config.LoadViperConfig)
 	rootCmd.PersistentFlags().BoolP(string(internal.Dry), "d", false, "dry run")
 	cloneCmd.PersistentFlags().BoolP(string(internal.CreDir), "c", false, "create directories")
 	viper.BindPFlag(string(internal.Dry), rootCmd.PersistentFlags().Lookup(string(internal.Dry)))

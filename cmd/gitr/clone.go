@@ -6,8 +6,7 @@ import (
 )
 
 var cloneCmd = &cobra.Command{
-	Use:   "clone",
+	Use:   string(handlers.Clone),
 	Short: "clones repo to mimic folder structure to the scm repo hierarchy",
-	Run:   handlers.Clone,
+	Run:   handlers.CloneHandler,
 }
-

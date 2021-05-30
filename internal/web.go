@@ -11,7 +11,7 @@ import (
 func PrintGitrWebInfo(scmSystem *config.ScmSystem, remoteUrl, branch string) {
 	repoPath := url.GetRepoPath(remoteUrl)
 	repoName := url.GetRepoName(remoteUrl)
-	webUrl := GetWebUrl(scmSystem.Provider, remoteUrl)
+	webUrl := GetWebUrl(scmSystem.Provider, scmSystem.Scheme, remoteUrl)
 	println("")
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
@@ -45,10 +45,10 @@ func PrintGitrWebInfo(scmSystem *config.ScmSystem, remoteUrl, branch string) {
 	println("")
 }
 
-func GetWebUrl(p config.ScmProvider, remoteUrl string) string {
+func GetWebUrl(p config.ScmProvider, scheme config.HttpScheme, remoteUrl string) string {
 	switch p {
 	default:
-		return fmt.Sprintf("https://%s/%s", url.GetHost(remoteUrl), url.GetRepoPath(remoteUrl))
+		return fmt.Sprintf("%s://%s/%s", scheme, url.GetHost(remoteUrl), url.GetRepoPath(remoteUrl))
 	}
 }
 

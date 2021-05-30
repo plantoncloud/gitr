@@ -6,56 +6,56 @@ import (
 )
 
 var branchesCmd = &cobra.Command{
-	Use:   "branches",
+	Use:   string(handlers.Branches),
 	Short: "open branches of the repo in the browser",
-	Run:   handlers.WebHandler(handlers.Branches),
+	Run:   handlers.WebHandler,
 }
 
 var webCmd = &cobra.Command{
-	Use:   "web",
+	Use:   string(handlers.Web),
 	Short: "open home page of the repo in the browser",
-	Run:   handlers.WebHandler(handlers.Web),
+	Run:   handlers.WebHandler,
 }
 
 var tagsCmd = &cobra.Command{
-	Use:   "tags",
+	Use:   string(handlers.Tags),
 	Short: "open tags of the repo in the browser",
-	Run:   handlers.WebHandler(handlers.Tags),
+	Run:   handlers.WebHandler,
 }
 
 var remCmd = &cobra.Command{
-	Use:   "rem",
+	Use:   string(handlers.Rem),
 	Short: "open local checkout branch of the repo in the browser",
-	Run:   handlers.WebHandler(handlers.Rem),
+	Run:   handlers.WebHandler,
 }
 
 var releasesCmd = &cobra.Command{
-	Use:   "releases",
+	Use:   string(handlers.Releases),
 	Short: "open releases of the repo in the browser",
-	Run:   handlers.WebHandler(handlers.Releases),
+	Run:   handlers.WebHandler,
 }
 
 var prsCmd = &cobra.Command{
-	Use:   "prs",
+	Use:   string(handlers.Prs),
 	Short: "open prs/mrs of the repo in the browser",
-	Run:   handlers.WebHandler(handlers.Prs),
+	Run:   handlers.WebHandler,
 }
 
 var pipelinesCmd = &cobra.Command{
-	Use:     "pipelines",
+	Use:     string(handlers.Pipelines),
 	Short:   "open pipelines/actions of the repo in the browser",
 	Aliases: []string{"pipe"},
-	Run:     handlers.WebHandler(handlers.Pipelines),
+	Run:     handlers.WebHandler,
 }
 
 var issuesCmd = &cobra.Command{
-	Use:   "issues",
+	Use:   string(handlers.Issues),
 	Short: "open issues of the repo in the browser",
-	Run:   handlers.WebHandler(handlers.Issues),
+	Run:   handlers.WebHandler,
 }
 
 var commitsCmd = &cobra.Command{
-	Use:   "commits",
+	Use:   string(handlers.Commits),
 	Short: "open commits of the local branch of repo in the browser",
-	Run:   handlers.WebHandler(handlers.Commits),
+	Run:   handlers.WebHandler,
 }
