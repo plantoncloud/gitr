@@ -30,7 +30,7 @@ func GetRepoName(repoPath string) string {
 	return strings.Split(repoPath, "/")[strings.Count(repoPath, "/")]
 }
 
-func GetHost(url string) string {
+func GetHostname(url string) string {
 	if url != "" {
 		if IsGitSshUrl(url) {
 			if strings.HasPrefix(url, "ssh://") {

@@ -43,7 +43,7 @@ type CloneConfig struct {
 	IncludeHostForCreDir bool   `yaml:"includeHostForCreDir"`
 }
 
-func GetScmSystem(cfg *GitrConfig, hostname string) (*ScmHost, error) {
+func GetScmHost(cfg *GitrConfig, hostname string) (*ScmHost, error) {
 	//return the scm system from config file
 	for _, scmSystem := range cfg.Scm.Hosts {
 		if scmSystem.Hostname == hostname {

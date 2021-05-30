@@ -66,6 +66,7 @@ brew install gitr
 
 | feature       | description                                                                           |
 |---------------|---------------------------------------------------------------------------------------|
+| gitr config   |  display gitr config                                                                  | 
 | gitr web      |  open a repo and different parts of a repo in web browser from command line           | 
 | gitr clone    |  organize git repos cloned from different scm providers and also retain their hierarchy on the scm provider on laptops which is not possible with the default `git clone <clone-url>`. This is particularly useful for gitlab as it supports a nested hierarchy.
 
@@ -103,20 +104,27 @@ Adding the below configuration to `~/.gitr.yaml`, every repo cloned using `gitr`
 mimics scm provider.
 
 ```yaml
-clone:
-  scmHome: /Users/swarup/scm
-  includeHostForCreDir: false
-  alwaysCreDir: true
+scm:
+  homeDir: /Users/swarup/scm
+  hosts:
+    - scheme: https
+      hostname: gitlab.mycompany.net
+      provider: gitlab
+      clone:
+        homeDir: ""
+        includeHostForCreDir: true
+        alwaysCreDir: true
 ## more config
 ```
 
-With above config `gitr` will clone all repos to `scmHome` location, regardless of where you
+With above config `gitr` will clone all repos to `scm.homeDir` location, regardless of where you
 run `gitr clone <clone-url>` command.
 
-Because `includeHostForCreDir` is set to `true`, `gitr` will clone the repo to a folder with the name of the hostname of
-the scm under `scmHome`.
+Because `scm.hosts.[0].includeHostForCreDir` is set to `true`, `gitr` will clone the repo to a folder with the name of
+the hostname of the scm under `scm.homeDir`.
 
-Because `alwaysCreDir` is set to `true`, `gitr` will clone the repo to the same path as that is in the `<clone-url>`.
+Because `scm.hosts.[0].alwaysCreDir` is set to `true`, `gitr` will clone the repo to the same path as that is in
+the `<clone-url>`.
 
 example:
 
@@ -166,34 +174,81 @@ github.com
 
 ### config file
 
-Below is the config options supported in `~/.gitr.yaml`
+The first you run any `gitr` comand, `gitr` will automatically create a config file and stores it at `${HOME}/.gitr.yaml` location with the below config if the config file does not already exist.
 
-| config                      |  default  | description                                                                                                                             |
-|-----------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| clone.scmHome               |     ""    |  if this value is set, then gitr clone will always clone the repos to this path, regardles of where you run `gitr clone` command from   |
-| clone.alwaysCreDir          |     false |  if this is set to true, then gitr clone will always create the directories present in the clone url                                    |
-| clone.includeHostForCreDir  |     false |  if this is set to true, then gitr clone will always prefix the hostname to the clone path                                              |
-| scmSystems.[].scheme        |     ""    |  http scheme of scm system allowed: http or https                                                                                       |
-| scmSystems.[].hostname      |     ""    |  hostname of scm system                                                                                                                 |
-| scmSystems.[].provider      |     ""    |  provider of scm system. allowed values are github, gitlab and bitbucket                                                                |
-| scmSystems.[].defaultBranch |     ""    |  this is the value of the default branch configured on the scm                                                                          |
+```yaml
+scm:
+  homeDir: ""
+  hosts:
+  - hostname: github.com
+    provider: github
+    defaultBranch: master
+    clone:
+      homeDir: ""
+      alwaysCreDir: false
+      includeHostForCreDir: false
+    scheme: https
+  - hostname: gitlab.com
+    provider: gitlab
+    defaultBranch: main
+    clone:
+      homeDir: ""
+      alwaysCreDir: false
+      includeHostForCreDir: false
+    scheme: https
+  - hostname: bitbucket.org
+    provider: bitbucket-cloud
+    defaultBranch: master
+    clone:
+      homeDir: ""
+      alwaysCreDir: false
+      includeHostForCreDir: false
+    scheme: https
+```
+
+You can customize the config per your requirements. Below is the config options supported in `~/.gitr.yaml`
+
+| config                                    |  default  | description                                                                                                                                   |
+|-------------------------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| scm.homeDir                               |     ""    |  if this value is set, then gitr clone will always clone the repos to this path, regardless of where you run `gitr clone` command from        |
+| scmSystems.[].scheme                      |     ""    |  http scheme of scm system allowed: http or https                                                                                             |
+| scmSystems.[].hostname                    |     ""    |  hostname of scm system                                                                                                                       |
+| scmSystems.[].provider                    |     ""    |  provider of scm system. allowed values are github, gitlab and bitbucket                                                                      |
+| scmSystems.[].defaultBranch               |     ""    |  this is the value of the default branch configured on the scm                                                                                |
+| scmSystems.[].clone.homeDir               |     ""    |  if this is to non-empty string, then gitr clone will consider the value as the home directory while cloning the repos from this host         |
+| scmSystems.[].clone.alwaysCreDir          |     false |  if this is set to true, then gitr clone will always create the directories present in the clone urlwhile cloning the repos from this host    |
+| scmSystems.[].clone.includeHostForCreDir  |     false |  if this is set to true, then gitr clone will always prefix the hostname to the clone path                                                    |
 
 #### example config file
 
 ```yaml
-clone:
-  scmHome: /Users/swarup/scm
-  alwaysCreDir: true
-  includeHostForCreDir: true
-scmSystems:
-  - hostname: github.mycompany.com
-    scheme: https
-    provider: github
-    defaultBranch: master
-  - hostname: gitlab.mycompany.com
-    scheme: http
-    provider: gitlab
-    defaultBranch: main
+scm:
+  homeDir: /Users/swarupd/scm
+  hosts:
+    - hostname: github.com
+      provider: github
+      defaultBranch: master
+      clone:
+        homeDir: ""
+        alwaysCreDir: true
+        includeHostForCreDir: true
+      scheme: https
+    - hostname: gitlab.com
+      provider: gitlab
+      defaultBranch: main
+      clone:
+        homeDir: ""
+        alwaysCreDir: true
+        includeHostForCreDir: true
+      scheme: https
+    - hostname: bitbucket.org
+      provider: bitbucket-cloud
+      defaultBranch: master
+      clone:
+        homeDir: ""
+        alwaysCreDir: true
+        includeHostForCreDir: true
+      scheme: https
 ```
 
 ### on-prem scm deployments
@@ -205,29 +260,36 @@ add the below shown config to `~/.gitr.yaml` file
 example:
 
 ```yaml
-scmSystems:
-  - hostname: gitlab.mycompany.net
-    scheme: https
-    provider: gitlab
-    defaultBranch: main
+scm:
+  hosts:
+    - hostname: gitlab.mycompany.net
+      scheme: https
+      provider: gitlab
+      clone:
+        homeDir: ""
+        includeHostForCreDir: true
+        alwaysCreDir: true
 ```
 
 multiple on-prem deployments can be added to `~/.gitr.yaml` file
 
 ```yaml
-scmSystems:
-  - hostname: github.mycompany.com
-    scheme: https
-    provider: github
-    defaultBranch: master
-  - hostname: bitbucket.mycompany.com
-    scheme: https
-    provider: bitbucket
-    defaultBranch: master
-  - hostname: gitlab.mycompany.com
-    scheme: https
-    provider: gitlab
-    defaultBranch: main
+scm:
+  hosts:
+    - hostname: gitlab.mycompany.net
+      scheme: https
+      provider: gitlab
+      clone:
+        homeDir: ""
+        includeHostForCreDir: true
+        alwaysCreDir: true
+    - hostname: bitbucket.mycompany.net
+      scheme: https
+      provider: bitbucket-datacenter
+      clone:
+        homeDir: ""
+        includeHostForCreDir: true
+        alwaysCreDir: true
 ```
 
 ### dry run
@@ -274,7 +336,7 @@ available for both web and clone features.
 * `--dry` flag passed to `gitr clone` command
 
 ```shell
-> gitr clone git@github.com:swarupdonepudi/gitr.git -d
+> gitr clone git@github.com:swarupdonepudi/gitr.git --dry
 
 +------------+---------------------------------------------------+
 | remote     | git@github.com:swarupdonepudi/gitr.git            |
@@ -283,14 +345,19 @@ available for both web and clone features.
 +------------+---------------------------------------------------+
 | host       | github.com                                        |
 +------------+---------------------------------------------------+
-| scheme     | http                                              |
-+------------+---------------------------------------------------+
 | repo-name  | gitr                                              |
++------------+---------------------------------------------------+
+| ssh-url    | git@github.com:swarupdonepudi/gitr.git            |
++------------+---------------------------------------------------+
+| http-url   | https://github.com/swarupdonepudi/gitr.git        |
 +------------+---------------------------------------------------+
 | create-dir | true                                              |
 +------------+---------------------------------------------------+
+| scm-home   | /Users/swarupd/scm                                |
++------------+---------------------------------------------------+
 | clone-path | /Users/swarupd/scm/github.com/swarupdonepudi/gitr |
 +------------+---------------------------------------------------+
+
 ```
 
 ### aliases

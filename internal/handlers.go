@@ -46,15 +46,16 @@ func CloneHandler(cmd *cobra.Command, args []string) {
 	inputUrl := args[0]
 	creDir := viper.GetBool(string(CreDir))
 	cfg := config.GetGitrConfig()
-	s, err := config.GetScmSystem(cfg, url.GetHost(inputUrl))
+	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
 	if err != nil {
 		log.Fatal(err)
 	}
+	scmHome := getScmHome(s.Clone.HomeDir, cfg.Scm.HomeDir)
 	if viper.GetBool(string(Dry)) {
-		PrintGitrCloneInfo(inputUrl, creDir || s.Clone.AlwaysCreDir, cfg)
+		printGitrCloneInfo(inputUrl, creDir || s.Clone.AlwaysCreDir, cfg)
 		return
 	}
-	clone.Clone(inputUrl, creDir || s.Clone.AlwaysCreDir, cfg)
+	clone.Clone(inputUrl, scmHome, creDir || s.Clone.AlwaysCreDir, s)
 }
 
 func WebHandler(cmd *cobra.Command, args []string) {
@@ -63,7 +64,7 @@ func WebHandler(cmd *cobra.Command, args []string) {
 	remoteUrl := getGitRemoteUrl(r)
 	branch := getGitBranch(r)
 
-	s, err := config.GetScmSystem(config.GetGitrConfig(), url.GetHost(remoteUrl))
+	s, err := config.GetScmHost(config.GetGitrConfig(), url.GetHostname(remoteUrl))
 	if err != nil {
 		log.Fatal(err)
 	}

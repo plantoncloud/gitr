@@ -16,14 +16,10 @@ import (
 	"strings"
 )
 
-func Clone(inputUrl string, creDir bool, cfg *config.GitrConfig) {
-	s, err := config.GetScmSystem(cfg, url.GetHost(inputUrl))
-	if err != nil {
-		log.Fatal(err)
-	}
+func Clone(inputUrl, scmHome string, creDir bool, s *config.ScmHost) {
 	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
 	repoName := url.GetRepoName(repoPath)
-	clonePath := GetClonePath(s.Hostname, repoPath, repoName, s.Clone.HomeDir, creDir || s.Clone.AlwaysCreDir, s.Clone.IncludeHostForCreDir)
+	clonePath := GetClonePath(s.Hostname, repoPath, repoName, scmHome, creDir || s.Clone.AlwaysCreDir, s.Clone.IncludeHostForCreDir)
 	if url.IsGitUrl(inputUrl) {
 		if url.IsGitSshUrl(inputUrl) {
 			if err := sshClone(inputUrl, clonePath); err != nil {
@@ -39,22 +35,14 @@ func Clone(inputUrl string, creDir bool, cfg *config.GitrConfig) {
 			println("gitr does not support clone using browser urls for bitbucket-datacenter & bitbucket.org")
 			return
 		}
-		sshCloneUrl := fmt.Sprintf("git@%s:%s.git", s.Hostname, repoPath)
+		sshCloneUrl := GetSshCloneUrl(s.Hostname, repoPath)
 		if err := sshClone(sshCloneUrl, clonePath); err != nil {
 			fmt.Println("error cloning the repo using ssh. trying http clone...")
-			httpCloneUrl := fmt.Sprintf("%s://%s/%s.git", s.Scheme, s.Hostname, repoPath)
+			httpCloneUrl := GetHttpCloneUrl(s.Hostname, repoPath, s.Scheme)
 			if err := httpClone(httpCloneUrl, clonePath); err != nil {
 				log.Fatalf("error cloning the repo using http. %v\n", err)
 			}
 		}
-	}
-}
-
-func GetScmHome(scmHostCloneConfig, globalCloneConfig *config.CloneConfig) string {
-	if scmHostCloneConfig.HomeDir != "" {
-		return scmHostCloneConfig.HomeDir
-	} else {
-		return globalCloneConfig.HomeDir
 	}
 }
 
@@ -101,7 +89,7 @@ func httpClone(url, clonePath string) error {
 }
 
 func sshClone(repoUrl, clonePath string) error {
-	auth, sshErr := setUpSshAuth(url.GetHost(repoUrl))
+	auth, sshErr := setUpSshAuth(url.GetHostname(repoUrl))
 	if sshErr != nil {
 		return sshErr
 	}
@@ -112,4 +100,12 @@ func sshClone(repoUrl, clonePath string) error {
 		Auth:     auth,
 	})
 	return err
+}
+
+func GetSshCloneUrl(hostname, repoPath string) string {
+	return fmt.Sprintf("git@%s:%s.git", hostname, repoPath)
+}
+
+func GetHttpCloneUrl(hostname, repoPath string, scheme config.HttpScheme) string {
+	return fmt.Sprintf("%s://%s/%s.git", scheme, hostname, repoPath)
 }
