@@ -31,7 +31,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolP(string(internal.Dry), "d", false, "dry run")
 	cloneCmd.PersistentFlags().BoolP(string(internal.CreDir), "c", false, "create directories")
 	viper.BindPFlag(string(internal.Dry), rootCmd.PersistentFlags().Lookup(string(internal.Dry)))
-	viper.BindPFlag(string(internal.CreDir), rootCmd.PersistentFlags().Lookup(string(internal.CreDir)))
+	viper.BindPFlag(string(internal.CreDir), cloneCmd.PersistentFlags().Lookup(string(internal.CreDir)))
 }
 
 func Execute() {
