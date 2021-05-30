@@ -1,4 +1,4 @@
 .idea
 bin
 tmp
-coverage.out
+*.cov

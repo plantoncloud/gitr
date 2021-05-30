@@ -23,7 +23,8 @@ setup-tests:
 	mv internal/git_test_data/r3-with-remote-custom-branch/.git-temp internal/git_test_data/r3-with-remote-custom-branch/.git
 .PHONY: execute-tests
 execute-tests:
-	go test -v -cover ./... -coverprofile=coverage.out || true
+	go test -v -coverpkg github.com/swarupdonepudi/gitr/v2/internal  -cover ./... -coverprofile=internal.cov || true
+	go test -v -coverpkg github.com/swarupdonepudi/gitr/v2/pkg/...  -cover ./... -coverprofile=pkg.cov || true
 .PHONY: cleanup-tests
 cleanup-tests:
 	mv internal/git_test_data/r1-no-remote/.git internal/git_test_data/r1-no-remote/.git-temp
@@ -33,7 +34,8 @@ cleanup-tests:
 test: setup-tests execute-tests cleanup-tests
 .PHONY: analyze-tests
 analyze-tests:
-	go tool cover -func=coverage.out
+	go tool cover -func=internal.cov
+	go tool cover -func=pkg.cov
 .PHONY: local
 local: build
 	cp bin/gitr-darwin /usr/local/bin/gitr

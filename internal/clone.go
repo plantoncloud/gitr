@@ -9,10 +9,10 @@ import (
 	"os"
 )
 
-func PrintCloneInfo(inputUrl string, creDir bool, cfg *config.GitrConfig) {
+func PrintGitrCloneInfo(inputUrl string, creDir bool, cfg *config.GitrConfig) {
 	clonePath := clone.GetClonePath(inputUrl, cfg.Clone.ScmHome, creDir || cfg.Clone.AlwaysCreDir, cfg.Clone.IncludeHostForCreDir)
 	scmSystem, err := config.GetScmSystem(cfg, url.GetHost(inputUrl))
-	if err == nil {
+	if err != nil {
 		log.Fatal(err)
 	}
 	println("")

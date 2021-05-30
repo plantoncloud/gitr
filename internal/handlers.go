@@ -3,6 +3,7 @@ package internal
 import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/swarupdonepudi/gitr/v2/pkg/clone"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"github.com/swarupdonepudi/gitr/v2/pkg/file"
 	"github.com/swarupdonepudi/gitr/v2/pkg/url"
@@ -10,6 +11,8 @@ import (
 )
 
 type GitrFlag string
+
+type CmdName string
 
 const (
 	Dry       GitrFlag = "dry"
@@ -26,16 +29,15 @@ const (
 	Clone     CmdName  = "clone"
 )
 
-type CmdName string
-
 func CloneHandler(cmd *cobra.Command, args []string) {
-	//gc := &gitr.GitrConfig{}
-	//c := gitr.ParseCloneReq(args, viper.GetBool("create-dir"), gc.Get())
-	//if cmd.Flag("dry").Value() {
-	//	c.PrintInfo()
-	//} else {
-	//	c.Clone()
-	//}
+	inputUrl := args[0]
+	creDir := viper.GetBool(string(CreDir))
+	cfg := config.GetGitrConfig()
+	if viper.GetBool(string(Dry)) {
+		PrintGitrCloneInfo(inputUrl, creDir || cfg.Clone.AlwaysCreDir, cfg)
+		return
+	}
+	clone.Clone(inputUrl, creDir || cfg.Clone.AlwaysCreDir, cfg)
 }
 
 func WebHandler(cmd *cobra.Command, args []string) {
@@ -47,7 +49,7 @@ func WebHandler(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if viper.GetBool("dry") {
+	if viper.GetBool(string(Dry)) {
 		PrintGitrWebInfo(scmSystem, remoteUrl, branch)
 		return
 	}
