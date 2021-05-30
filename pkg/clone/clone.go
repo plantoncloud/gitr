@@ -23,7 +23,7 @@ func Clone(inputUrl string, creDir bool, cfg *config.GitrConfig) {
 	}
 	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
 	repoName := url.GetRepoName(repoPath)
-	clonePath := GetClonePath(s.Hostname, repoPath, repoName, cfg.Clone.ScmHome, creDir || cfg.Clone.AlwaysCreDir, cfg.Clone.IncludeHostForCreDir)
+	clonePath := GetClonePath(s.Hostname, repoPath, repoName, s.Clone.HomeDir, creDir || s.Clone.AlwaysCreDir, s.Clone.IncludeHostForCreDir)
 	if url.IsGitUrl(inputUrl) {
 		if url.IsGitSshUrl(inputUrl) {
 			if err := sshClone(inputUrl, clonePath); err != nil {
@@ -47,6 +47,14 @@ func Clone(inputUrl string, creDir bool, cfg *config.GitrConfig) {
 				log.Fatalf("error cloning the repo using http. %v\n", err)
 			}
 		}
+	}
+}
+
+func GetScmHome(scmHostCloneConfig, globalCloneConfig *config.CloneConfig) string {
+	if scmHostCloneConfig.HomeDir != "" {
+		return scmHostCloneConfig.HomeDir
+	} else {
+		return globalCloneConfig.HomeDir
 	}
 }
 

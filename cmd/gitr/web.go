@@ -2,60 +2,60 @@ package gitr
 
 import (
 	"github.com/spf13/cobra"
-	handlers "github.com/swarupdonepudi/gitr/v2/internal"
+	h "github.com/swarupdonepudi/gitr/v2/internal"
 )
 
 var branchesCmd = &cobra.Command{
-	Use:   string(handlers.Branches),
+	Use:   string(h.Branches),
 	Short: "open branches of the repo in the browser",
-	Run:   handlers.WebHandler,
+	Run:   h.WebHandler,
 }
 
 var webCmd = &cobra.Command{
-	Use:   string(handlers.Web),
+	Use:   string(h.Web),
 	Short: "open home page of the repo in the browser",
-	Run:   handlers.WebHandler,
+	Run:   h.WebHandler,
 }
 
 var tagsCmd = &cobra.Command{
-	Use:   string(handlers.Tags),
+	Use:   string(h.Tags),
 	Short: "open tags of the repo in the browser",
-	Run:   handlers.WebHandler,
+	Run:   h.WebHandler,
 }
 
 var remCmd = &cobra.Command{
-	Use:   string(handlers.Rem),
+	Use:   string(h.Rem),
 	Short: "open local checkout branch of the repo in the browser",
-	Run:   handlers.WebHandler,
+	Run:   h.WebHandler,
 }
 
 var releasesCmd = &cobra.Command{
-	Use:   string(handlers.Releases),
+	Use:   string(h.Releases),
 	Short: "open releases of the repo in the browser",
-	Run:   handlers.WebHandler,
+	Run:   h.WebHandler,
 }
 
 var prsCmd = &cobra.Command{
-	Use:   string(handlers.Prs),
+	Use:   string(h.Prs),
 	Short: "open prs/mrs of the repo in the browser",
-	Run:   handlers.WebHandler,
+	Run:   h.WebHandler,
 }
 
 var pipelinesCmd = &cobra.Command{
-	Use:     string(handlers.Pipelines),
+	Use:     string(h.Pipelines),
 	Short:   "open pipelines/actions of the repo in the browser",
 	Aliases: []string{"pipe"},
-	Run:     handlers.WebHandler,
+	Run:     h.WebHandler,
 }
 
 var issuesCmd = &cobra.Command{
-	Use:   string(handlers.Issues),
+	Use:   string(h.Issues),
 	Short: "open issues of the repo in the browser",
-	Run:   handlers.WebHandler,
+	Run:   h.WebHandler,
 }
 
 var commitsCmd = &cobra.Command{
-	Use:   string(handlers.Commits),
+	Use:   string(h.Commits),
 	Short: "open commits of the local branch of repo in the browser",
-	Run:   handlers.WebHandler,
+	Run:   h.WebHandler,
 }

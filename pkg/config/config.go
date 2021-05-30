@@ -21,40 +21,31 @@ const (
 )
 
 type GitrConfig struct {
-	ScmSystems []ScmSystem     `yaml:"scmSystems"`
-	Clone      GitrCloneConfig `yaml:"clone"`
+	Scm Scm `yaml:"scm"`
 }
 
-type GitrCloneConfig struct {
-	ScmHome              string `yaml:"scmHome"`
+type Scm struct {
+	Hosts   []ScmHost `yaml:"hosts"`
+	HomeDir string    `yaml:"homeDir"`
+}
+
+type ScmHost struct {
+	Hostname      string      `yaml:"hostname"`
+	Provider      ScmProvider `yaml:"provider"`
+	DefaultBranch string      `yaml:"defaultBranch"`
+	Clone         CloneConfig `yaml:"clone"`
+	Scheme        HttpScheme  `yaml:"scheme"`
+}
+
+type CloneConfig struct {
+	HomeDir              string `yaml:"homeDir"`
 	AlwaysCreDir         bool   `yaml:"alwaysCreDir"`
 	IncludeHostForCreDir bool   `yaml:"includeHostForCreDir"`
 }
 
-type ScmSystem struct {
-	Scheme        HttpScheme  `yaml:"scheme"`
-	Hostname      string      `yaml:"hostname"`
-	Provider      ScmProvider `yaml:"provider"`
-	DefaultBranch string      `yaml:"defaultBranch"`
-}
-
-func defaultScmSystems() []ScmSystem {
-	return []ScmSystem{
-		{Https, "github.com", GitHub, "master"},
-		{Https, "gitlab.com", GitLab, "main"},
-		{Https, "bitbucket.org", BitBucketCloud, "master"},
-	}
-}
-
-func GetScmSystem(cfg *GitrConfig, hostname string) (*ScmSystem, error) {
+func GetScmSystem(cfg *GitrConfig, hostname string) (*ScmHost, error) {
 	//return the scm system from config file
-	for _, scmSystem := range cfg.ScmSystems {
-		if scmSystem.Hostname == hostname {
-			return &scmSystem, nil
-		}
-	}
-	//return the scm system from default scm systems if one is not found in config file
-	for _, scmSystem := range defaultScmSystems() {
+	for _, scmSystem := range cfg.Scm.Hosts {
 		if scmSystem.Hostname == hostname {
 			return &scmSystem, nil
 		}
@@ -73,11 +64,10 @@ func LoadViperConfig() {
 }
 
 func GetGitrConfig() *GitrConfig {
-	LoadViperConfig()
-	cfg := &GitrConfig{}
-	err := viper.Unmarshal(cfg)
+	var cfg GitrConfig
+	err := viper.Unmarshal(&cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return cfg
+	return &cfg
 }

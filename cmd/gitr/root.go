@@ -16,7 +16,9 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(cloneCmd,
+	rootCmd.AddCommand(
+		configCmd,
+		cloneCmd,
 		branchesCmd,
 		commitsCmd,
 		issuesCmd,
@@ -27,11 +29,16 @@ func init() {
 		tagsCmd,
 		webCmd,
 	)
-	cobra.OnInitialize(config.LoadViperConfig)
+	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().BoolP(string(internal.Dry), "d", false, "dry run")
 	cloneCmd.PersistentFlags().BoolP(string(internal.CreDir), "c", false, "create directories")
 	viper.BindPFlag(string(internal.Dry), rootCmd.PersistentFlags().Lookup(string(internal.Dry)))
 	viper.BindPFlag(string(internal.CreDir), cloneCmd.PersistentFlags().Lookup(string(internal.CreDir)))
+}
+
+func initConfig() {
+	internal.EnsureInitialConfig()
+	config.LoadViperConfig()
 }
 
 func Execute() {

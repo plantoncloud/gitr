@@ -2,11 +2,11 @@ package gitr
 
 import (
 	"github.com/spf13/cobra"
-	handlers "github.com/swarupdonepudi/gitr/v2/internal"
+	h "github.com/swarupdonepudi/gitr/v2/internal"
 )
 
 var cloneCmd = &cobra.Command{
-	Use:   string(handlers.Clone),
+	Use:   string(h.Clone),
 	Short: "clones repo to mimic folder structure to the scm repo hierarchy",
-	Run:   handlers.CloneHandler,
+	Run:   h.CloneHandler,
 }

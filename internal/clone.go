@@ -13,7 +13,7 @@ func PrintGitrCloneInfo(inputUrl string, creDir bool, cfg *config.GitrConfig) {
 	s, err := config.GetScmSystem(cfg, url.GetHost(inputUrl))
 	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
 	repoName := url.GetRepoName(repoPath)
-	clonePath := clone.GetClonePath(s.Hostname, repoPath, repoName, cfg.Clone.ScmHome, creDir || cfg.Clone.AlwaysCreDir, cfg.Clone.IncludeHostForCreDir)
+	clonePath := clone.GetClonePath(s.Hostname, repoPath, repoName, s.Clone.HomeDir, creDir || s.Clone.AlwaysCreDir, s.Clone.IncludeHostForCreDir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,7 +28,7 @@ func PrintGitrCloneInfo(inputUrl string, creDir bool, cfg *config.GitrConfig) {
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"repo-name", repoName})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"create-dir", cfg.Clone.AlwaysCreDir || creDir})
+	t.AppendRow(table.Row{"create-dir", s.Clone.AlwaysCreDir || creDir})
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"clone-path", clonePath})
 	t.AppendSeparator()

@@ -1,12 +1,14 @@
 package internal
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/swarupdonepudi/gitr/v2/pkg/clone"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"github.com/swarupdonepudi/gitr/v2/pkg/file"
 	"github.com/swarupdonepudi/gitr/v2/pkg/url"
+	"gopkg.in/yaml.v2"
 	"log"
 )
 
@@ -27,17 +29,32 @@ const (
 	Web       CmdName  = "web"
 	Rem       CmdName  = "rem"
 	Clone     CmdName  = "clone"
+	Config    CmdName  = "config"
 )
+
+func ConfigHandler(cmd *cobra.Command, args []string) {
+	cfg := config.GetGitrConfig()
+	d, err := yaml.Marshal(&cfg)
+	fmt.Printf("")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("\n%s\n", string(d))
+}
 
 func CloneHandler(cmd *cobra.Command, args []string) {
 	inputUrl := args[0]
 	creDir := viper.GetBool(string(CreDir))
 	cfg := config.GetGitrConfig()
+	s, err := config.GetScmSystem(cfg, url.GetHost(inputUrl))
+	if err != nil {
+		log.Fatal(err)
+	}
 	if viper.GetBool(string(Dry)) {
-		PrintGitrCloneInfo(inputUrl, creDir || cfg.Clone.AlwaysCreDir, cfg)
+		PrintGitrCloneInfo(inputUrl, creDir || s.Clone.AlwaysCreDir, cfg)
 		return
 	}
-	clone.Clone(inputUrl, creDir || cfg.Clone.AlwaysCreDir, cfg)
+	clone.Clone(inputUrl, creDir || s.Clone.AlwaysCreDir, cfg)
 }
 
 func WebHandler(cmd *cobra.Command, args []string) {

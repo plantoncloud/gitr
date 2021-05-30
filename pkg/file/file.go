@@ -1,6 +1,7 @@
 package file
 
 import (
+	"github.com/mitchellh/go-homedir"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -27,4 +28,9 @@ func GetAbsPath(f string) string {
 func GetPwd() string {
 	pwd, _ := os.Getwd()
 	return pwd
+}
+
+func GetHomeDir() string {
+	home, _ := homedir.Dir()
+	return home
 }
