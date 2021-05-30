@@ -4,22 +4,18 @@ import (
 	"fmt"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
-	"github.com/swarupdonepudi/gitr/v2/pkg/url"
 	"os"
 )
 
-func PrintGitrWebInfo(scmSystem *config.ScmSystem, remoteUrl, branch string) {
-	repoPath := url.GetRepoPath(remoteUrl)
-	repoName := url.GetRepoName(remoteUrl)
-	webUrl := GetWebUrl(scmSystem.Provider, scmSystem.Scheme, remoteUrl)
+func PrintGitrWebInfo(p config.ScmProvider, host, remoteUrl, webUrl, repoPath, repoName, branch string) {
 	println("")
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendRow(table.Row{"remote", remoteUrl})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"provider", scmSystem.Provider})
+	t.AppendRow(table.Row{"provider", p})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"host", scmSystem.Hostname})
+	t.AppendRow(table.Row{"host", host})
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"repo-path", repoPath})
 	t.AppendSeparator()
@@ -29,26 +25,26 @@ func PrintGitrWebInfo(scmSystem *config.ScmSystem, remoteUrl, branch string) {
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"url-web", webUrl})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-remote", GetRemUrl(scmSystem.Provider, webUrl, branch)})
+	t.AppendRow(table.Row{"url-remote", GetRemUrl(p, webUrl, branch)})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-commits", GetCommitsUrl(scmSystem.Provider, repoPath, branch)})
+	t.AppendRow(table.Row{"url-commits", GetCommitsUrl(p, repoPath, branch)})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-branches", GetBranchesUrl(scmSystem.Provider, webUrl)})
+	t.AppendRow(table.Row{"url-branches", GetBranchesUrl(p, webUrl)})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-tags", GetTagsUrl(scmSystem.Provider, webUrl)})
+	t.AppendRow(table.Row{"url-tags", GetTagsUrl(p, webUrl)})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-releases", GetReleasesUrl(scmSystem.Provider, webUrl)})
+	t.AppendRow(table.Row{"url-releases", GetReleasesUrl(p, webUrl)})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"url-pipelines", GetPipelinesUrl(scmSystem.Provider, webUrl)})
+	t.AppendRow(table.Row{"url-pipelines", GetPipelinesUrl(p, webUrl)})
 	t.AppendSeparator()
 	t.Render()
 	println("")
 }
 
-func GetWebUrl(p config.ScmProvider, scheme config.HttpScheme, remoteUrl string) string {
+func GetWebUrl(p config.ScmProvider, scheme config.HttpScheme, host, repoPath string) string {
 	switch p {
 	default:
-		return fmt.Sprintf("%s://%s/%s", scheme, url.GetHost(remoteUrl), url.GetRepoPath(remoteUrl))
+		return fmt.Sprintf("%s://%s/%s", scheme, host, repoPath)
 	}
 }
 

@@ -21,7 +21,9 @@ func Clone(inputUrl string, creDir bool, cfg *config.GitrConfig) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	clonePath := GetClonePath(inputUrl, cfg.Clone.ScmHome, creDir || cfg.Clone.AlwaysCreDir, cfg.Clone.IncludeHostForCreDir)
+	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
+	repoName := url.GetRepoName(repoPath)
+	clonePath := GetClonePath(s.Hostname, repoPath, repoName, cfg.Clone.ScmHome, creDir || cfg.Clone.AlwaysCreDir, cfg.Clone.IncludeHostForCreDir)
 	if url.IsGitUrl(inputUrl) {
 		if url.IsGitSshUrl(inputUrl) {
 			if err := sshClone(inputUrl, clonePath); err != nil {
@@ -33,14 +35,14 @@ func Clone(inputUrl string, creDir bool, cfg *config.GitrConfig) {
 			}
 		}
 	} else {
-		if s.Provider == config.BitBucketDatacenter {
-			println("clone using browser urls for bitbucket-datacenter is not supported")
+		if s.Provider == config.BitBucketDatacenter || s.Provider == config.BitBucketCloud {
+			println("gitr does not support clone using browser urls for bitbucket-datacenter & bitbucket.org")
 			return
 		}
-		sshCloneUrl := fmt.Sprintf("git@%s:%s.git", s.Hostname, url.GetRepoPath(inputUrl))
+		sshCloneUrl := fmt.Sprintf("git@%s:%s.git", s.Hostname, repoPath)
 		if err := sshClone(sshCloneUrl, clonePath); err != nil {
 			fmt.Println("error cloning the repo using ssh. trying http clone...")
-			httpCloneUrl := fmt.Sprintf("%s://%s/%s.git", s.Scheme, s.Hostname, url.GetRepoPath(inputUrl))
+			httpCloneUrl := fmt.Sprintf("%s://%s/%s.git", s.Scheme, s.Hostname, repoPath)
 			if err := httpClone(httpCloneUrl, clonePath); err != nil {
 				log.Fatalf("error cloning the repo using http. %v\n", err)
 			}
@@ -48,16 +50,16 @@ func Clone(inputUrl string, creDir bool, cfg *config.GitrConfig) {
 	}
 }
 
-func GetClonePath(repoUrl, scmHome string, creDir, includeHostForCreDir bool) string {
+func GetClonePath(scmHost, repoPath, repoName, scmHome string, creDir, includeHostForCreDir bool) string {
 	clonePath := ""
 	if creDir {
 		if includeHostForCreDir {
-			clonePath = fmt.Sprintf("%s/%s", url.GetHost(repoUrl), url.GetRepoPath(repoUrl))
+			clonePath = fmt.Sprintf("%s/%s", scmHost, repoPath)
 		} else {
-			clonePath = url.GetRepoPath(repoUrl)
+			clonePath = repoPath
 		}
 	} else {
-		clonePath = url.GetRepoName(url.GetRepoPath(repoUrl))
+		clonePath = repoName
 	}
 	if scmHome != "" {
 		clonePath = fmt.Sprintf("%s/%s", scmHome, clonePath)

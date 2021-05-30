@@ -2,6 +2,8 @@ package url
 
 import (
 	"github.com/skratchdot/open-golang/open"
+	"github.com/swarupdonepudi/gitr/v2/pkg/config"
+	"log"
 	"regexp"
 	"strings"
 )
@@ -46,8 +48,28 @@ func GetHost(url string) string {
 	}
 }
 
-func GetRepoPath(url string) string {
-	return url[strings.Index(url, GetHost(url))+1+len(GetHost(url)) : strings.Index(url, ".git")]
+func GetRepoPath(url, host string, p config.ScmProvider) string {
+	if IsGitUrl(url) {
+		return url[strings.Index(url, host)+1+len(host) : strings.Index(url, ".git")]
+	} else {
+		switch p {
+		case config.GitLab:
+			if strings.Contains(url, "/-/") {
+				return url[strings.Index(url, host)+1+len(host) : strings.Index(url, "/-/")]
+			} else {
+				return url[strings.Index(url, host)+1+len(host):]
+			}
+		case config.GitHub:
+			if strings.Contains(url, "/blob/") {
+				return url[strings.Index(url, host)+1+len(host) : strings.Index(url, "/blob/")]
+			} else {
+				return url[strings.Index(url, host)+1+len(host):]
+			}
+		default:
+			log.Fatalf("provider %s not supported for browser urls", p)
+			return ""
+		}
+	}
 }
 
 func OpenInBrowser(url string) {

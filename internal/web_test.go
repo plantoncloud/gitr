@@ -167,18 +167,19 @@ func TestWebUrls(t *testing.T) {
 	var urlTests = []struct {
 		provider    config.ScmProvider
 		scheme      config.HttpScheme
-		remoteUrl   string
+		host        string
+		repoPath    string
 		expectedUrl string
 	}{
-		{config.GitHub, config.Https, "git@github.com:swarupdonepudi/gitr.git", "https://github.com/swarupdonepudi/gitr"},
-		{config.GitHub, config.Http, "https://github.com/swarupdonepudi/gitr.git", "http://github.com/swarupdonepudi/gitr"},
-		{config.GitLab, config.Https, "git@gitlab.com:gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss"},
-		{config.GitLab, config.Http, "https://gitlab.com/gitlab-org/gitlab-foss.git", "http://gitlab.com/gitlab-org/gitlab-foss"},
-		{config.GitLab, config.Https, "https://gitlab.com/gitlab-org/gitlab-foss.git", "https://gitlab.com/gitlab-org/gitlab-foss"},
+		{config.GitHub, config.Https, "github.com", "swarupdonepudi/gitr", "https://github.com/swarupdonepudi/gitr"},
+		{config.GitHub, config.Http, "github.com", "swarupdonepudi/gitr", "http://github.com/swarupdonepudi/gitr"},
+		{config.GitLab, config.Https, "gitlab.com", "gitlab-org/gitlab-foss", "https://gitlab.com/gitlab-org/gitlab-foss"},
+		{config.GitLab, config.Http, "gitlab.com", "gitlab-org/gitlab-foss", "http://gitlab.com/gitlab-org/gitlab-foss"},
+		{config.GitLab, config.Https, "gitlab.com", "gitlab-org/gitlab-foss", "https://gitlab.com/gitlab-org/gitlab-foss"},
 	}
 	t.Run("validate web urls", func(t *testing.T) {
 		for _, u := range urlTests {
-			returnedUrl := GetWebUrl(u.provider, u.scheme, u.remoteUrl)
+			returnedUrl := GetWebUrl(u.provider, u.scheme, u.host, u.repoPath)
 			if returnedUrl != u.expectedUrl {
 				t.Errorf("expecting %s but got %s", u.expectedUrl, returnedUrl)
 			}

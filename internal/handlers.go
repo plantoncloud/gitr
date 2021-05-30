@@ -41,39 +41,44 @@ func CloneHandler(cmd *cobra.Command, args []string) {
 }
 
 func WebHandler(cmd *cobra.Command, args []string) {
-	var urlToOpen string
 	r := getGitRepo(file.GetPwd())
+
 	remoteUrl := getGitRemoteUrl(r)
 	branch := getGitBranch(r)
-	scmSystem, err := config.GetScmSystem(config.GetGitrConfig(), url.GetHost(remoteUrl))
+
+	s, err := config.GetScmSystem(config.GetGitrConfig(), url.GetHost(remoteUrl))
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	repoPath := url.GetRepoPath(remoteUrl, s.Hostname, s.Provider)
+	repoName := url.GetRepoName(repoPath)
+	webUrl := GetWebUrl(s.Provider, s.Scheme, s.Hostname, repoPath)
+
 	if viper.GetBool(string(Dry)) {
-		PrintGitrWebInfo(scmSystem, remoteUrl, branch)
+		PrintGitrWebInfo(s.Provider, s.Hostname, remoteUrl, webUrl, repoPath, repoName, branch)
 		return
 	}
-	webUrl := GetWebUrl(scmSystem.Provider, scmSystem.Scheme, remoteUrl)
-	url.OpenInBrowser(urlToOpen)
+
 	switch CmdName(cmd.Name()) {
 	case Branches:
-		url.OpenInBrowser(GetBranchesUrl(scmSystem.Provider, webUrl))
+		url.OpenInBrowser(GetBranchesUrl(s.Provider, webUrl))
 	case Prs:
-		url.OpenInBrowser(GetPrsUrl(scmSystem.Provider, webUrl))
+		url.OpenInBrowser(GetPrsUrl(s.Provider, webUrl))
 	case Commits:
-		url.OpenInBrowser(GetCommitsUrl(scmSystem.Provider, webUrl, branch))
+		url.OpenInBrowser(GetCommitsUrl(s.Provider, webUrl, branch))
 	case Issues:
-		url.OpenInBrowser(GetIssuesUrl(scmSystem.Provider, webUrl))
+		url.OpenInBrowser(GetIssuesUrl(s.Provider, webUrl))
 	case Tags:
-		url.OpenInBrowser(GetTagsUrl(scmSystem.Provider, webUrl))
+		url.OpenInBrowser(GetTagsUrl(s.Provider, webUrl))
 	case Releases:
-		url.OpenInBrowser(GetReleasesUrl(scmSystem.Provider, webUrl))
+		url.OpenInBrowser(GetReleasesUrl(s.Provider, webUrl))
 	case Pipelines:
-		url.OpenInBrowser(GetPipelinesUrl(scmSystem.Provider, webUrl))
+		url.OpenInBrowser(GetPipelinesUrl(s.Provider, webUrl))
 	case Web:
 		url.OpenInBrowser(webUrl)
 	case Rem:
-		url.OpenInBrowser(GetRemUrl(scmSystem.Provider, webUrl, branch))
+		url.OpenInBrowser(GetRemUrl(s.Provider, webUrl, branch))
 	default:
 		log.Fatal("unknown web command")
 	}

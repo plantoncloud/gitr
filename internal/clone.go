@@ -10,8 +10,10 @@ import (
 )
 
 func PrintGitrCloneInfo(inputUrl string, creDir bool, cfg *config.GitrConfig) {
-	clonePath := clone.GetClonePath(inputUrl, cfg.Clone.ScmHome, creDir || cfg.Clone.AlwaysCreDir, cfg.Clone.IncludeHostForCreDir)
-	scmSystem, err := config.GetScmSystem(cfg, url.GetHost(inputUrl))
+	s, err := config.GetScmSystem(cfg, url.GetHost(inputUrl))
+	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
+	repoName := url.GetRepoName(repoPath)
+	clonePath := clone.GetClonePath(s.Hostname, repoPath, repoName, cfg.Clone.ScmHome, creDir || cfg.Clone.AlwaysCreDir, cfg.Clone.IncludeHostForCreDir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -20,11 +22,11 @@ func PrintGitrCloneInfo(inputUrl string, creDir bool, cfg *config.GitrConfig) {
 	t.SetOutputMirror(os.Stdout)
 	t.AppendRow(table.Row{"remote", inputUrl})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"provider", scmSystem.Provider})
+	t.AppendRow(table.Row{"provider", s.Provider})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"host", scmSystem.Hostname})
+	t.AppendRow(table.Row{"host", s.Hostname})
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"repo-name", url.GetRepoName(url.GetRepoPath(inputUrl))})
+	t.AppendRow(table.Row{"repo-name", repoName})
 	t.AppendSeparator()
 	t.AppendRow(table.Row{"create-dir", cfg.Clone.AlwaysCreDir || creDir})
 	t.AppendSeparator()
