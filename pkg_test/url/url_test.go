@@ -1,15 +1,15 @@
-package lib_test
+package url_test
 
 import (
-	gitr "github.com/swarupdonepudi/gitr/v2/lib"
+	"github.com/swarupdonepudi/gitr/v2/pkg/config"
+	"github.com/swarupdonepudi/gitr/v2/pkg/url"
 	"testing"
 )
 
 func TestIsGitUrl(t *testing.T) {
-	gru := &gitr.GitrUtil{}
 	var positiveUrlTests = []struct {
 		url      string
-		isGitUrl      bool
+		isGitUrl bool
 	}{
 		{"git@github.com:swarupdonepudi/gitr.git", true},
 		{"https://github.com/swarupdonepudi/gitr.git", true},
@@ -18,21 +18,21 @@ func TestIsGitUrl(t *testing.T) {
 	}
 	var negativeUrlTests = []struct {
 		url      string
-		isGitUrl      bool
+		isGitUrl bool
 	}{
 		{"https://github.com/swarupdonepudi/gitr", false},
 		{"git@github.com:swarupdonepudi/gitr", false},
 	}
 	t.Run("urls ending with .git should be git urls", func(t *testing.T) {
 		for _, u := range positiveUrlTests {
-			if gru.IsGitUrl(u.url) != u.isGitUrl {
+			if url.IsGitUrl(u.url) != u.isGitUrl {
 				t.Errorf("expected url %s as git url", u.url)
 			}
 		}
 	})
 	t.Run("urls not ending with .git should not be git urls", func(t *testing.T) {
 		for _, u := range negativeUrlTests {
-			if gru.IsGitUrl(u.url) != u.isGitUrl {
+			if url.IsGitUrl(u.url) != u.isGitUrl {
 				t.Errorf("expected url %s as not git url", u.url)
 			}
 		}
@@ -40,7 +40,6 @@ func TestIsGitUrl(t *testing.T) {
 }
 
 func TestIsGitSshUrl(t *testing.T) {
-	gru := &gitr.GitrUtil{}
 	var positiveUrlTests = []struct {
 		url         string
 		isGitSshUrl bool
@@ -57,14 +56,14 @@ func TestIsGitSshUrl(t *testing.T) {
 	}
 	t.Run("urls prefixed with ssh or git should be git ssh urls", func(t *testing.T) {
 		for _, u := range positiveUrlTests {
-			if gru.IsGitSshUrl(u.url) != u.isGitSshUrl {
+			if url.IsGitSshUrl(u.url) != u.isGitSshUrl {
 				t.Errorf("expected url %s as git url", u.url)
 			}
 		}
 	})
 	t.Run("urls not prefixed with ssh or git should not be git ssh urls", func(t *testing.T) {
 		for _, u := range negativeUrlTests {
-			if gru.IsGitSshUrl(u.url) != u.isGitSshUrl {
+			if url.IsGitSshUrl(u.url) != u.isGitSshUrl {
 				t.Errorf("expected url %s as not git url", u.url)
 			}
 		}
@@ -72,7 +71,6 @@ func TestIsGitSshUrl(t *testing.T) {
 }
 
 func TestIsGitHttpUrlHasUsername(t *testing.T) {
-	gru := &gitr.GitrUtil{}
 	var usernameTests = []struct {
 		url         string
 		hasUsername bool
@@ -85,17 +83,16 @@ func TestIsGitHttpUrlHasUsername(t *testing.T) {
 
 	t.Run("username in http url", func(t *testing.T) {
 		for _, u := range usernameTests {
-			if gru.IsGitHttpUrlHasUsername(u.url) != u.hasUsername {
-				t.Errorf("expected %v but received %v for %s ", u.hasUsername, gru.IsGitHttpUrlHasUsername(u.url), u.url)
+			if url.IsGitHttpUrlHasUsername(u.url) != u.hasUsername {
+				t.Errorf("expected %v but received %v for %s ", u.hasUsername, url.IsGitHttpUrlHasUsername(u.url), u.url)
 			}
 		}
 	})
 }
 
 func TestIsGitRepoName(t *testing.T) {
-	gru := &gitr.GitrUtil{}
 	var repoNameTests = []struct {
-		repoPath      string
+		repoPath string
 		repoName string
 	}{
 		{"swarupdonepudi/gitr.git", "gitr.git"},
@@ -109,10 +106,34 @@ func TestIsGitRepoName(t *testing.T) {
 
 	t.Run("repo name from repo path", func(t *testing.T) {
 		for _, u := range repoNameTests {
-			if gru.GetRepoName(u.repoPath) != u.repoName {
-				t.Errorf("expected %s but got %s for %s path", u.repoName, gru.GetRepoName(u.repoPath), u.repoPath)
+			if url.GetRepoName(u.repoPath) != u.repoName {
+				t.Errorf("expected %s but got %s for %s path", u.repoName, url.GetRepoName(u.repoPath), u.repoPath)
 			}
 		}
 	})
 }
 
+func TestGetRepoPath(t *testing.T) {
+	var repoNameTests = []struct {
+		url          string
+		host         string
+		provider     config.ScmProvider
+		expectedPath string
+	}{
+		{"https://github.com/swarupdonepudi/gitr/blob/master/.gitattributes", "github.com", config.GitHub, "swarupdonepudi/gitr"},
+		{"git@github.com/swarupdonepudi/gitr.git", "github.com", config.GitHub, "swarupdonepudi/gitr"},
+		{"git@gitlab.com/swarupdonepudi/sample-repo.git", "gitlab.com", config.GitLab, "swarupdonepudi/sample-repo"},
+		{"git@gitlab.com/swarupdonepudi/subgroup/sample-repo.git", "gitlab.com", config.GitLab, "swarupdonepudi/subgroup/sample-repo"},
+		{"https://gitlab.com/swarupdonepudi/subgroup/subgroup2/repo-name/-/tree/master/.gitattributes", "gitlab.com", config.GitLab, "swarupdonepudi/subgroup/subgroup2/repo-name"},
+		{"https://gitlab.com/swarupdonepudi/subgroup/repo-name/-/tree/master/.gitattributes", "gitlab.com", config.GitLab, "swarupdonepudi/subgroup/repo-name"},
+	}
+
+	t.Run("repo name from repo path", func(t *testing.T) {
+		for _, u := range repoNameTests {
+			returnedPath := url.GetRepoPath(u.url, u.host, u.provider)
+			if returnedPath != u.expectedPath {
+				t.Errorf("expected %s but got %s for %s url", u.expectedPath, returnedPath, u.url)
+			}
+		}
+	})
+}
