@@ -211,13 +211,13 @@ You can customize the config per your requirements. Below is the config options 
 | config                                    |  default  | description                                                                                                                                   |
 |-------------------------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------|
 | scm.homeDir                               |     ""    |  if this value is set, then gitr clone will always clone the repos to this path, regardless of where you run `gitr clone` command from        |
-| scmSystems.[].scheme                      |     ""    |  http scheme of scm system allowed: http or https                                                                                             |
-| scmSystems.[].hostname                    |     ""    |  hostname of scm system                                                                                                                       |
-| scmSystems.[].provider                    |     ""    |  provider of scm system. allowed values are github, gitlab and bitbucket                                                                      |
-| scmSystems.[].defaultBranch               |     ""    |  this is the value of the default branch configured on the scm                                                                                |
-| scmSystems.[].clone.homeDir               |     ""    |  if this is to non-empty string, then gitr clone will consider the value as the home directory while cloning the repos from this host         |
-| scmSystems.[].clone.alwaysCreDir          |     false |  if this is set to true, then gitr clone will always create the directories present in the clone urlwhile cloning the repos from this host    |
-| scmSystems.[].clone.includeHostForCreDir  |     false |  if this is set to true, then gitr clone will always prefix the hostname to the clone path                                                    |
+| scm.hosts.[].scheme                       |     ""    |  http scheme of scm system allowed: http or https                                                                                             |
+| scm.hosts.[].hostname                     |     ""    |  hostname of scm system                                                                                                                       |
+| scm.hosts.[].provider                     |     ""    |  provider of scm system. allowed values are github, gitlab and bitbucket                                                                      |
+| scm.hosts.[].defaultBranch                |     ""    |  this is the value of the default branch configured on the scm                                                                                |
+| scm.hosts.[].clone.homeDir                |     ""    |  if this is to non-empty string, then gitr clone will consider the value as the home directory while cloning the repos from this host         |
+| scm.hosts.[].clone.alwaysCreDir           |     false |  if this is set to true, then gitr clone will always create the directories present in the clone urlwhile cloning the repos from this host    |
+| scm.hosts.[].clone.includeHostForCreDir   |     false |  if this is set to true, then gitr clone will always prefix the hostname to the clone path                                                    |
 
 #### example config file
 
@@ -304,33 +304,34 @@ available for both web and clone features.
 ```shell
 > gitr web -d
 
-+---------------+-------------------------------------------------------+
-| remote        | git@github.com:swarupdonepudi/gitr.git                |
-+---------------+-------------------------------------------------------+
-| provider      | github                                                |
-+---------------+-------------------------------------------------------+
-| host          | github.com                                            |
-+---------------+-------------------------------------------------------+
-| repo-path     | swarupdonepudi/gitr                                   |
-+---------------+-------------------------------------------------------+
-| repo-name     | gitr                                                  |
-+---------------+-------------------------------------------------------+
-| branch        | master                                                |
-+---------------+-------------------------------------------------------+
-| url-web       | https://github.com/swarupdonepudi/gitr                |
-+---------------+-------------------------------------------------------+
-| url-remote    | https://github.com/swarupdonepudi/gitr/v2/tree/master    |
-+---------------+-------------------------------------------------------+
-| url-commits   | https://github.com/swarupdonepudi/gitr/v2/commits/master |
-+---------------+-------------------------------------------------------+
-| url-branches  | https://github.com/swarupdonepudi/gitr/v2/branches       |
-+---------------+-------------------------------------------------------+
-| url-tags      | https://github.com/swarupdonepudi/gitr/v2/tags           |
-+---------------+-------------------------------------------------------+
-| url-releases  | https://github.com/swarupdonepudi/gitr/v2/releases       |
-+---------------+-------------------------------------------------------+
-| url-pipelines | https://github.com/swarupdonepudi/gitr/v2/actions        |
-+---------------+-------------------------------------------------------+
++---------------+----------------------------------------------------+
+| remote        | git@github.com:swarupdonepudi/gitr.git             |
++---------------+----------------------------------------------------+
+| provider      | github                                             |
++---------------+----------------------------------------------------+
+| host          | github.com                                         |
++---------------+----------------------------------------------------+
+| repo-path     | swarupdonepudi/gitr                                |
++---------------+----------------------------------------------------+
+| repo-name     | gitr                                               |
++---------------+----------------------------------------------------+
+| branch        | master                                             |
++---------------+----------------------------------------------------+
+| url-web       | https://github.com/swarupdonepudi/gitr             |
++---------------+----------------------------------------------------+
+| url-remote    | https://github.com/swarupdonepudi/gitr/tree/master |
++---------------+----------------------------------------------------+
+| url-commits   | swarupdonepudi/gitr/commits/master                 |
++---------------+----------------------------------------------------+
+| url-branches  | https://github.com/swarupdonepudi/gitr/branches    |
++---------------+----------------------------------------------------+
+| url-tags      | https://github.com/swarupdonepudi/gitr/tags        |
++---------------+----------------------------------------------------+
+| url-releases  | https://github.com/swarupdonepudi/gitr/releases    |
++---------------+----------------------------------------------------+
+| url-pipelines | https://github.com/swarupdonepudi/gitr/actions     |
++---------------+----------------------------------------------------+
+
 ```
 
 * `--dry` flag passed to `gitr clone` command
