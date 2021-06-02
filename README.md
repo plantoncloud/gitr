@@ -178,6 +178,7 @@ The first time you run any `gitr` comand, `gitr` will automatically create a con
 
 ```yaml
 scm:
+  copyCloneLocationCdCmdToClipboard: false
   homeDir: ""
   hosts:
   - hostname: github.com
@@ -210,6 +211,7 @@ You can customize the config per your requirements. Below is the config options 
 
 | config                                    |  default  | description                                                                                                                                   |
 |-------------------------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| copyCloneLocationCdCmdToClipboard         |     false |  if this value is set, then gitr will add "cd <cloned-location>" text to your os clipboard. this is useful for quick navigation               |
 | scm.homeDir                               |     ""    |  if this value is set, then gitr clone will always clone the repos to this path, regardless of where you run `gitr clone` command from        |
 | scm.hosts.[].scheme                       |     ""    |  http scheme of scm system allowed: http or https                                                                                             |
 | scm.hosts.[].hostname                     |     ""    |  hostname of scm system                                                                                                                       |
@@ -223,6 +225,7 @@ You can customize the config per your requirements. Below is the config options 
 
 ```yaml
 scm:
+  copyCloneLocationCdCmdToClipboard: false
   homeDir: /Users/swarupd/scm
   hosts:
     - hostname: github.com

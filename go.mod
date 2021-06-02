@@ -3,6 +3,7 @@ module github.com/swarupdonepudi/gitr/v2
 go 1.16
 
 require (
+	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/go-git/go-git/v5 v5.3.0
 	github.com/jedib0t/go-pretty/v6 v6.2.1
 	github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351

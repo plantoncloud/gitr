@@ -21,7 +21,8 @@ const (
 )
 
 type GitrConfig struct {
-	Scm Scm `yaml:"scm"`
+	CopyCloneLocationCdCmdToClipboard bool `yaml:"copyCloneLocationCdCmdToClipboard"`
+	Scm                               Scm  `yaml:"scm"`
 }
 
 type Scm struct {
