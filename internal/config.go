@@ -26,6 +26,7 @@ func EnsureInitialConfig() {
 
 func getDefaultConfig() *config.GitrConfig {
 	return &config.GitrConfig{
+		CopyCloneLocationCdCmdToClipboard: false,
 		Scm: config.Scm{
 			HomeDir: "",
 			Hosts:   defaultScmSystems(),

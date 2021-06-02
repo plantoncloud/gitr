@@ -55,7 +55,7 @@ func CloneHandler(cmd *cobra.Command, args []string) {
 		printGitrCloneInfo(inputUrl, creDir || s.Clone.AlwaysCreDir, cfg)
 		return
 	}
-	clone.Clone(inputUrl, scmHome, creDir || s.Clone.AlwaysCreDir, s)
+	clone.Clone(inputUrl, scmHome, creDir || s.Clone.AlwaysCreDir, cfg.CopyCloneLocationCdCmdToClipboard, s)
 }
 
 func WebHandler(cmd *cobra.Command, args []string) {

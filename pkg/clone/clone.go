@@ -3,6 +3,7 @@ package clone
 import (
 	"errors"
 	"fmt"
+	"github.com/atotto/clipboard"
 	"github.com/go-git/go-git/v5"
 	ssh2 "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/kevinburke/ssh_config"
@@ -16,7 +17,7 @@ import (
 	"strings"
 )
 
-func Clone(inputUrl, scmHome string, creDir bool, s *config.ScmHost) {
+func Clone(inputUrl, scmHome string, creDir, copyCloneLocationCdCmdToClipboard bool, s *config.ScmHost) {
 	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
 	repoName := url.GetRepoName(repoPath)
 	clonePath := GetClonePath(s.Hostname, repoPath, repoName, scmHome, creDir || s.Clone.AlwaysCreDir, s.Clone.IncludeHostForCreDir)
@@ -45,7 +46,15 @@ func Clone(inputUrl, scmHome string, creDir bool, s *config.ScmHost) {
 		}
 	}
 	fmt.Printf("\ncloned path: %s\n", clonePath)
-	fmt.Printf("\n*** run below command to navigate to cloned location  ***\n\ncd %s\n\n", clonePath)
+	if copyCloneLocationCdCmdToClipboard {
+		err := clipboard.WriteAll(fmt.Sprintf("cd %s", clonePath))
+		if err != nil {
+			log.Fatalf("err copying cloned path to clipboard. %v\n", err)
+		}
+		fmt.Printf("\nnote: command to navigate to cloned location has been added to clipboard. run cmd+v to paste the command\n\n")
+	} else {
+		fmt.Printf("\n*** run below command to navigate to cloned location  ***\n\ncd %s\n\n", clonePath)
+	}
 }
 
 func GetClonePath(scmHost, repoPath, repoName, scmHome string, creDir, includeHostForCreDir bool) string {
