@@ -44,6 +44,8 @@ func Clone(inputUrl, scmHome string, creDir bool, s *config.ScmHost) {
 			}
 		}
 	}
+	fmt.Printf("\ncloned path: %s\n", clonePath)
+	fmt.Printf("\n*** run below command to navigate to cloned location  ***\n\ncd %s\n\n", clonePath)
 }
 
 func GetClonePath(scmHost, repoPath, repoName, scmHome string, creDir, includeHostForCreDir bool) string {
