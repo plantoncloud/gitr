@@ -26,7 +26,7 @@ func EnsureInitialConfig() {
 
 func getDefaultConfig() *config.GitrConfig {
 	return &config.GitrConfig{
-		CopyCloneLocationCdCmdToClipboard: false,
+		CopyRepoPathCdCmdToClipboard: false,
 		Scm: config.Scm{
 			HomeDir: "",
 			Hosts:   defaultScmSystems(),
@@ -37,8 +37,8 @@ func getDefaultConfig() *config.GitrConfig {
 func defaultScmSystems() []config.ScmHost {
 	defaultCloneConfig := config.CloneConfig{
 		HomeDir:              "",
-		AlwaysCreDir:         false,
-		IncludeHostForCreDir: false,
+		AlwaysCreDir:         true,
+		IncludeHostForCreDir: true,
 	}
 	return []config.ScmHost{
 		{Scheme: config.Https, Hostname: "github.com", Provider: config.GitHub, DefaultBranch: "master", Clone: defaultCloneConfig},
