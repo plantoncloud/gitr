@@ -17,43 +17,47 @@ import (
 	"strings"
 )
 
-func Clone(inputUrl, scmHome string, creDir, copyCloneLocationCdCmdToClipboard bool, s *config.ScmHost) {
+func Clone(inputUrl, scmHome string, creDir, copyRepoPathCdCmdToClipboard bool, s *config.ScmHost) {
 	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
 	repoName := url.GetRepoName(repoPath)
-	clonePath := GetClonePath(s.Hostname, repoPath, repoName, scmHome, creDir || s.Clone.AlwaysCreDir, s.Clone.IncludeHostForCreDir)
-	if url.IsGitUrl(inputUrl) {
-		if url.IsGitSshUrl(inputUrl) {
-			if err := sshClone(inputUrl, clonePath); err != nil {
-				log.Fatalf("error cloning the repo. %v\n", err)
+	repoLocation := GetClonePath(s.Hostname, repoPath, repoName, scmHome, creDir || s.Clone.AlwaysCreDir, s.Clone.IncludeHostForCreDir)
+	if file.IsDirExists(repoLocation) {
+		println("\nrepo already exists. skipping cloning...")
+	} else {
+		if url.IsGitUrl(inputUrl) {
+			if url.IsGitSshUrl(inputUrl) {
+				if err := sshClone(inputUrl, repoLocation); err != nil {
+					log.Fatalf("error cloning the repo. %v\n", err)
+				}
+			} else {
+				if err := httpClone(inputUrl, repoLocation); err != nil {
+					log.Fatalf("error cloning the repo. %v\n", err)
+				}
 			}
 		} else {
-			if err := httpClone(inputUrl, clonePath); err != nil {
-				log.Fatalf("error cloning the repo. %v\n", err)
+			if s.Provider == config.BitBucketDatacenter || s.Provider == config.BitBucketCloud {
+				println("gitr does not support clone using browser urls for bitbucket-datacenter & bitbucket.org")
+				return
 			}
-		}
-	} else {
-		if s.Provider == config.BitBucketDatacenter || s.Provider == config.BitBucketCloud {
-			println("gitr does not support clone using browser urls for bitbucket-datacenter & bitbucket.org")
-			return
-		}
-		sshCloneUrl := GetSshCloneUrl(s.Hostname, repoPath)
-		if err := sshClone(sshCloneUrl, clonePath); err != nil {
-			fmt.Println("error cloning the repo using ssh. trying http clone...")
-			httpCloneUrl := GetHttpCloneUrl(s.Hostname, repoPath, s.Scheme)
-			if err := httpClone(httpCloneUrl, clonePath); err != nil {
-				log.Fatalf("error cloning the repo using http. %v\n", err)
+			sshCloneUrl := GetSshCloneUrl(s.Hostname, repoPath)
+			if err := sshClone(sshCloneUrl, repoLocation); err != nil {
+				fmt.Println("error cloning the repo using ssh. trying http clone...")
+				httpCloneUrl := GetHttpCloneUrl(s.Hostname, repoPath, s.Scheme)
+				if err := httpClone(httpCloneUrl, repoLocation); err != nil {
+					log.Fatalf("error cloning the repo using http. %v\n", err)
+				}
 			}
 		}
 	}
-	fmt.Printf("\ncloned path: %s\n", clonePath)
-	if copyCloneLocationCdCmdToClipboard {
-		err := clipboard.WriteAll(fmt.Sprintf("cd %s", clonePath))
+	fmt.Printf("\nrepo path: %s\n", repoLocation)
+	if copyRepoPathCdCmdToClipboard {
+		err := clipboard.WriteAll(fmt.Sprintf("cd %s", repoLocation))
 		if err != nil {
-			log.Fatalf("err copying cloned path to clipboard. %v\n", err)
+			log.Fatalf("err copying repo path to clipboard. %v\n", err)
 		}
-		fmt.Printf("\nnote: command to navigate to cloned location has been added to clipboard. run cmd+v to paste the command\n\n")
+		fmt.Printf("\nnote: command to navigate to repo path has been added to clipboard. run cmd+v to paste the command\n\n")
 	} else {
-		fmt.Printf("\n*** run below command to navigate to cloned location  ***\n\ncd %s\n\n", clonePath)
+		fmt.Printf("\n*** run below command to navigate to repo path  ***\n\ncd %s\n\n", repoLocation)
 	}
 }
 

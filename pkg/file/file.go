@@ -16,6 +16,14 @@ func IsFileExists(f string) bool {
 	return !info.IsDir()
 }
 
+func IsDirExists(d string) bool {
+	info, err := os.Stat(d)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return info.IsDir()
+}
+
 func GetAbsPath(f string) string {
 	usr, _ := user.Current()
 	dir := usr.HomeDir
