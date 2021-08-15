@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"github.com/atotto/clipboard"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/swarupdonepudi/gitr/v2/pkg/clone"
@@ -99,5 +100,23 @@ func WebHandler(cmd *cobra.Command, args []string) {
 		url.OpenInBrowser(GetRemUrl(s.Provider, webUrl, branch))
 	default:
 		log.Fatal("unknown web command")
+	}
+}
+
+func PathHandler(cmd *cobra.Command, args []string) {
+	inputUrl := args[0]
+	creDir := viper.GetBool(string(CreDir))
+	cfg := config.GetGitrConfig()
+	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
+	if err != nil {
+		log.Fatalf("failed to get scm host. err: %v", err)
+	}
+	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
+	repoName := url.GetRepoName(repoPath)
+	scmHome := getScmHome(s.Clone.HomeDir, cfg.Scm.HomeDir)
+	repoLocation := clone.GetClonePath(s.Hostname, repoPath, repoName, scmHome, creDir || s.Clone.AlwaysCreDir, s.Clone.IncludeHostForCreDir)
+	fmt.Println(repoLocation)
+	if err := clipboard.WriteAll(fmt.Sprintf("cd %s", repoLocation)); err != nil {
+		log.Fatalf("err copying repo path to clipboard. %v\n", err)
 	}
 }
