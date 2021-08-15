@@ -19,6 +19,7 @@ func init() {
 	rootCmd.AddCommand(
 		configCmd,
 		cloneCmd,
+		pathCmd,
 		branchesCmd,
 		commitsCmd,
 		issuesCmd,
