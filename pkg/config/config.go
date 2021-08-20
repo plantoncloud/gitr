@@ -40,7 +40,7 @@ func LoadViperConfig() {
 	}
 }
 
-func GetGitrConfig() *GitrConfig {
+func NewGitrConfig() *GitrConfig {
 	var cfg GitrConfig
 	err := viper.Unmarshal(&cfg)
 	if err != nil {
