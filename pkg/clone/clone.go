@@ -1,71 +1,88 @@
 package clone
 
 import (
-	"errors"
 	"fmt"
 	"github.com/atotto/clipboard"
 	"github.com/go-git/go-git/v5"
 	ssh2 "github.com/go-git/go-git/v5/plumbing/transport/ssh"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/kevinburke/ssh_config"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"github.com/swarupdonepudi/gitr/v2/pkg/file"
 	"github.com/swarupdonepudi/gitr/v2/pkg/url"
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 )
 
-func Clone(inputUrl, scmHome string, creDir, copyRepoPathCdCmdToClipboard bool, s *config.ScmHost) {
+func Clone(cfg *config.GitrConfig, inputUrl string, creDir, dry bool) error {
+	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
+	if err != nil {
+		return errors.Wrapf(err, "failed to clone git repo with %s url", inputUrl)
+	}
 	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
-	repoName := url.GetRepoName(repoPath)
-	repoLocation := GetClonePath(s.Hostname, repoPath, repoName, scmHome, creDir || s.Clone.AlwaysCreDir, s.Clone.IncludeHostForCreDir)
+	repoLocation := GetClonePath(inputUrl, creDir)
+	if dry {
+		printGitrCloneInfo(inputUrl, creDir || s.Clone.AlwaysCreDir, cfg)
+		return nil
+	}
 	if file.IsDirExists(repoLocation) {
 		println("\nrepo already exists. skipping cloning...")
 	} else {
 		if url.IsGitUrl(inputUrl) {
 			if url.IsGitSshUrl(inputUrl) {
 				if err := sshClone(inputUrl, repoLocation); err != nil {
-					log.Fatalf("error cloning the repo. %v\n", err)
+					return errors.Wrap(err, "error cloning the repo")
 				}
 			} else {
 				if err := httpClone(inputUrl, repoLocation); err != nil {
-					log.Fatalf("error cloning the repo. %v\n", err)
+					return errors.Wrap(err, "error cloning the repo")
 				}
 			}
 		} else {
 			if s.Provider == config.BitBucketDatacenter || s.Provider == config.BitBucketCloud {
 				println("gitr does not support clone using browser urls for bitbucket-datacenter & bitbucket.org")
-				return
+				return nil
 			}
 			sshCloneUrl := GetSshCloneUrl(s.Hostname, repoPath)
 			if err := sshClone(sshCloneUrl, repoLocation); err != nil {
-				fmt.Println("error cloning the repo using ssh. trying http clone...")
+				log.Warnf("failed to clone repo using ssh. trying http clone...")
 				httpCloneUrl := GetHttpCloneUrl(s.Hostname, repoPath, s.Scheme)
 				if err := httpClone(httpCloneUrl, repoLocation); err != nil {
-					log.Fatalf("error cloning the repo using http. %v\n", err)
+					return errors.Wrap(err, "error cloning the repo using http")
 				}
 			}
 		}
 	}
-	fmt.Printf("\nrepo path: %s\n", repoLocation)
-	if copyRepoPathCdCmdToClipboard {
+	log.Infof("\nrepo path: %s\n", repoLocation)
+	if cfg.CopyRepoPathCdCmdToClipboard {
 		err := clipboard.WriteAll(fmt.Sprintf("cd %s", repoLocation))
 		if err != nil {
-			log.Fatalf("err copying repo path to clipboard. %v\n", err)
+			return errors.Wrap(err, "err copying repo path to clipboard")
 		}
-		fmt.Printf("\nnote: command to navigate to repo path has been added to clipboard. run cmd+v to paste the command\n\n")
+		log.Infof("\nnote: command to navigate to repo path has been added to clipboard. run cmd+v to paste the command\n\n")
 	} else {
 		fmt.Printf("\n*** run below command to navigate to repo path  ***\n\ncd %s\n\n", repoLocation)
 	}
+	return nil
 }
 
-func GetClonePath(scmHost, repoPath, repoName, scmHome string, creDir, includeHostForCreDir bool) string {
+func GetClonePath(inputUrl string, creDir bool) string {
+	cfg := config.NewGitrConfig()
+	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
+	if err != nil {
+		log.Fatalf("failed to get scm host. err: %v", err)
+	}
+	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
+	repoName := url.GetRepoName(repoPath)
+	scmHome := getScmHome(s.Clone.HomeDir, cfg.Scm.HomeDir)
 	clonePath := ""
 	if creDir {
-		if includeHostForCreDir {
-			clonePath = fmt.Sprintf("%s/%s", scmHost, repoPath)
+		if s.Clone.IncludeHostForCreDir {
+			clonePath = fmt.Sprintf("%s/%s", s.Hostname, repoPath)
 		} else {
 			clonePath = repoPath
 		}
@@ -123,4 +140,48 @@ func GetSshCloneUrl(hostname, repoPath string) string {
 
 func GetHttpCloneUrl(hostname, repoPath string, scheme config.HttpScheme) string {
 	return fmt.Sprintf("%s://%s/%s.git", scheme, hostname, repoPath)
+}
+
+func printGitrCloneInfo(inputUrl string, creDir bool, cfg *config.GitrConfig) {
+	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
+	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
+	repoName := url.GetRepoName(repoPath)
+	scmHome := getScmHome(s.Clone.HomeDir, cfg.Scm.HomeDir)
+	clonePath := GetClonePath(inputUrl, creDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	println("")
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendRow(table.Row{"remote", inputUrl})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"provider", s.Provider})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"host", s.Hostname})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"repo-name", repoName})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"ssh-url", GetSshCloneUrl(s.Hostname, repoPath)})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"http-url", GetHttpCloneUrl(s.Hostname, repoPath, s.Scheme)})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"create-dir", s.Clone.AlwaysCreDir || creDir})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"scm-home", scmHome})
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"clone-path", clonePath})
+	t.AppendSeparator()
+	t.Render()
+	println("")
+}
+
+func getScmHome(scmHostHomeDir, scmHomeDir string) string {
+	if scmHostHomeDir != "" {
+		return scmHostHomeDir
+	}
+	if scmHomeDir != "" {
+		return scmHomeDir
+	}
+	return file.GetPwd()
 }

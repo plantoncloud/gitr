@@ -34,7 +34,7 @@ const (
 )
 
 func ConfigHandler(cmd *cobra.Command, args []string) {
-	cfg := config.GetGitrConfig()
+	cfg := config.NewGitrConfig()
 	d, err := yaml.Marshal(&cfg)
 	fmt.Printf("")
 	if err != nil {
@@ -46,17 +46,11 @@ func ConfigHandler(cmd *cobra.Command, args []string) {
 func CloneHandler(cmd *cobra.Command, args []string) {
 	inputUrl := args[0]
 	creDir := viper.GetBool(string(CreDir))
-	cfg := config.GetGitrConfig()
-	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
+	cfg := config.NewGitrConfig()
+	err := clone.Clone(cfg, inputUrl, creDir, viper.GetBool(string(Dry)))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to clone repo. err: %v", err)
 	}
-	scmHome := getScmHome(s.Clone.HomeDir, cfg.Scm.HomeDir)
-	if viper.GetBool(string(Dry)) {
-		printGitrCloneInfo(inputUrl, creDir || s.Clone.AlwaysCreDir, cfg)
-		return
-	}
-	clone.Clone(inputUrl, scmHome, creDir || s.Clone.AlwaysCreDir, cfg.CopyRepoPathCdCmdToClipboard, s)
 }
 
 func WebHandler(cmd *cobra.Command, args []string) {
@@ -65,7 +59,7 @@ func WebHandler(cmd *cobra.Command, args []string) {
 	remoteUrl := getGitRemoteUrl(r)
 	branch := getGitBranch(r)
 
-	s, err := config.GetScmHost(config.GetGitrConfig(), url.GetHostname(remoteUrl))
+	s, err := config.GetScmHost(config.NewGitrConfig(), url.GetHostname(remoteUrl))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -106,17 +100,12 @@ func WebHandler(cmd *cobra.Command, args []string) {
 func PathHandler(cmd *cobra.Command, args []string) {
 	inputUrl := args[0]
 	creDir := viper.GetBool(string(CreDir))
-	cfg := config.GetGitrConfig()
-	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
-	if err != nil {
-		log.Fatalf("failed to get scm host. err: %v", err)
-	}
-	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
-	repoName := url.GetRepoName(repoPath)
-	scmHome := getScmHome(s.Clone.HomeDir, cfg.Scm.HomeDir)
-	repoLocation := clone.GetClonePath(s.Hostname, repoPath, repoName, scmHome, creDir || s.Clone.AlwaysCreDir, s.Clone.IncludeHostForCreDir)
+	cfg := config.NewGitrConfig()
+	repoLocation := clone.GetClonePath(inputUrl, creDir)
 	fmt.Println(repoLocation)
-	if err := clipboard.WriteAll(fmt.Sprintf("cd %s", repoLocation)); err != nil {
-		log.Fatalf("err copying repo path to clipboard. %v\n", err)
+	if cfg.CopyRepoPathCdCmdToClipboard {
+		if err := clipboard.WriteAll(fmt.Sprintf("cd %s", repoLocation)); err != nil {
+			log.Fatalf("err copying repo path to clipboard. %v\n", err)
+		}
 	}
 }
