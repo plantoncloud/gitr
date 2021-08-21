@@ -1,4 +1,4 @@
-package internal
+package git
 
 import (
 	"github.com/go-git/go-git/v5"
@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func getGitRepo(folder string) *git.Repository {
+func GetGitRepo(folder string) *git.Repository {
 	for true {
 		repo, err := git.PlainOpen(folder)
 		if err != nil {
@@ -24,7 +24,7 @@ func getGitRepo(folder string) *git.Repository {
 	return nil
 }
 
-func getGitRemoteUrl(r *git.Repository) string {
+func GetGitRemoteUrl(r *git.Repository) string {
 	remotes, err := r.Remotes()
 	if err != nil {
 		log.Fatal(err)
@@ -35,7 +35,7 @@ func getGitRemoteUrl(r *git.Repository) string {
 	return remotes[0].Config().URLs[0]
 }
 
-func getGitBranch(r *git.Repository) string {
+func GetGitBranch(r *git.Repository) string {
 	head, err := r.Head()
 	if err != nil {
 		log.Fatal(err)

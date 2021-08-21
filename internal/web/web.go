@@ -1,4 +1,4 @@
-package internal
+package web
 
 import (
 	"fmt"

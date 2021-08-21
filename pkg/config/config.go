@@ -1,11 +1,8 @@
 package config
 
 import (
-	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -31,16 +28,6 @@ func GetScmHost(cfg *GitrConfig, hostname string) (*ScmHost, error) {
 		}
 	}
 	return nil, errors.New("scm provider not found for hostname " + hostname)
-}
-
-func LoadViperConfig() {
-	home, _ := homedir.Dir()
-	viper.AddConfigPath(home)
-	viper.SetConfigType("yaml")
-	viper.SetConfigName(".gitr")
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal("failed to read config file")
-	}
 }
 
 func NewGitrConfig() (*GitrConfig, error) {
