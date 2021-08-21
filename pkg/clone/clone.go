@@ -71,7 +71,10 @@ func Clone(cfg *config.GitrConfig, inputUrl string, creDir, dry bool) error {
 }
 
 func GetClonePath(inputUrl string, creDir bool) string {
-	cfg := config.NewGitrConfig()
+	cfg, err := config.NewGitrConfig()
+	if err != nil {
+		log.Fatalf("failed to get gitr config. err: %v", err)
+	}
 	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
 	if err != nil {
 		log.Fatalf("failed to get scm host. err: %v", err)

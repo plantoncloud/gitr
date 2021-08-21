@@ -9,7 +9,7 @@ import (
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"github.com/swarupdonepudi/gitr/v2/pkg/file"
 	"github.com/swarupdonepudi/gitr/v2/pkg/url"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 	"log"
 )
 
@@ -34,7 +34,10 @@ const (
 )
 
 func ConfigHandler(cmd *cobra.Command, args []string) {
-	cfg := config.NewGitrConfig()
+	cfg, err := config.NewGitrConfig()
+	if err != nil {
+		log.Fatalf("failed to get gitr config. err: %v", err)
+	}
 	d, err := yaml.Marshal(&cfg)
 	fmt.Printf("")
 	if err != nil {
@@ -46,9 +49,11 @@ func ConfigHandler(cmd *cobra.Command, args []string) {
 func CloneHandler(cmd *cobra.Command, args []string) {
 	inputUrl := args[0]
 	creDir := viper.GetBool(string(CreDir))
-	cfg := config.NewGitrConfig()
-	err := clone.Clone(cfg, inputUrl, creDir, viper.GetBool(string(Dry)))
+	cfg, err := config.NewGitrConfig()
 	if err != nil {
+		log.Fatalf("failed to get gitr config. err: %v", err)
+	}
+	if err := clone.Clone(cfg, inputUrl, creDir, viper.GetBool(string(Dry))); err != nil {
 		log.Fatalf("failed to clone repo. err: %v", err)
 	}
 }
@@ -58,8 +63,11 @@ func WebHandler(cmd *cobra.Command, args []string) {
 
 	remoteUrl := getGitRemoteUrl(r)
 	branch := getGitBranch(r)
-
-	s, err := config.GetScmHost(config.NewGitrConfig(), url.GetHostname(remoteUrl))
+	cfg, err := config.NewGitrConfig()
+	if err != nil {
+		log.Fatalf("failed to get gitr config. err: %v", err)
+	}
+	s, err := config.GetScmHost(cfg, url.GetHostname(remoteUrl))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -100,7 +108,10 @@ func WebHandler(cmd *cobra.Command, args []string) {
 func PathHandler(cmd *cobra.Command, args []string) {
 	inputUrl := args[0]
 	creDir := viper.GetBool(string(CreDir))
-	cfg := config.NewGitrConfig()
+	cfg, err := config.NewGitrConfig()
+	if err != nil {
+		log.Fatalf("failed to get gitr config. err: %v", err)
+	}
 	repoLocation := clone.GetClonePath(inputUrl, creDir)
 	fmt.Println(repoLocation)
 	if cfg.CopyRepoPathCdCmdToClipboard {
