@@ -6,15 +6,15 @@ import (
 )
 
 func TestGitrConfig(t *testing.T) {
-	defaultCloneConfig := config.CloneConfig{
+	defaultCloneConfig := &config.CloneConfig{
 		HomeDir:              "",
 		AlwaysCreDir:         false,
 		IncludeHostForCreDir: false,
 	}
 
 	gc1 := &config.GitrConfig{
-		Scm: config.Scm{
-			Hosts: []config.ScmHost{
+		Scm: &config.Scm{
+			Hosts: []*config.ScmHost{
 				{Scheme: config.Https, Hostname: "github.com", Provider: config.GitHub, DefaultBranch: "master", Clone: defaultCloneConfig},
 				{Scheme: config.Https, Hostname: "gitlab.com", Provider: config.GitLab, DefaultBranch: "main", Clone: defaultCloneConfig},
 				{Scheme: config.Https, Hostname: "bitbucket.org", Provider: config.BitBucketCloud, DefaultBranch: "master", Clone: defaultCloneConfig},

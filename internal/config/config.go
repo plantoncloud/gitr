@@ -34,20 +34,20 @@ func EnsureInitialConfig() error {
 func getDefaultConfig() *config.GitrConfig {
 	return &config.GitrConfig{
 		CopyRepoPathCdCmdToClipboard: false,
-		Scm: config.Scm{
+		Scm: &config.Scm{
 			HomeDir: "",
 			Hosts:   defaultScmSystems(),
 		},
 	}
 }
 
-func defaultScmSystems() []config.ScmHost {
-	defaultCloneConfig := config.CloneConfig{
+func defaultScmSystems() []*config.ScmHost {
+	defaultCloneConfig := &config.CloneConfig{
 		HomeDir:              "",
 		AlwaysCreDir:         true,
 		IncludeHostForCreDir: true,
 	}
-	return []config.ScmHost{
+	return []*config.ScmHost{
 		{Scheme: config.Https, Hostname: "github.com", Provider: config.GitHub, DefaultBranch: "master", Clone: defaultCloneConfig},
 		{Scheme: config.Https, Hostname: "gitlab.com", Provider: config.GitLab, DefaultBranch: "main", Clone: defaultCloneConfig},
 		{Scheme: config.Https, Hostname: "bitbucket.org", Provider: config.BitBucketCloud, DefaultBranch: "master", Clone: defaultCloneConfig},
