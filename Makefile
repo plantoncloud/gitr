@@ -1,3 +1,7 @@
+pkg=github.com/swarupdonepudi/gitr
+LDFLAGS=-ldflags "-X ${pkg}/pkg/version.Version=${v}"
+build_cmd=go build -v ${LDFLAGS}
+
 .PHONY: deps
 deps:
 	go mod download
@@ -10,12 +14,14 @@ fmt:
 	go fmt ./...
 .PHONY: build
 build: deps vet fmt
-	env GOOS=darwin GOARCH=amd64 go build -o bin/gitr-darwin main.go
-	env GOOS=linux GOARCH=amd64 go build -o bin/gitr-linux main.go
-	env GOOS=windows GOARCH=386  go build -o bin/gitr-windows-386.exe main.go
+	env GOOS=darwin GOARCH=amd64 ${build_cmd} -o bin/gitr-darwin main.go
+	env GOOS=linux GOARCH=amd64 ${build_cmd} -o bin/gitr-linux main.go
+	env GOOS=windows GOARCH=386  ${build_cmd} -o bin/gitr-windows-386.exe main.go
 .PHONY: checksum
+
 checksum: build
 	openssl dgst -sha256 bin/gitr-darwin
+
 .PHONY: setup-tests
 setup-tests:
 	mv internal/git_test_data/r1-no-remote/.git-temp internal/git_test_data/r1-no-remote/.git

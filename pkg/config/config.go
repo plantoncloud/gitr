@@ -1,10 +1,13 @@
 package config
 
 import (
-	"errors"
 	"github.com/mitchellh/go-homedir"
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 	"log"
+	"os"
+	"path/filepath"
 )
 
 type ScmProvider string
@@ -40,11 +43,19 @@ func LoadViperConfig() {
 	}
 }
 
-func NewGitrConfig() *GitrConfig {
-	var cfg GitrConfig
-	err := viper.Unmarshal(&cfg)
+func NewGitrConfig() (*GitrConfig, error) {
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal(err)
+		return nil, errors.Wrap(err, "failed to read user home directory required for reading ${HOME}/.gitr.yaml")
 	}
-	return &cfg
+	gitrConfigYaml := filepath.Join(homeDir, ".gitr.yaml")
+	file, err := os.ReadFile(gitrConfigYaml)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to read %s file", gitrConfigYaml)
+	}
+	var cfg GitrConfig
+	if err := yaml.Unmarshal(file, &cfg); err != nil {
+		return nil, errors.Wrapf(err, "failed to unmarshal %s file", gitrConfigYaml)
+	}
+	return &cfg, nil
 }
