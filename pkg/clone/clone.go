@@ -89,7 +89,7 @@ func GetClonePath(cfg *config.GitrConfig, inputUrl string, creDir bool) (string,
 		return "", errors.Wrap(err, "failed to get scm home dir")
 	}
 	clonePath := ""
-	if creDir {
+	if creDir || s.Clone.AlwaysCreDir {
 		if s.Clone.IncludeHostForCreDir {
 			clonePath = fmt.Sprintf("%s/%s", s.Hostname, repoPath)
 		} else {
