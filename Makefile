@@ -1,4 +1,4 @@
-pkg=github.com/swarupdonepudi/gitr
+pkg=github.com/swarupdonepudi/gitr/v2
 LDFLAGS=-ldflags "-X ${pkg}/pkg/version.Version=${v}"
 build_cmd=go build -v ${LDFLAGS}
 
