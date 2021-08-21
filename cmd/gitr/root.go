@@ -29,6 +29,7 @@ func init() {
 		remCmd,
 		tagsCmd,
 		webCmd,
+		versionCmd,
 	)
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().BoolP(string(internal.Dry), "d", false, "dry run")
