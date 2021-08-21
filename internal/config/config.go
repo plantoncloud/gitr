@@ -1,16 +1,22 @@
-package internal
+package config
 
 import (
 	"fmt"
+	"github.com/leftbin/go-util/pkg/file"
+	"github.com/pkg/errors"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
-	"github.com/swarupdonepudi/gitr/v2/pkg/file"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
-func EnsureInitialConfig() {
-	gitrConfigFile := fmt.Sprintf("%s/.gitr.yaml", file.GetHomeDir())
+func EnsureInitialConfig() error {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return errors.Wrap(err, "failed to get user home dir")
+	}
+	gitrConfigFile := fmt.Sprintf("%s/.gitr.yaml", homeDir)
 	cfg := getDefaultConfig()
 	d, err := yaml.Marshal(&cfg)
 	if err != nil {
@@ -22,6 +28,7 @@ func EnsureInitialConfig() {
 			log.Fatal(err)
 		}
 	}
+	return nil
 }
 
 func getDefaultConfig() *config.GitrConfig {

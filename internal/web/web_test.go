@@ -1,4 +1,4 @@
-package internal
+package web
 
 import (
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"

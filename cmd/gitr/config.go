@@ -1,12 +1,28 @@
 package gitr
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
-	h "github.com/swarupdonepudi/gitr/v2/internal"
+	"github.com/swarupdonepudi/gitr/v2/pkg/config"
+	"gopkg.in/yaml.v3"
+	"log"
 )
 
 var configCmd = &cobra.Command{
-	Use:   string(h.Config),
+	Use:   "config",
 	Short: "see gitr config",
-	Run:   h.ConfigHandler,
+	Run:   configHandler,
+}
+
+func configHandler(cmd *cobra.Command, args []string) {
+	cfg, err := config.NewGitrConfig()
+	if err != nil {
+		log.Fatalf("failed to get gitr config. err: %v", err)
+	}
+	d, err := yaml.Marshal(&cfg)
+	fmt.Printf("")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("\n%s\n", string(d))
 }

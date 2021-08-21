@@ -7,10 +7,10 @@ import (
 	ssh2 "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/kevinburke/ssh_config"
+	"github.com/leftbin/go-util/pkg/file"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
-	"github.com/swarupdonepudi/gitr/v2/pkg/file"
 	"github.com/swarupdonepudi/gitr/v2/pkg/url"
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
@@ -24,9 +24,16 @@ func Clone(cfg *config.GitrConfig, inputUrl string, creDir, dry bool) error {
 		return errors.Wrapf(err, "failed to clone git repo with %s url", inputUrl)
 	}
 	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
-	repoLocation := GetClonePath(inputUrl, creDir)
+	repoLocation, err := GetClonePath(cfg, inputUrl, creDir)
+	if err != nil {
+
+		return errors.Wrap(err, "failed to get clone path")
+	}
 	if dry {
-		printGitrCloneInfo(inputUrl, creDir || s.Clone.AlwaysCreDir, cfg)
+		err := printGitrCloneInfo(cfg, inputUrl, creDir || s.Clone.AlwaysCreDir)
+		if err != nil {
+			return errors.Wrap(err, "failed to print gitr clone info")
+		}
 		return nil
 	}
 	if file.IsDirExists(repoLocation) {
@@ -70,18 +77,17 @@ func Clone(cfg *config.GitrConfig, inputUrl string, creDir, dry bool) error {
 	return nil
 }
 
-func GetClonePath(inputUrl string, creDir bool) string {
-	cfg, err := config.NewGitrConfig()
-	if err != nil {
-		log.Fatalf("failed to get gitr config. err: %v", err)
-	}
+func GetClonePath(cfg *config.GitrConfig, inputUrl string, creDir bool) (string, error) {
 	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
 	if err != nil {
 		log.Fatalf("failed to get scm host. err: %v", err)
 	}
 	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
 	repoName := url.GetRepoName(repoPath)
-	scmHome := getScmHome(s.Clone.HomeDir, cfg.Scm.HomeDir)
+	scmHome, err := getScmHome(s.Clone.HomeDir, cfg.Scm.HomeDir)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get scm home dir")
+	}
 	clonePath := ""
 	if creDir {
 		if s.Clone.IncludeHostForCreDir {
@@ -95,7 +101,7 @@ func GetClonePath(inputUrl string, creDir bool) string {
 	if scmHome != "" {
 		clonePath = fmt.Sprintf("%s/%s", scmHome, clonePath)
 	}
-	return clonePath
+	return clonePath, nil
 }
 
 func setUpSshAuth(hostname string) (*ssh2.PublicKeys, error) {
@@ -103,19 +109,29 @@ func setUpSshAuth(hostname string) (*ssh2.PublicKeys, error) {
 	homeDir, _ := os.UserHomeDir()
 	if strings.HasSuffix(keyFilePath, "identity") {
 		var defaultSshKey = fmt.Sprintf("%s/.ssh/id_rsa", homeDir)
-		if file.IsFileExists(file.GetAbsPath(defaultSshKey)) {
+		absPath, err := file.GetAbsPath(defaultSshKey)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to get abs path of %s", defaultSshKey)
+		}
+		if file.IsFileExists(absPath) {
 			keyFilePath = defaultSshKey
 		} else {
 			return nil, errors.New("ssh auth not found")
 		}
 	}
-	pem, _ := ioutil.ReadFile(file.GetAbsPath(keyFilePath))
+	keyFileAbsPath, err := file.GetAbsPath(keyFilePath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to get abs path of %s", keyFilePath)
+	}
+	pem, _ := ioutil.ReadFile(keyFileAbsPath)
 	signer, _ := ssh.ParsePrivateKey(pem)
 	return &ssh2.PublicKeys{User: "git", Signer: signer}, nil
 }
 
 func httpClone(url, clonePath string) error {
-	os.MkdirAll(clonePath, os.ModePerm)
+	if err := os.MkdirAll(clonePath, os.ModePerm); err != nil {
+		return errors.Wrapf(err, "failed to created dir %s", clonePath)
+	}
 	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
 		URL:      url,
 		Progress: os.Stdout,
@@ -128,7 +144,9 @@ func sshClone(repoUrl, clonePath string) error {
 	if sshErr != nil {
 		return sshErr
 	}
-	os.MkdirAll(clonePath, os.ModePerm)
+	if err := os.MkdirAll(clonePath, os.ModePerm); err != nil {
+		return errors.Wrapf(err, "failed to created dir %s", clonePath)
+	}
 	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
 		URL:      repoUrl,
 		Progress: os.Stdout,
@@ -145,14 +163,17 @@ func GetHttpCloneUrl(hostname, repoPath string, scheme config.HttpScheme) string
 	return fmt.Sprintf("%s://%s/%s.git", scheme, hostname, repoPath)
 }
 
-func printGitrCloneInfo(inputUrl string, creDir bool, cfg *config.GitrConfig) {
+func printGitrCloneInfo(cfg *config.GitrConfig, inputUrl string, creDir bool) error {
 	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
 	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
 	repoName := url.GetRepoName(repoPath)
-	scmHome := getScmHome(s.Clone.HomeDir, cfg.Scm.HomeDir)
-	clonePath := GetClonePath(inputUrl, creDir)
+	scmHome, err := getScmHome(s.Clone.HomeDir, cfg.Scm.HomeDir)
 	if err != nil {
-		log.Fatal(err)
+		return errors.Wrap(err, "failed to get scm home dir")
+	}
+	clonePath, err := GetClonePath(cfg, inputUrl, creDir)
+	if err != nil {
+		return errors.Wrap(err, "failed to get clone path")
 	}
 	println("")
 	t := table.NewWriter()
@@ -177,14 +198,19 @@ func printGitrCloneInfo(inputUrl string, creDir bool, cfg *config.GitrConfig) {
 	t.AppendSeparator()
 	t.Render()
 	println("")
+	return nil
 }
 
-func getScmHome(scmHostHomeDir, scmHomeDir string) string {
+func getScmHome(scmHostHomeDir, scmHomeDir string) (string, error) {
 	if scmHostHomeDir != "" {
-		return scmHostHomeDir
+		return scmHostHomeDir, nil
 	}
 	if scmHomeDir != "" {
-		return scmHomeDir
+		return scmHomeDir, nil
 	}
-	return file.GetPwd()
+	getwd, err := os.Getwd()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get current dir")
+	}
+	return getwd, nil
 }
