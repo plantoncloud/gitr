@@ -24,10 +24,10 @@ func GetScmHost(cfg *GitrConfig, hostname string) (*ScmHost, error) {
 	//return the scm system from config file
 	for _, scmSystem := range cfg.Scm.Hosts {
 		if scmSystem.Hostname == hostname {
-			return &scmSystem, nil
+			return scmSystem, nil
 		}
 	}
-	return nil, errors.New("scm provider not found for hostname " + hostname)
+	return nil, &UnknownScmHostErr{ScmHost: hostname}
 }
 
 func NewGitrConfig() (*GitrConfig, error) {
