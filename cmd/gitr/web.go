@@ -1,13 +1,13 @@
 package gitr
 
 import (
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/swarupdonepudi/gitr/v2/internal/cli"
 	"github.com/swarupdonepudi/gitr/v2/internal/git"
 	"github.com/swarupdonepudi/gitr/v2/internal/web"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"github.com/swarupdonepudi/gitr/v2/pkg/url"
-	"log"
 	"os"
 )
 
@@ -96,7 +96,7 @@ func webHandler(cmd *cobra.Command, args []string) {
 	}
 	s, err := config.GetScmHost(cfg, url.GetHostname(remoteUrl))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to get scm host for %s url. err: %v", remoteUrl, err)
 	}
 
 	repoPath := url.GetRepoPath(remoteUrl, s.Hostname, s.Provider)

@@ -6,8 +6,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"log"
 	"os"
 )
 
@@ -20,12 +18,11 @@ func EnsureInitialConfig() error {
 	cfg := getDefaultConfig()
 	d, err := yaml.Marshal(&cfg)
 	if err != nil {
-		log.Fatal(err)
+		return errors.Wrap(err, "failed to marshal config")
 	}
 	if !file.IsFileExists(gitrConfigFile) {
-		err = ioutil.WriteFile(gitrConfigFile, d, 0644)
-		if err != nil {
-			log.Fatal(err)
+		if err = os.WriteFile(gitrConfigFile, d, 0644); err != nil {
+			return errors.Wrapf(err, "failed to write file %s", gitrConfigFile)
 		}
 	}
 	return nil

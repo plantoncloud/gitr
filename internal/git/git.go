@@ -2,7 +2,7 @@ package git
 
 import (
 	"github.com/go-git/go-git/v5"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"path/filepath"
 	"strings"
 )
@@ -27,7 +27,7 @@ func GetGitRepo(folder string) *git.Repository {
 func GetGitRemoteUrl(r *git.Repository) string {
 	remotes, err := r.Remotes()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to get remote url from git repo. err: %v", err)
 	}
 	if len(remotes) == 0 {
 		return ""
@@ -38,7 +38,7 @@ func GetGitRemoteUrl(r *git.Repository) string {
 func GetGitBranch(r *git.Repository) string {
 	head, err := r.Head()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to get head from git repo. err: %v", err)
 	}
 	return strings.ReplaceAll(head.Name().String(), "refs/heads/", "")
 }
