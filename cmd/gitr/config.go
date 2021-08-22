@@ -2,10 +2,10 @@ package gitr
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"gopkg.in/yaml.v3"
-	"log"
 )
 
 var configCmd = &cobra.Command{

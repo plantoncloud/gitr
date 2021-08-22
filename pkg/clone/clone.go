@@ -37,7 +37,7 @@ func Clone(cfg *config.GitrConfig, inputUrl string, creDir, dry bool) error {
 		return nil
 	}
 	if file.IsDirExists(repoLocation) {
-		println("\nrepo already exists. skipping cloning...")
+		log.Info("repo already exists. skipping cloning...")
 	} else {
 		if url.IsGitUrl(inputUrl) {
 			if url.IsGitSshUrl(inputUrl) {
@@ -51,12 +51,12 @@ func Clone(cfg *config.GitrConfig, inputUrl string, creDir, dry bool) error {
 			}
 		} else {
 			if s.Provider == config.BitBucketDatacenter || s.Provider == config.BitBucketCloud {
-				println("gitr does not support clone using browser urls for bitbucket-datacenter & bitbucket.org")
+				log.Warn("gitr does not support clone using browser urls for bitbucket-datacenter & bitbucket.org")
 				return nil
 			}
 			sshCloneUrl := GetSshCloneUrl(s.Hostname, repoPath)
 			if err := sshClone(sshCloneUrl, repoLocation); err != nil {
-				log.Warnf("failed to clone repo using ssh. trying http clone...")
+				log.Warn("failed to clone repo using ssh. trying http clone...")
 				httpCloneUrl := GetHttpCloneUrl(s.Hostname, repoPath, s.Scheme)
 				if err := httpClone(httpCloneUrl, repoLocation); err != nil {
 					return errors.Wrap(err, "error cloning the repo using http")
@@ -64,15 +64,15 @@ func Clone(cfg *config.GitrConfig, inputUrl string, creDir, dry bool) error {
 			}
 		}
 	}
-	log.Infof("\nrepo path: %s\n", repoLocation)
+	log.Infof("repo path: %s", repoLocation)
 	if cfg.CopyRepoPathCdCmdToClipboard {
 		err := clipboard.WriteAll(fmt.Sprintf("cd %s", repoLocation))
 		if err != nil {
 			return errors.Wrap(err, "err copying repo path to clipboard")
 		}
-		log.Infof("\nnote: command to navigate to repo path has been added to clipboard. run cmd+v to paste the command\n\n")
+		log.Info("command to navigate to repo path has been added to clipboard. run cmd+v to paste the command")
 	} else {
-		fmt.Printf("\n*** run below command to navigate to repo path  ***\n\ncd %s\n\n", repoLocation)
+		log.Infof("run this command to navigate to repo path: cd %s", repoLocation)
 	}
 	return nil
 }

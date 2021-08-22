@@ -1,11 +1,10 @@
 package gitr
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/swarupdonepudi/gitr/v2/internal/cli"
 	"github.com/swarupdonepudi/gitr/v2/internal/config"
-	"os"
 )
 
 var rootCmd = &cobra.Command{
@@ -31,16 +30,13 @@ func init() {
 		tagsCmd,
 		webCmd,
 	)
-	initConfig()
-}
-
-func initConfig() {
-	config.EnsureInitialConfig()
+	if err := config.EnsureInitialConfig(); err != nil {
+		log.Fatalf("failed to initialize config. err %v", err)
+	}
 }
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatalf("failed to run command. err %v", err)
 	}
 }
