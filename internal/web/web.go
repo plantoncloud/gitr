@@ -52,6 +52,8 @@ func GetRemUrl(p config.ScmProvider, webUrl, repoBranch string) string {
 	switch p {
 	case config.GitLab:
 		return fmt.Sprintf("%s/-/tree/%s", webUrl, repoBranch)
+	case config.BitBucketCloud:
+		return fmt.Sprintf("%s/branch/%s", webUrl, repoBranch)
 	default:
 		return fmt.Sprintf("%s/tree/%s", webUrl, repoBranch)
 	}
