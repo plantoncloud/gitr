@@ -14,6 +14,7 @@ func TestRemUrls(t *testing.T) {
 	}{
 		{config.GitHub, "https://github.com/swarupdonepudi/gitr", "master", "https://github.com/swarupdonepudi/gitr/tree/master"},
 		{config.GitHub, "https://github.com/swarupdonepudi/gitr", "feat/custom-branch", "https://github.com/swarupdonepudi/gitr/tree/feat/custom-branch"},
+		{config.BitBucketCloud, "https://bitbucket.org/ramamohanraju/demo-project", "master", "https://bitbucket.org/ramamohanraju/demo-project/branch/master"},
 	}
 	t.Run("validate remote urls", func(t *testing.T) {
 		for _, u := range urlTests {
