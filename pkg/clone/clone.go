@@ -264,7 +264,11 @@ func gitPullHelper(path string, auth transport.AuthMethod) error {
 		Auth:     auth,
 	})
 	if err != nil {
-		log.Infof("Already up to date.")
+		if err.Error() == "already up-to-date" {
+			log.Infof("Already up to date.")
+			return nil
+		}
+		return err
 	}
 	ref, err := r.Head()
 	if err != nil {
