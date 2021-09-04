@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/atotto/clipboard"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/transport"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	ssh2 "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -11,6 +12,7 @@ import (
 	"github.com/leftbin/go-util/pkg/file"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/swarupdonepudi/gitr/v2/pkg"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"github.com/swarupdonepudi/gitr/v2/pkg/url"
 	"golang.org/x/crypto/ssh"
@@ -38,7 +40,10 @@ func Clone(cfg *config.GitrConfig, inputUrl string, token string, creDir, dry bo
 		return nil
 	}
 	if file.IsDirExists(repoLocation) {
-		log.Info("repo already exists. skipping cloning...")
+		log.Info("repo already exists. pulling the latest changes from origin")
+		if err := gitPull(inputUrl, repoLocation); err != nil {
+			return err
+		}
 	} else {
 		if url.IsGitUrl(inputUrl) {
 			if url.IsGitSshUrl(inputUrl) {
@@ -162,6 +167,9 @@ func httpClone(url, clonePath string) error {
 		URL:      url,
 		Progress: os.Stdout,
 	})
+	if err != nil {
+		pkg.Remove(clonePath)
+	}
 	return err
 }
 
@@ -188,6 +196,9 @@ func httpsGitClone(repoUrl, inputToken, clonePath string) error {
 			Password: *token,
 		},
 	})
+	if err != nil {
+		pkg.Remove(clonePath)
+	}
 	return err
 }
 
@@ -204,7 +215,67 @@ func sshClone(repoUrl, clonePath string) error {
 		Progress: os.Stdout,
 		Auth:     auth,
 	})
+	if err != nil {
+		pkg.Remove(clonePath)
+	}
 	return err
+}
+
+func gitPull(repoUrl, clonePath string) error {
+	if url.IsGitUrl(repoUrl) {
+		if url.IsGitSshUrl(repoUrl) {
+			auth, sshErr := setUpSshAuth(url.GetHostname(repoUrl))
+			if sshErr != nil {
+				return sshErr
+			}
+			return gitPullHelper(clonePath, auth)
+		} else {
+			token, err := setUpHttpsPersonalAccessToken(url.GetHostname(repoUrl), "")
+			if err != nil {
+				return err
+			}
+			auth := &http.BasicAuth{
+				Username: "abc123", // this can be anything except an empty string
+				Password: *token,
+			}
+			return gitPullHelper(clonePath, auth)
+		}
+	} else {
+		log.Infof("gitr supports pull only for git")
+	}
+	return nil
+}
+
+func gitPullHelper(path string, auth transport.AuthMethod) error {
+	if err := os.Chdir(path); err != nil {
+		return errors.Wrapf(err, "failed to navigate to dir %s", path)
+	}
+
+	r, err := git.PlainOpen(path)
+	if err != nil {
+		return errors.Wrapf(err, "given dir is not a git repository %s", path)
+	}
+	w, err := r.Worktree()
+	if err != nil {
+		return err
+	}
+	err = w.Pull(&git.PullOptions{RemoteName: "origin",
+		Progress: os.Stdout,
+		Auth:     auth,
+	})
+	if err != nil {
+		log.Infof("Already up to date.")
+	}
+	ref, err := r.Head()
+	if err != nil {
+		return err
+	}
+	commit, err := r.CommitObject(ref.Hash())
+	if err != nil {
+		return err
+	}
+	fmt.Println(commit)
+	return nil
 }
 
 func GetSshCloneUrl(hostname, repoPath string) string {
