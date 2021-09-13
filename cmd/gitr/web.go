@@ -4,9 +4,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/swarupdonepudi/gitr/v2/internal/cli"
-	"github.com/swarupdonepudi/gitr/v2/internal/git"
 	"github.com/swarupdonepudi/gitr/v2/internal/web"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
+	"github.com/swarupdonepudi/gitr/v2/pkg/git"
 	"github.com/swarupdonepudi/gitr/v2/pkg/url"
 	"os"
 )
