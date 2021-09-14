@@ -42,7 +42,7 @@ func Clone(cfg *config.GitrConfig, inputUrl string, token string, creDir, dry bo
 	if file.IsDirExists(repoLocation) {
 		log.Info("repo already exists. pulling the latest changes from origin")
 		if err := gitPull(inputUrl, repoLocation); err != nil {
-			return err
+			return errors.Wrap(err, "error occurred while using git pull to the latest data")
 		}
 	} else {
 		if url.IsGitUrl(inputUrl) {
@@ -176,7 +176,7 @@ func httpClone(url, clonePath string) error {
 func httpsGitClone(repoUrl, inputToken, clonePath string) error {
 	token, err := setUpHttpsPersonalAccessToken(url.GetHostname(repoUrl), inputToken)
 	if err != nil {
-		log.Warn("your laptop is not configured with personal access token of git\n")
+		log.Warn("your laptop is not configured with personal access token of git")
 		log.Infoln("please follow the below steps as one time set up\n" +
 			"####################################################\n" +
 			"1. set up your personal access token for git (https://docs.gitlab.com/12.10/ee/user/profile/personal_access_tokens.html)\n" +
@@ -228,17 +228,17 @@ func gitPull(repoUrl, clonePath string) error {
 			if sshErr != nil {
 				return sshErr
 			}
-			return gitPullHelper(clonePath, auth)
+			return gitPullAndPrintLatestCommitObject(clonePath, auth)
 		} else {
 			token, err := setUpHttpsPersonalAccessToken(url.GetHostname(repoUrl), "")
 			if err != nil {
-				return err
+				return errors.Wrap(err, "error setting up personal access token")
 			}
 			auth := &http.BasicAuth{
 				Username: "abc123", // this can be anything except an empty string
 				Password: *token,
 			}
-			return gitPullHelper(clonePath, auth)
+			return gitPullAndPrintLatestCommitObject(clonePath, auth)
 		}
 	} else {
 		log.Infof("gitr supports pull only for git")
@@ -246,18 +246,14 @@ func gitPull(repoUrl, clonePath string) error {
 	return nil
 }
 
-func gitPullHelper(path string, auth transport.AuthMethod) error {
-	if err := os.Chdir(path); err != nil {
-		return errors.Wrapf(err, "failed to navigate to dir %s", path)
-	}
-
+func gitPullAndPrintLatestCommitObject(path string, auth transport.AuthMethod) error {
 	r, err := git.PlainOpen(path)
 	if err != nil {
 		return errors.Wrapf(err, "given dir is not a git repository %s", path)
 	}
 	w, err := r.Worktree()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error while getting the work tree")
 	}
 	err = w.Pull(&git.PullOptions{RemoteName: "origin",
 		Progress: os.Stdout,
@@ -268,15 +264,15 @@ func gitPullHelper(path string, auth transport.AuthMethod) error {
 			log.Infof("Already up to date.")
 			return nil
 		}
-		return err
+		return errors.Wrap(err, "error while pulling the latest from git")
 	}
 	ref, err := r.Head()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error while getting the git head info")
 	}
 	commit, err := r.CommitObject(ref.Hash())
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error while getting the git commit object info")
 	}
 	fmt.Println(commit)
 	return nil
