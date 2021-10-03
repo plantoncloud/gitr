@@ -12,7 +12,6 @@ import (
 	"github.com/leftbin/go-util/pkg/file"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/swarupdonepudi/gitr/v2/pkg"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"github.com/swarupdonepudi/gitr/v2/pkg/url"
 	"golang.org/x/crypto/ssh"
@@ -168,7 +167,9 @@ func httpClone(url, clonePath string) error {
 		Progress: os.Stdout,
 	})
 	if err != nil {
-		pkg.Remove(clonePath)
+		if err := os.Remove(clonePath); err != nil {
+			return errors.Wrapf(err, "failed to delete dir %s", clonePath)
+		}
 	}
 	return err
 }
@@ -197,7 +198,9 @@ func httpsGitClone(repoUrl, inputToken, clonePath string) error {
 		},
 	})
 	if err != nil {
-		pkg.Remove(clonePath)
+		if err := os.Remove(clonePath); err != nil {
+			return errors.Wrapf(err, "failed to delete dir %s", clonePath)
+		}
 	}
 	return err
 }
@@ -216,7 +219,9 @@ func sshClone(repoUrl, clonePath string) error {
 		Auth:     auth,
 	})
 	if err != nil {
-		pkg.Remove(clonePath)
+		if err := os.Remove(clonePath); err != nil {
+			return errors.Wrapf(err, "failed to delete dir %s", clonePath)
+		}
 	}
 	return err
 }
