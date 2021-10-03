@@ -20,7 +20,7 @@ import (
 	"strings"
 )
 
-func Clone(cfg *config.GitrConfig, inputUrl string, token string, creDir, dry bool) error {
+func Clone(cfg *config.GitrConfig, inputUrl string, creDir, dry bool) error {
 	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
 	if err != nil {
 		return errors.Wrapf(err, "failed to clone git repo with %s url", inputUrl)
@@ -50,7 +50,7 @@ func Clone(cfg *config.GitrConfig, inputUrl string, token string, creDir, dry bo
 					return errors.Wrap(err, "error cloning the repo")
 				}
 			} else {
-				if err := httpsGitClone(inputUrl, token, repoLocation); err != nil {
+				if err := httpsGitClone(inputUrl, repoLocation); err != nil {
 					return errors.Wrap(err, "error cloning the repo")
 				}
 			}
@@ -133,28 +133,21 @@ func setUpSshAuth(hostname string) (*ssh2.PublicKeys, error) {
 	return &ssh2.PublicKeys{User: "git", Signer: signer}, nil
 }
 
-func setUpHttpsPersonalAccessToken(hostname, inputToken string) (*string, error) {
+func setUpHttpsPersonalAccessToken(hostname string) (*string, error) {
 	homeDir, _ := os.UserHomeDir()
 	pAccessTokenDir := fmt.Sprintf("%s/.personal_access_tokens", homeDir)
 	pAccessTokenFilePath := fmt.Sprintf("%s/%s", pAccessTokenDir, hostname)
 	pAccessTokenFileAbsPath, err := file.GetAbsPath(pAccessTokenFilePath)
-	if len(inputToken) == 0 {
-		if file.IsFileExists(pAccessTokenFileAbsPath) {
-			pem, _ := ioutil.ReadFile(pAccessTokenFileAbsPath)
-			if err != nil {
-				return nil, errors.Wrapf(err, "failed to get abs path of %s", pAccessTokenFileAbsPath)
-			}
-			token := string(pem[:])
-			return &token, nil
-		} else {
-			return nil, errors.Errorf("file not present in %s", pAccessTokenDir)
+
+	if file.IsFileExists(pAccessTokenFileAbsPath) {
+		pem, _ := ioutil.ReadFile(pAccessTokenFileAbsPath)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to get abs path of %s", pAccessTokenFileAbsPath)
 		}
+		token := string(pem[:])
+		return &token, nil
 	} else {
-		if err := os.MkdirAll(pAccessTokenDir, os.ModePerm); err != nil {
-			return nil, errors.Wrapf(err, "failed to created dir %s", pAccessTokenDir)
-		}
-		err = ioutil.WriteFile(pAccessTokenFilePath, []byte(inputToken), os.ModePerm)
-		return &inputToken, err
+		return nil, errors.Errorf("file not present in %s", pAccessTokenDir)
 	}
 }
 
@@ -174,15 +167,15 @@ func httpClone(url, clonePath string) error {
 	return err
 }
 
-func httpsGitClone(repoUrl, inputToken, clonePath string) error {
-	token, err := setUpHttpsPersonalAccessToken(url.GetHostname(repoUrl), inputToken)
+func httpsGitClone(repoUrl, clonePath string) error {
+	token, err := setUpHttpsPersonalAccessToken(url.GetHostname(repoUrl))
 	if err != nil {
 		log.Warn("your laptop is not configured with personal access token of git")
 		log.Infoln("please follow the below steps as one time set up\n" +
 			"####################################################\n" +
 			"1. set up your personal access token for git (https://docs.gitlab.com/12.10/ee/user/profile/personal_access_tokens.html)\n" +
-			"2. copy your token and pass it as third argument (<token>) for the below command.\n" +
-			"3. gitr clone <repo-path> <token>\n" +
+			"2. run `gitr token add --host <host> --token <some-secret-token>` to set up token.\n" +
+			"3. run `gitr token get --host <host>` to view set token.\n" +
 			"####################################################")
 		return err
 	}
@@ -235,7 +228,7 @@ func gitPull(repoUrl, clonePath string) error {
 			}
 			return gitPullAndPrintLatestCommitObject(clonePath, auth)
 		} else {
-			token, err := setUpHttpsPersonalAccessToken(url.GetHostname(repoUrl), "")
+			token, err := setUpHttpsPersonalAccessToken(url.GetHostname(repoUrl))
 			if err != nil {
 				return errors.Wrap(err, "error setting up personal access token")
 			}

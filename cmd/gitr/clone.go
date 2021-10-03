@@ -23,10 +23,6 @@ func cloneHandler(cmd *cobra.Command, args []string) {
 		log.Fatalf("clone url required as argument")
 	}
 	inputUrl := args[0]
-	var token = ""
-	if len(args) > 1 {
-		token = args[1]
-	}
 	dry, err := cmd.InheritedFlags().GetBool(string(cli.Dry))
 	cli.HandleFlagErr(err, cli.Dry)
 	creDir, err := cmd.PersistentFlags().GetBool(string(cli.CreDir))
@@ -35,7 +31,7 @@ func cloneHandler(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("failed to get gitr config. err: %v", err)
 	}
-	if err := clone.Clone(cfg, inputUrl, token, creDir, dry); err != nil {
+	if err := clone.Clone(cfg, inputUrl, creDir, dry); err != nil {
 		log.Fatalf("failed to clone repo. err: %v", err)
 	}
 }
