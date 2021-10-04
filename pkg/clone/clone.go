@@ -17,6 +17,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -135,8 +136,8 @@ func setUpSshAuth(hostname string) (*ssh2.PublicKeys, error) {
 
 func setUpHttpsPersonalAccessToken(hostname string) (*string, error) {
 	homeDir, _ := os.UserHomeDir()
-	pAccessTokenDir := fmt.Sprintf("%s/.personal_access_tokens", homeDir)
-	pAccessTokenFilePath := fmt.Sprintf("%s/%s", pAccessTokenDir, hostname)
+	pAccessTokenDir := filepath.Join(homeDir, ".personal_access_tokens")
+	pAccessTokenFilePath := filepath.Join(pAccessTokenDir, hostname)
 	pAccessTokenFileAbsPath, err := file.GetAbsPath(pAccessTokenFilePath)
 
 	if file.IsFileExists(pAccessTokenFileAbsPath) {
