@@ -135,15 +135,21 @@ func setUpSshAuth(hostname string) (*ssh2.PublicKeys, error) {
 }
 
 func setUpHttpsPersonalAccessToken(hostname string) (*string, error) {
-	homeDir, _ := os.UserHomeDir()
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to fetch user home directory")
+	}
 	pAccessTokenDir := filepath.Join(homeDir, ".personal_access_tokens")
 	pAccessTokenFilePath := filepath.Join(pAccessTokenDir, hostname)
 	pAccessTokenFileAbsPath, err := file.GetAbsPath(pAccessTokenFilePath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to get abs path of %s", pAccessTokenFilePath)
+	}
 
 	if file.IsFileExists(pAccessTokenFileAbsPath) {
-		pem, _ := ioutil.ReadFile(pAccessTokenFileAbsPath)
+		pem, err := ioutil.ReadFile(pAccessTokenFileAbsPath)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to get abs path of %s", pAccessTokenFileAbsPath)
+			return nil, errors.Wrapf(err, "failed to read %s", pAccessTokenFileAbsPath)
 		}
 		token := string(pem[:])
 		return &token, nil
