@@ -151,7 +151,7 @@ func setUpHttpsPersonalAccessToken(hostname string) (*string, error) {
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to read %s", pAccessTokenFileAbsPath)
 		}
-		token := string(pem[:])
+		token := string(pem)
 		return &token, nil
 	} else {
 		return nil, errors.Errorf("file not present in %s", pAccessTokenDir)
