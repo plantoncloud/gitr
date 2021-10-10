@@ -226,29 +226,31 @@ func sshClone(repoUrl, clonePath string) error {
 	return err
 }
 
-func gitPull(repoUrl, clonePath string) error {
-	if url.IsGitUrl(repoUrl) {
-		if url.IsGitSshUrl(repoUrl) {
-			auth, sshErr := setUpSshAuth(url.GetHostname(repoUrl))
-			if sshErr != nil {
-				return sshErr
-			}
-			return gitPullAndPrintLatestCommitObject(clonePath, auth)
-		} else {
-			token, err := setUpHttpsPersonalAccessToken(url.GetHostname(repoUrl))
-			if err != nil {
-				return errors.Wrap(err, "error setting up personal access token")
-			}
-			auth := &http.BasicAuth{
-				Username: "abc123", // this can be anything except an empty string
-				Password: *token,
-			}
-			return gitPullAndPrintLatestCommitObject(clonePath, auth)
+func gitPull(repoUrl, clonePath string) (err error) {
+	if !url.IsGitUrl(repoUrl) {
+		log.Infof("gitr supports pull only for git")
+		return nil
+	}
+	var auth transport.AuthMethod
+	if url.IsGitSshUrl(repoUrl) {
+		auth, err = setUpSshAuth(url.GetHostname(repoUrl))
+		if err != nil {
+			return errors.Wrap(err, "ssh auth setup failed")
 		}
 	} else {
-		log.Infof("gitr supports pull only for git")
+		token, err := setUpHttpsPersonalAccessToken(url.GetHostname(repoUrl))
+		if err != nil {
+			return errors.Wrap(err, "error setting up personal access token")
+		}
+		auth = &http.BasicAuth{
+			Username: "non-empty-string", // this can be anything except an empty string
+			Password: *token,
+		}
 	}
-	return nil
+	if err := gitPullAndPrintLatestCommitObject(clonePath, auth); err != nil {
+		return errors.Wrap(err, "failed to git pull")
+	}
+	return
 }
 
 func gitPullAndPrintLatestCommitObject(path string, auth transport.AuthMethod) error {
