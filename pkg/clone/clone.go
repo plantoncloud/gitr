@@ -2,6 +2,11 @@ package clone
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/atotto/clipboard"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport"
@@ -15,10 +20,6 @@ import (
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"github.com/swarupdonepudi/gitr/v2/pkg/url"
 	"golang.org/x/crypto/ssh"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 func Clone(cfg *config.GitrConfig, inputUrl string, creDir, dry bool) error {
@@ -258,30 +259,35 @@ func gitPullAndPrintLatestCommitObject(path string, auth transport.AuthMethod) e
 	if err != nil {
 		return errors.Wrapf(err, "given dir is not a git repository %s", path)
 	}
+
 	w, err := r.Worktree()
 	if err != nil {
 		return errors.Wrap(err, "error while getting the work tree")
 	}
+
 	err = w.Pull(&git.PullOptions{RemoteName: "origin",
 		Progress: os.Stdout,
 		Auth:     auth,
 	})
+
 	if err != nil {
-		if err.Error() == "already up-to-date" {
-			log.Infof("Already up to date.")
-			return nil
+		if err.Error() != "already up-to-date" {
+			return errors.Wrap(err, "error while pulling the latest from git")
 		}
-		return errors.Wrap(err, "error while pulling the latest from git")
+		return nil
 	}
+
 	ref, err := r.Head()
 	if err != nil {
 		return errors.Wrap(err, "error while getting the git head info")
 	}
+
 	commit, err := r.CommitObject(ref.Hash())
 	if err != nil {
 		return errors.Wrap(err, "error while getting the git commit object info")
 	}
-	fmt.Println(commit)
+	log.Info(commit)
+
 	return nil
 }
 
