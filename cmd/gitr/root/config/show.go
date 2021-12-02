@@ -1,4 +1,4 @@
-package gitr
+package config
 
 import (
 	"fmt"
@@ -8,13 +8,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var configCmd = &cobra.Command{
-	Use:   "config",
-	Short: "see gitr config",
-	Run:   configHandler,
+var Show = &cobra.Command{
+	Use:   "show",
+	Short: "show gitr config",
+	Run:   showHandler,
 }
 
-func configHandler(cmd *cobra.Command, args []string) {
+func showHandler(cmd *cobra.Command, args []string) {
 	cfg, err := config.NewGitrConfig()
 	if err != nil {
 		log.Fatalf("failed to get gitr config. err: %v", err)

@@ -44,4 +44,4 @@ analyze-tests:
 	go tool cover -func=pkg.cov
 .PHONY: local
 local: build
-	cp bin/gitr-darwin /usr/local/bin/gitr
+	sudo cp bin/gitr-darwin /usr/local/bin/gitr

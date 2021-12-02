@@ -1,4 +1,4 @@
-package gitr
+package root
 
 import (
 	"fmt"
@@ -10,14 +10,14 @@ import (
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 )
 
-var pathCmd = &cobra.Command{
+var Path = &cobra.Command{
 	Use:   "path",
 	Short: "prints the path to which the repo is cloned/will be cloned",
 	Run:   pathHandler,
 }
 
 func init() {
-	pathCmd.PersistentFlags().BoolP(string(cli.CreDir), "", false, "cre folders to mimic repo path on scm")
+	Path.PersistentFlags().BoolP(string(cli.CreDir), "", false, "cre folders to mimic repo path on scm")
 }
 
 func pathHandler(cmd *cobra.Command, args []string) {
