@@ -1,4 +1,4 @@
-package gitr
+package root
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/swarupdonepudi/gitr/v2/pkg/version"
 )
 
-var versionCmd = &cobra.Command{
+var Version = &cobra.Command{
 	Use:     "version",
 	Short:   "check the version of the cli",
 	Aliases: []string{"v"},

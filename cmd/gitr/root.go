@@ -3,6 +3,7 @@ package gitr
 import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/swarupdonepudi/gitr/v2/cmd/gitr/root"
 	"github.com/swarupdonepudi/gitr/v2/internal/cli"
 	"github.com/swarupdonepudi/gitr/v2/internal/config"
 )
@@ -16,19 +17,19 @@ var rootCmd = &cobra.Command{
 func init() {
 	rootCmd.PersistentFlags().BoolP(string(cli.Dry), "", false, "dry run")
 	rootCmd.AddCommand(
-		versionCmd,
-		configCmd,
-		cloneCmd,
-		pathCmd,
-		branchesCmd,
-		commitsCmd,
-		issuesCmd,
-		pipelinesCmd,
-		prsCmd,
-		releasesCmd,
-		remCmd,
-		tagsCmd,
-		webCmd,
+		root.Version,
+		root.Config,
+		root.Clone,
+		root.Path,
+		root.BranchesCmd,
+		root.CommitsCmd,
+		root.IssuesCmd,
+		root.PipelinesCmd,
+		root.PrsCmd,
+		root.ReleasesCmd,
+		root.RemCmd,
+		root.TagsCmd,
+		root.WebCmd,
 	)
 	if err := config.EnsureInitialConfig(); err != nil {
 		log.Fatalf("failed to initialize config. err %v", err)

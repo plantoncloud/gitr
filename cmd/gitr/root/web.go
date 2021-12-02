@@ -1,4 +1,4 @@
-package gitr
+package root
 
 import (
 	log "github.com/sirupsen/logrus"
@@ -11,71 +11,71 @@ import (
 	"os"
 )
 
-type WebCmd string
+type WebCmdName string
 
 const (
-	Branches  WebCmd = "branches"
-	Prs       WebCmd = "prs"
-	Commits   WebCmd = "commits"
-	Issues    WebCmd = "issues"
-	Tags      WebCmd = "tags"
-	Releases  WebCmd = "releases"
-	Pipelines WebCmd = "pipelines"
-	Web       WebCmd = "web"
-	Rem       WebCmd = "rem"
+	branches  WebCmdName = "branches"
+	prs       WebCmdName = "prs"
+	commits   WebCmdName = "commits"
+	issues    WebCmdName = "issues"
+	tags      WebCmdName = "tags"
+	releases  WebCmdName = "releases"
+	pipelines WebCmdName = "pipelines"
+	webHome   WebCmdName = "web"
+	rem       WebCmdName = "rem"
 )
 
-var branchesCmd = &cobra.Command{
-	Use:   string(Branches),
+var BranchesCmd = &cobra.Command{
+	Use:   string(branches),
 	Short: "open branches of the repo in the browser",
 	Run:   webHandler,
 }
 
-var webCmd = &cobra.Command{
-	Use:   string(Web),
+var WebCmd = &cobra.Command{
+	Use:   string(webHome),
 	Short: "open home page of the repo in the browser",
 	Run:   webHandler,
 }
 
-var tagsCmd = &cobra.Command{
-	Use:   string(Tags),
+var TagsCmd = &cobra.Command{
+	Use:   string(tags),
 	Short: "open tags of the repo in the browser",
 	Run:   webHandler,
 }
 
-var remCmd = &cobra.Command{
-	Use:   string(Rem),
+var RemCmd = &cobra.Command{
+	Use:   string(rem),
 	Short: "open local checkout branch of the repo in the browser",
 	Run:   webHandler,
 }
 
-var releasesCmd = &cobra.Command{
-	Use:   string(Releases),
+var ReleasesCmd = &cobra.Command{
+	Use:   string(releases),
 	Short: "open releases of the repo in the browser",
 	Run:   webHandler,
 }
 
-var prsCmd = &cobra.Command{
-	Use:   string(Prs),
+var PrsCmd = &cobra.Command{
+	Use:   string(prs),
 	Short: "open prs/mrs of the repo in the browser",
 	Run:   webHandler,
 }
 
-var pipelinesCmd = &cobra.Command{
-	Use:     string(Pipelines),
+var PipelinesCmd = &cobra.Command{
+	Use:     string(pipelines),
 	Short:   "open pipelines/actions of the repo in the browser",
 	Aliases: []string{"pipe"},
 	Run:     webHandler,
 }
 
-var issuesCmd = &cobra.Command{
-	Use:   string(Issues),
+var IssuesCmd = &cobra.Command{
+	Use:   string(issues),
 	Short: "open issues of the repo in the browser",
 	Run:   webHandler,
 }
 
-var commitsCmd = &cobra.Command{
-	Use:   string(Commits),
+var CommitsCmd = &cobra.Command{
+	Use:   string(commits),
 	Short: "open commits of the local branch of repo in the browser",
 	Run:   webHandler,
 }
@@ -108,24 +108,24 @@ func webHandler(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	switch WebCmd(cmd.Name()) {
-	case Branches:
+	switch WebCmdName(cmd.Name()) {
+	case branches:
 		url.OpenInBrowser(web.GetBranchesUrl(s.Provider, webUrl))
-	case Prs:
+	case prs:
 		url.OpenInBrowser(web.GetPrsUrl(s.Provider, webUrl))
-	case Commits:
+	case commits:
 		url.OpenInBrowser(web.GetCommitsUrl(s.Provider, webUrl, branch))
-	case Issues:
+	case issues:
 		url.OpenInBrowser(web.GetIssuesUrl(s.Provider, webUrl))
-	case Tags:
+	case tags:
 		url.OpenInBrowser(web.GetTagsUrl(s.Provider, webUrl))
-	case Releases:
+	case releases:
 		url.OpenInBrowser(web.GetReleasesUrl(s.Provider, webUrl))
-	case Pipelines:
+	case pipelines:
 		url.OpenInBrowser(web.GetPipelinesUrl(s.Provider, webUrl))
-	case Web:
+	case webHome:
 		url.OpenInBrowser(webUrl)
-	case Rem:
+	case rem:
 		url.OpenInBrowser(web.GetRemUrl(s.Provider, webUrl, branch))
 	default:
 		log.Fatal("unknown web command")
