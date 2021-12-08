@@ -14,13 +14,14 @@ fmt:
 	go fmt ./...
 .PHONY: build
 build: deps vet fmt
-	env GOOS=darwin GOARCH=amd64 ${build_cmd} -o bin/gitr-darwin main.go
-	env GOOS=linux GOARCH=amd64 ${build_cmd} -o bin/gitr-linux main.go
-	env GOOS=windows GOARCH=386  ${build_cmd} -o bin/gitr-windows-386.exe main.go
+	env GOOS=darwin ${build_cmd} -o bin/gitr-darwin main.go
+	env GOOS=darwin GOARCH=amd64 ${build_cmd} -o bin/gitr-darwin-amd64 main.go
+	env GOOS=darwin GOARCH=arm64 ${build_cmd} -o bin/gitr-darwin-arm64 main.go
 .PHONY: checksum
 
 checksum: build
-	openssl dgst -sha256 bin/gitr-darwin
+	openssl dgst -sha256 bin/gitr-darwin-amd64
+	openssl dgst -sha256 bin/gitr-darwin-arm64
 
 .PHONY: setup-tests
 setup-tests:
