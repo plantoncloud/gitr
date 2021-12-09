@@ -1,12 +1,19 @@
 package gitr
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/swarupdonepudi/gitr/v2/cmd/gitr/root"
 	"github.com/swarupdonepudi/gitr/v2/internal/cli"
 	"github.com/swarupdonepudi/gitr/v2/internal/config"
+	"os"
+	"runtime"
 )
+
+var debug bool
+
+const HomebrewAppleSiliconBinPath = "/opt/homebrew/bin"
 
 var rootCmd = &cobra.Command{
 	Use:   "gitr",
@@ -15,6 +22,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
+	rootCmd.PersistentFlags().BoolVar(&debug, string(cli.Debug), false, "set log level to debug")
 	rootCmd.PersistentFlags().BoolP(string(cli.Dry), "", false, "dry run")
 	rootCmd.AddCommand(
 		root.Version,
@@ -31,6 +39,18 @@ func init() {
 		root.TagsCmd,
 		root.WebCmd,
 	)
+	cobra.OnInitialize(func() {
+		if debug {
+			log.SetLevel(log.DebugLevel)
+			log.Debug("running in debug mode")
+		}
+		if runtime.GOARCH == "arm64" {
+			pathEnvVal := os.Getenv("PATH")
+			if err := os.Setenv("PATH", fmt.Sprintf("%s:%s", pathEnvVal, HomebrewAppleSiliconBinPath)); err != nil {
+				log.Fatalf("failed to set PATH env. err: %v", err)
+			}
+		}
+	})
 	if err := config.EnsureInitialConfig(); err != nil {
 		log.Fatalf("failed to initialize config. err %v", err)
 	}

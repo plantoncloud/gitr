@@ -7,6 +7,7 @@ type Flag string
 const (
 	Dry    Flag = "dry"
 	CreDir Flag = "create-dir"
+	Debug  Flag = "debug"
 )
 
 func HandleFlagErr(err error, flag Flag) {
