@@ -18,6 +18,7 @@ var Clone = &cobra.Command{
 
 func init() {
 	Clone.PersistentFlags().BoolP(string(cli.CreDir), "", false, "cre folders to mimic repo path on scm")
+	Clone.PersistentFlags().StringP(string(cli.Token), "", "", "https personal access token help: https://docs.gitlab.com/12.10/ee/user/profile/personal_access_tokens.html")
 }
 
 func cloneHandler(cmd *cobra.Command, args []string) {
@@ -25,14 +26,12 @@ func cloneHandler(cmd *cobra.Command, args []string) {
 		log.Fatalf("clone url required as argument")
 	}
 	inputUrl := args[0]
-	var token = ""
-	if len(args) > 1 {
-		token = args[1]
-	}
 	dry, err := cmd.InheritedFlags().GetBool(string(cli.Dry))
 	cli.HandleFlagErr(err, cli.Dry)
 	creDir, err := cmd.PersistentFlags().GetBool(string(cli.CreDir))
 	cli.HandleFlagErr(err, cli.CreDir)
+	token, err := cmd.PersistentFlags().GetString(string(cli.Token))
+	cli.HandleFlagErr(err, cli.Token)
 	cfg, err := config.NewGitrConfig()
 	if err != nil {
 		log.Fatalf("failed to get gitr config. err: %v", err)
