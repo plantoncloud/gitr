@@ -8,6 +8,7 @@ const (
 	Dry    Flag = "dry"
 	CreDir Flag = "create-dir"
 	Debug  Flag = "debug"
+	Token  Flag = "token"
 )
 
 func HandleFlagErr(err error, flag Flag) {

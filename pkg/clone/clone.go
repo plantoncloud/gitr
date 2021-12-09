@@ -19,13 +19,13 @@ import (
 	"strings"
 )
 
-func Clone(cfg *config.GitrConfig, inputUrl string, token string, creDir, dry bool) (clonePath string, err error) {
+func Clone(cfg *config.GitrConfig, inputUrl string, token string, creDir, dry bool) (repoLocation string, err error) {
 	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to clone git repo with %s url", inputUrl)
 	}
 	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
-	repoLocation, err := GetClonePath(cfg, inputUrl, creDir)
+	repoLocation, err = GetClonePath(cfg, inputUrl, creDir)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to get clone path")
 	}
@@ -50,23 +50,32 @@ func Clone(cfg *config.GitrConfig, inputUrl string, token string, creDir, dry bo
 			if err := sshClone(inputUrl, repoLocation); err != nil {
 				return "", errors.Wrap(err, "error cloning the repo")
 			}
-		} else {
+			return repoLocation, nil
+		}
+		if token == "" {
+			token, err = getHttpsCloneToken(s.Hostname)
+			if err != nil {
+				return "", errors.Wrap(err, "failed to check if https clone token is configured")
+			}
+		}
+		if token != "" {
 			if err := httpsGitClone(inputUrl, token, repoLocation); err != nil {
 				return "", errors.Wrap(err, "error cloning the repo")
 			}
+			return repoLocation, nil
 		}
-	} else {
-		if s.Provider == config.BitBucketDatacenter || s.Provider == config.BitBucketCloud {
-			log.Warn("gitr does not support clone using browser urls for bitbucket-datacenter & bitbucket.org")
-			return "", nil
-		}
-		sshCloneUrl := GetSshCloneUrl(s.Hostname, repoPath)
-		if err := sshClone(sshCloneUrl, repoLocation); err != nil {
-			log.Warn("failed to clone repo using ssh. trying http clone...")
-			httpCloneUrl := GetHttpCloneUrl(s.Hostname, repoPath, s.Scheme)
-			if err := httpClone(httpCloneUrl, repoLocation); err != nil {
-				return "", errors.Wrap(err, "error cloning the repo using http")
-			}
+
+	}
+	if s.Provider == config.BitBucketDatacenter || s.Provider == config.BitBucketCloud {
+		log.Warn("gitr does not support clone using browser urls for bitbucket-datacenter & bitbucket.org")
+		return "", nil
+	}
+	sshCloneUrl := GetSshCloneUrl(s.Hostname, repoPath)
+	if err := sshClone(sshCloneUrl, repoLocation); err != nil {
+		log.Warn("failed to clone repo using ssh. trying http clone...")
+		httpCloneUrl := GetHttpCloneUrl(s.Hostname, repoPath, s.Scheme)
+		if err := httpClone(httpCloneUrl, repoLocation); err != nil {
+			return "", errors.Wrap(err, "error cloning the repo using http")
 		}
 	}
 	return repoLocation, nil
@@ -123,29 +132,21 @@ func setUpSshAuth(hostname string) (*ssh2.PublicKeys, error) {
 	return &ssh2.PublicKeys{User: "git", Signer: signer}, nil
 }
 
-func setUpHttpsPersonalAccessToken(hostname, inputToken string) (*string, error) {
-	homeDir, _ := os.UserHomeDir()
-	pAccessTokenDir := fmt.Sprintf("%s/.personal_access_tokens", homeDir)
-	pAccessTokenFilePath := fmt.Sprintf("%s/%s", pAccessTokenDir, hostname)
-	pAccessTokenFileAbsPath, err := file.GetAbsPath(pAccessTokenFilePath)
-	if len(inputToken) == 0 {
-		if file.IsFileExists(pAccessTokenFileAbsPath) {
-			pem, _ := ioutil.ReadFile(pAccessTokenFileAbsPath)
-			if err != nil {
-				return nil, errors.Wrapf(err, "failed to get abs path of %s", pAccessTokenFileAbsPath)
-			}
-			token := string(pem[:])
-			return &token, nil
-		} else {
-			return nil, errors.Errorf("file not present in %s", pAccessTokenDir)
-		}
-	} else {
-		if err := os.MkdirAll(pAccessTokenDir, os.ModePerm); err != nil {
-			return nil, errors.Wrapf(err, "failed to created dir %s", pAccessTokenDir)
-		}
-		err = ioutil.WriteFile(pAccessTokenFilePath, []byte(inputToken), os.ModePerm)
-		return &inputToken, err
+func getHttpsCloneToken(hostname string) (string, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get user home dir")
 	}
+	pAccessTokenFilePath := filepath.Join(homeDir, ".personal_access_tokens", hostname)
+	pAccessTokenFileAbsPath, err := file.GetAbsPath(pAccessTokenFilePath)
+	if !file.IsFileExists(pAccessTokenFileAbsPath) {
+		return "", nil
+	}
+	pem, err := ioutil.ReadFile(pAccessTokenFileAbsPath)
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to read %s file", pAccessTokenFileAbsPath)
+	}
+	return string(pem), nil
 }
 
 func httpClone(url, clonePath string) error {
@@ -159,29 +160,21 @@ func httpClone(url, clonePath string) error {
 	return err
 }
 
-func httpsGitClone(repoUrl, inputToken, clonePath string) error {
-	token, err := setUpHttpsPersonalAccessToken(url.GetHostname(repoUrl), inputToken)
-	if err != nil {
-		log.Warn("your laptop is not configured with personal access token of git\n")
-		log.Infoln("please follow the below steps as one time set up\n" +
-			"####################################################\n" +
-			"1. set up your personal access token for git (https://docs.gitlab.com/12.10/ee/user/profile/personal_access_tokens.html)\n" +
-			"2. copy your token and pass it as third argument (<token>) for the below command.\n" +
-			"3. gitr clone <repo-path> <token>\n" +
-			"####################################################")
-		return err
-	}
+func httpsGitClone(repoUrl, token, clonePath string) error {
 	if err := os.MkdirAll(clonePath, os.ModePerm); err != nil {
 		return errors.Wrapf(err, "failed to created dir %s", clonePath)
 	}
-	_, err = git.PlainClone(clonePath, false, &git.CloneOptions{
+	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
 		URL:      repoUrl,
 		Progress: os.Stdout,
 		Auth: &http.BasicAuth{
 			Username: "abc123", // this can be anything except an empty string
-			Password: *token,
+			Password: token,
 		},
 	})
+	if err != nil {
+		return errors.Wrapf(err, "failed to clone repo using personal access token %s", token)
+	}
 	return err
 }
 
