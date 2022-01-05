@@ -6,17 +6,16 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	ssh2 "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/kevinburke/ssh_config"
 	"github.com/leftbin/go-util/pkg/file"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	intssh "github.com/swarupdonepudi/gitr/v2/internal/ssh"
 	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"github.com/swarupdonepudi/gitr/v2/pkg/url"
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 func Clone(cfg *config.GitrConfig, inputUrl string, token string, creDir, dry bool) (repoLocation string, err error) {
@@ -109,26 +108,22 @@ func GetClonePath(cfg *config.GitrConfig, inputUrl string, creDir bool) (string,
 }
 
 func setUpSshAuth(hostname string) (*ssh2.PublicKeys, error) {
-	keyFilePath := ssh_config.Get(hostname, "IdentityFile")
-	homeDir, _ := os.UserHomeDir()
-	if strings.HasSuffix(keyFilePath, "identity") {
-		var defaultSshKey = fmt.Sprintf("%s/.ssh/id_rsa", homeDir)
-		absPath, err := file.GetAbsPath(defaultSshKey)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to get abs path of %s", defaultSshKey)
-		}
-		if file.IsFileExists(absPath) {
-			keyFilePath = defaultSshKey
-		} else {
-			return nil, errors.New("ssh auth not found")
-		}
-	}
-	keyFileAbsPath, err := file.GetAbsPath(keyFilePath)
+	sshKeyPath, err := intssh.GetKeyPath(hostname)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to get abs path of %s", keyFilePath)
+		return nil, errors.Wrapf(err, "failed to get ssh config path")
 	}
-	pem, _ := ioutil.ReadFile(keyFileAbsPath)
-	signer, _ := ssh.ParsePrivateKey(pem)
+	if !file.IsFileExists(sshKeyPath) {
+		log.Debugf("%s file not found", sshKeyPath)
+		return nil, errors.Errorf("ssh auth not found")
+	}
+	pem, err := ioutil.ReadFile(sshKeyPath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to read %s file", sshKeyPath)
+	}
+	signer, err := ssh.ParsePrivateKey(pem)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to parse private key %s", sshKeyPath)
+	}
 	return &ssh2.PublicKeys{User: "git", Signer: signer}, nil
 }
 

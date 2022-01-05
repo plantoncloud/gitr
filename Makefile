@@ -25,18 +25,18 @@ checksum: build
 
 .PHONY: setup-tests
 setup-tests:
-	mv internal/git/git_test_data/r1-no-remote/.git-temp internal/git/git_test_data/r1-no-remote/.git
-	mv internal/git/git_test_data/r2-with-remote/.git-temp internal/git/git_test_data/r2-with-remote/.git
-	mv internal/git/git_test_data/r3-with-remote-custom-branch/.git-temp internal/git/git_test_data/r3-with-remote-custom-branch/.git
+	mv pkg/git/git_test_data/r1-no-remote/.git-temp pkg/git/git_test_data/r1-no-remote/.git
+	mv pkg/git/git_test_data/r2-with-remote/.git-temp pkg/git/git_test_data/r2-with-remote/.git
+	mv pkg/git/git_test_data/r3-with-remote-custom-branch/.git-temp pkg/git/git_test_data/r3-with-remote-custom-branch/.git
 .PHONY: execute-tests
 execute-tests:
 	go test -v -coverpkg github.com/swarupdonepudi/gitr/v2/internal/..  -cover ./... -coverprofile=internal.cov || true
 	go test -v -coverpkg github.com/swarupdonepudi/gitr/v2/pkg/...  -cover ./... -coverprofile=pkg.cov || true
 .PHONY: cleanup-tests
 cleanup-tests:
-	mv internal/git/git_test_data/r1-no-remote/.git internal/git/git_test_data/r1-no-remote/.git-temp
-	mv internal/git/git_test_data/r2-with-remote/.git internal/git/git_test_data/r2-with-remote/.git-temp
-	mv internal/git/git_test_data/r3-with-remote-custom-branch/.git internal/git/git_test_data/r3-with-remote-custom-branch/.git-temp
+	mv pkg/git/git_test_data/r1-no-remote/.git pkg/git/git_test_data/r1-no-remote/.git-temp
+	mv pkg/git/git_test_data/r2-with-remote/.git pkg/git/git_test_data/r2-with-remote/.git-temp
+	mv pkg/git/git_test_data/r3-with-remote-custom-branch/.git pkg/git/git_test_data/r3-with-remote-custom-branch/.git-temp
 .PHONY: test
 test: setup-tests execute-tests cleanup-tests
 .PHONY: analyze-tests
