@@ -51,11 +51,11 @@ func getDefaultSshKeyPath() (string, error) {
 }
 
 func getConfigReader(configFilePath string) (io.Reader, error) {
-	file, err := os.ReadFile(configFilePath)
+	f, err := os.ReadFile(configFilePath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to read file %s", configFilePath)
 	}
-	return bytes.NewReader(file), nil
+	return bytes.NewReader(f), nil
 }
 
 func getConfigFilePath() (string, error) {

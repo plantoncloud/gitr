@@ -46,6 +46,7 @@ func Clone(cfg *config.GitrConfig, inputUrl string, token string, creDir, dry bo
 	}
 	if url.IsGitUrl(inputUrl) {
 		if url.IsGitSshUrl(inputUrl) {
+			log.Debugf("cloning using ssh url %s", inputUrl)
 			if err := sshClone(inputUrl, repoLocation); err != nil {
 				return "", errors.Wrap(err, "error cloning the repo")
 			}
@@ -70,6 +71,7 @@ func Clone(cfg *config.GitrConfig, inputUrl string, token string, creDir, dry bo
 		return "", nil
 	}
 	sshCloneUrl := GetSshCloneUrl(s.Hostname, repoPath)
+	log.Debugf("cloning using ssh url %s", sshCloneUrl)
 	if err := sshClone(sshCloneUrl, repoLocation); err != nil {
 		log.Warn("failed to clone repo using ssh. trying http clone...")
 		httpCloneUrl := GetHttpCloneUrl(s.Hostname, repoPath, s.Scheme)
@@ -174,19 +176,22 @@ func httpsGitClone(repoUrl, token, clonePath string) error {
 }
 
 func sshClone(repoUrl, clonePath string) error {
-	auth, sshErr := setUpSshAuth(url.GetHostname(repoUrl))
-	if sshErr != nil {
-		return sshErr
+	auth, err := setUpSshAuth(url.GetHostname(repoUrl))
+	if err != nil {
+		return errors.Wrapf(err, "failed to setup ssh auth")
 	}
 	if err := os.MkdirAll(clonePath, os.ModePerm); err != nil {
 		return errors.Wrapf(err, "failed to created dir %s", clonePath)
 	}
-	_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
+	_, err = git.PlainClone(clonePath, false, &git.CloneOptions{
 		URL:      repoUrl,
 		Progress: os.Stdout,
 		Auth:     auth,
 	})
-	return err
+	if err != nil {
+		return errors.Wrapf(err, "failed to clone using %s url", repoUrl)
+	}
+	return nil
 }
 
 func GetSshCloneUrl(hostname, repoPath string) string {
