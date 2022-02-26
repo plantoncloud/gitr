@@ -3,7 +3,7 @@ package config
 import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/swarupdonepudi/gitr/v2/internal/config"
+	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 )
 
 var Init = &cobra.Command{
