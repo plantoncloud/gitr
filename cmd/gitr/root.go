@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/swarupdonepudi/gitr/v2/cmd/gitr/root"
 	"github.com/swarupdonepudi/gitr/v2/internal/cli"
-	"github.com/swarupdonepudi/gitr/v2/internal/config"
+	"github.com/swarupdonepudi/gitr/v2/pkg/config"
 	"os"
 	"runtime"
 )
