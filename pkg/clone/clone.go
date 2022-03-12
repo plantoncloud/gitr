@@ -7,6 +7,7 @@ import (
 	ssh2 "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/leftbin/go-util/pkg/file"
+	"github.com/leftbin/go-util/pkg/shell"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	intssh "github.com/swarupdonepudi/gitr/v2/internal/ssh"
@@ -15,6 +16,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 )
 
@@ -176,20 +178,11 @@ func httpsGitClone(repoUrl, token, clonePath string) error {
 }
 
 func sshClone(repoUrl, clonePath string) error {
-	auth, err := setUpSshAuth(url.GetHostname(repoUrl))
-	if err != nil {
-		return errors.Wrapf(err, "failed to setup ssh auth")
-	}
 	if err := os.MkdirAll(clonePath, os.ModePerm); err != nil {
-		return errors.Wrapf(err, "failed to created dir %s", clonePath)
+		return errors.Wrapf(err, "failed to create dir %s", clonePath)
 	}
-	_, err = git.PlainClone(clonePath, false, &git.CloneOptions{
-		URL:      repoUrl,
-		Progress: os.Stdout,
-		Auth:     auth,
-	})
-	if err != nil {
-		return errors.Wrapf(err, "failed to clone using %s url", repoUrl)
+	if err := shell.RunCmd(exec.Command("git", "clone", repoUrl, clonePath)); err != nil {
+		return errors.Wrapf(err, "failed to clone")
 	}
 	return nil
 }
