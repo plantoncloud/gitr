@@ -3,7 +3,7 @@ package root
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/swarupdonepudi/gitr/v2/pkg/version"
+	"github.com/swarupdonepudi/gitr/pkg/version"
 )
 
 var Version = &cobra.Command{

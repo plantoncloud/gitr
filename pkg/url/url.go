@@ -1,9 +1,10 @@
 package url
 
 import (
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/skratchdot/open-golang/open"
-	"github.com/swarupdonepudi/gitr/v2/pkg/config"
+	"github.com/swarupdonepudi/gitr/pkg/config"
 	"regexp"
 	"strings"
 )
@@ -46,27 +47,25 @@ func GetHostname(url string) string {
 	return strings.Split(strings.Split(url, "://")[1], "/")[0]
 }
 
-func GetRepoPath(url, host string, p config.ScmProvider) string {
+func GetRepoPath(url, host string, p config.ScmProvider) (string, error) {
 	if IsGitUrl(url) {
-		return url[strings.Index(url, host)+1+len(host) : strings.Index(url, ".git")]
-	} else {
-		switch p {
-		case config.GitLab:
-			if strings.Contains(url, "/-/") {
-				return url[strings.Index(url, host)+1+len(host) : strings.Index(url, "/-/")]
-			} else {
-				return url[strings.Index(url, host)+1+len(host):]
-			}
-		case config.GitHub:
-			if strings.Contains(url, "/blob/") {
-				return url[strings.Index(url, host)+1+len(host) : strings.Index(url, "/blob/")]
-			} else {
-				return url[strings.Index(url, host)+1+len(host):]
-			}
-		default:
-			log.Fatalf("provider %s not supported for browser urls", p)
-			return ""
+		return url[strings.Index(url, host)+1+len(host) : strings.Index(url, ".git")], nil
+	}
+	switch p {
+	case config.GitLab:
+		if strings.Contains(url, "/-/") {
+			return url[strings.Index(url, host)+1+len(host) : strings.Index(url, "/-/")], nil
+		} else {
+			return url[strings.Index(url, host)+1+len(host):], nil
 		}
+	case config.GitHub:
+		if strings.Contains(url, "/blob/") {
+			return url[strings.Index(url, host)+1+len(host) : strings.Index(url, "/blob/")], nil
+		} else {
+			return url[strings.Index(url, host)+1+len(host):], nil
+		}
+	default:
+		return "", errors.Errorf("provider %s not supported for browser urls", p)
 	}
 }
 

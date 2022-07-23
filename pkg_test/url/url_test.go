@@ -1,8 +1,8 @@
 package url_test
 
 import (
-	"github.com/swarupdonepudi/gitr/v2/pkg/config"
-	"github.com/swarupdonepudi/gitr/v2/pkg/url"
+	"github.com/swarupdonepudi/gitr/pkg/config"
+	"github.com/swarupdonepudi/gitr/pkg/url"
 	"testing"
 )
 
@@ -130,7 +130,10 @@ func TestGetRepoPath(t *testing.T) {
 
 	t.Run("repo name from repo path", func(t *testing.T) {
 		for _, u := range repoNameTests {
-			returnedPath := url.GetRepoPath(u.url, u.host, u.provider)
+			returnedPath, err := url.GetRepoPath(u.url, u.host, u.provider)
+			if err != nil {
+				t.Errorf("not expecting error but got err: %s", err.Error())
+			}
 			if returnedPath != u.expectedPath {
 				t.Errorf("expected %s but got %s for %s url", u.expectedPath, returnedPath, u.url)
 			}

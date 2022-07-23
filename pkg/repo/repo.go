@@ -2,9 +2,9 @@ package repo
 
 import (
 	"github.com/pkg/errors"
-	"github.com/swarupdonepudi/gitr/v2/pkg/config"
-	gitrgit "github.com/swarupdonepudi/gitr/v2/pkg/git"
-	"github.com/swarupdonepudi/gitr/v2/pkg/url"
+	"github.com/swarupdonepudi/gitr/pkg/config"
+	gitrgit "github.com/swarupdonepudi/gitr/pkg/git"
+	"github.com/swarupdonepudi/gitr/pkg/url"
 	"os"
 )
 
@@ -14,7 +14,11 @@ func GetRepoPathOnHost(remoteUrl string, gitrCfg *config.GitrConfig) (string, er
 	if err != nil {
 		return "", errors.Wrap(err, "failed to get scm host config")
 	}
-	return url.GetRepoPath(remoteUrl, scmHost, scmHostCfg.Provider), nil
+	repoPath, err := url.GetRepoPath(remoteUrl, scmHost, scmHostCfg.Provider)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get repo path")
+	}
+	return repoPath, nil
 }
 
 func GetPathOnScmFromPwd() (string, error) {
@@ -26,8 +30,14 @@ func GetPathOnScmFromPwd() (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to read current dir")
 	}
-	gitRepo := gitrgit.GetGitRepo(pwd)
-	remoteUrl := gitrgit.GetGitRemoteUrl(gitRepo)
+	gitRepo, err := gitrgit.GetGitRepo(pwd)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get git repo")
+	}
+	remoteUrl, err := gitrgit.GetGitRemoteUrl(gitRepo)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get remote url")
+	}
 	projectPath, err := GetRepoPathOnHost(remoteUrl, gitrCfg)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to get repo path on host")

@@ -3,11 +3,11 @@ package root
 import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/swarupdonepudi/gitr/v2/internal/cli"
-	"github.com/swarupdonepudi/gitr/v2/internal/web"
-	"github.com/swarupdonepudi/gitr/v2/pkg/config"
-	"github.com/swarupdonepudi/gitr/v2/pkg/git"
-	"github.com/swarupdonepudi/gitr/v2/pkg/url"
+	"github.com/swarupdonepudi/gitr/internal/cli"
+	"github.com/swarupdonepudi/gitr/internal/web"
+	"github.com/swarupdonepudi/gitr/pkg/config"
+	"github.com/swarupdonepudi/gitr/pkg/git"
+	"github.com/swarupdonepudi/gitr/pkg/url"
 	"os"
 )
 
@@ -87,9 +87,18 @@ func webHandler(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("failed to get current dir. err: %v", err)
 	}
-	r := git.GetGitRepo(pwd)
-	remoteUrl := git.GetGitRemoteUrl(r)
-	branch := git.GetGitBranch(r)
+	r, err := git.GetGitRepo(pwd)
+	if err != nil {
+		log.Fatalf("failed to get repo")
+	}
+	remoteUrl, err := git.GetGitRemoteUrl(r)
+	if err != nil {
+		log.Fatalf("failed to get remote url")
+	}
+	branch, err := git.GetGitBranch(r)
+	if err != nil {
+		log.Fatalf("failed to get git branch")
+	}
 	cfg, err := config.NewGitrConfig()
 	if err != nil {
 		log.Fatalf("failed to get gitr config. err: %v", err)
@@ -99,7 +108,10 @@ func webHandler(cmd *cobra.Command, args []string) {
 		log.Fatalf("failed to get scm host for %s url. err: %v", remoteUrl, err)
 	}
 
-	repoPath := url.GetRepoPath(remoteUrl, s.Hostname, s.Provider)
+	repoPath, err := url.GetRepoPath(remoteUrl, s.Hostname, s.Provider)
+	if err != nil {
+		log.Fatalf("failed to get repo path")
+	}
 	repoName := url.GetRepoName(repoPath)
 	webUrl := web.GetWebUrl(s.Provider, s.Scheme, s.Hostname, repoPath)
 
