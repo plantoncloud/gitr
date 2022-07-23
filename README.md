@@ -47,7 +47,7 @@ knowledge that is built into it to smartly navigate you to the right web page of
 ### install
 
 `gitr` can be easily installed on mac using brew. While it can also be installed on linux, windows using
-the [binary](https://github.com/swarupdonepudi/gitr/v2/releases), it has not been tested on those platforms.
+the [binary](https://github.com/swarupdonepudi/gitr/releases), it has not been tested on those platforms.
 
 ```
 brew tap swarupdonepudi/homebrew-gitr
@@ -64,11 +64,11 @@ brew install gitr
 
 ### features
 
-| feature       | description                                                                           |
-|---------------|---------------------------------------------------------------------------------------|
-| gitr config   |  display gitr config                                                                  | 
-| gitr web      |  open a repo and different parts of a repo in web browser from command line           | 
-| gitr clone    |  organize git repos cloned from different scm providers and also retain their hierarchy on the scm provider on laptops which is not possible with the default `git clone <clone-url>`. This is particularly useful for gitlab as it supports a nested hierarchy.
+| feature     | description                                                                                                                                                                                                                                                     |
+|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| gitr config | display gitr config                                                                                                                                                                                                                                             | 
+| gitr web    | open a repo and different parts of a repo in web browser from command line                                                                                                                                                                                      | 
+| gitr clone  | organize git repos cloned from different scm providers and also retain their hierarchy on the scm provider on laptops which is not possible with the default `git clone <clone-url>`. This is particularly useful for gitlab as it supports a nested hierarchy. |
 
 #### gitr web
 

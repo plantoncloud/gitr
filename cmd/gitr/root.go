@@ -4,9 +4,9 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/swarupdonepudi/gitr/v2/cmd/gitr/root"
-	"github.com/swarupdonepudi/gitr/v2/internal/cli"
-	"github.com/swarupdonepudi/gitr/v2/pkg/config"
+	"github.com/swarupdonepudi/gitr/cmd/gitr/root"
+	"github.com/swarupdonepudi/gitr/internal/cli"
+	"github.com/swarupdonepudi/gitr/pkg/config"
 	"os"
 	"runtime"
 )

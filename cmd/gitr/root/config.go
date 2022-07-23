@@ -2,7 +2,7 @@ package root
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/swarupdonepudi/gitr/v2/cmd/gitr/root/config"
+	"github.com/swarupdonepudi/gitr/cmd/gitr/root/config"
 )
 
 var Config = &cobra.Command{

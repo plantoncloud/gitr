@@ -10,9 +10,9 @@ import (
 	"github.com/leftbin/go-util/pkg/shell"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	intssh "github.com/swarupdonepudi/gitr/v2/internal/ssh"
-	"github.com/swarupdonepudi/gitr/v2/pkg/config"
-	"github.com/swarupdonepudi/gitr/v2/pkg/url"
+	intssh "github.com/swarupdonepudi/gitr/internal/ssh"
+	"github.com/swarupdonepudi/gitr/pkg/config"
+	"github.com/swarupdonepudi/gitr/pkg/url"
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"os"
@@ -25,7 +25,10 @@ func Clone(cfg *config.GitrConfig, inputUrl string, token string, creDir, dry bo
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to clone git repo with %s url", inputUrl)
 	}
-	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
+	repoPath, err := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get repo path")
+	}
 	repoLocation, err = GetClonePath(cfg, inputUrl, creDir)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to get clone path")
@@ -89,7 +92,10 @@ func GetClonePath(cfg *config.GitrConfig, inputUrl string, creDir bool) (string,
 	if err != nil {
 		log.Fatalf("failed to get scm host. err: %v", err)
 	}
-	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
+	repoPath, err := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get repo path")
+	}
 	repoName := url.GetRepoName(repoPath)
 	scmHome, err := getScmHome(s.Clone.HomeDir, cfg.Scm.HomeDir)
 	if err != nil {
@@ -197,7 +203,10 @@ func GetHttpCloneUrl(hostname, repoPath string, scheme config.HttpScheme) string
 
 func printGitrCloneInfo(cfg *config.GitrConfig, inputUrl string, creDir bool) error {
 	s, err := config.GetScmHost(cfg, url.GetHostname(inputUrl))
-	repoPath := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
+	repoPath, err := url.GetRepoPath(inputUrl, s.Hostname, s.Provider)
+	if err != nil {
+		return errors.Wrap(err, "failed to get repo path")
+	}
 	repoName := url.GetRepoName(repoPath)
 	scmHome, err := getScmHome(s.Clone.HomeDir, cfg.Scm.HomeDir)
 	if err != nil {
