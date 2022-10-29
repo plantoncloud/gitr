@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-//GetGitRepo returns a git repository by walking the file system upwards from the provided directory
-//and returns an error when no git repository is found before reaching the "/"(root) directory
+// GetGitRepo returns a git repository by walking the file system upwards from the provided directory
+// and returns an error when no git repository is found before reaching the "/"(root) directory
 func GetGitRepo(folder string) (*git.Repository, error) {
 	for true {
 		gitRepo, err := git.PlainOpen(folder)
@@ -25,8 +25,8 @@ func GetGitRepo(folder string) (*git.Repository, error) {
 	return nil, errors.New("git repository not found in the folder tree")
 }
 
-//GetGitRemoteUrl returns the first url in the first remote found in the git repository object
-//and returns an errors either if there is no remotes or if there is no urls for the first remote.
+// GetGitRemoteUrl returns the first url in the first remote found in the git repository object
+// and returns an errors either if there is no remotes or if there is no urls for the first remote.
 func GetGitRemoteUrl(r *git.Repository) (string, error) {
 	remotes, err := r.Remotes()
 	if err != nil {
@@ -41,7 +41,7 @@ func GetGitRemoteUrl(r *git.Repository) (string, error) {
 	return remotes[0].Config().URLs[0], nil
 }
 
-//GetGitBranch returns the name of the current branch
+// GetGitBranch returns the name of the current branch
 func GetGitBranch(r *git.Repository) (string, error) {
 	head, err := r.Head()
 	if err != nil {

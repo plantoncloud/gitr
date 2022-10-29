@@ -1,10 +1,32 @@
-pkg=github.com/swarupdonepudi/gitr
-LDFLAGS=-ldflags "-X ${pkg}/pkg/version.Version=${v}"
+name=gitr
+name_local=gitr
+pkg=github.com/plantoncloud/gitr
+build_dir=build
+v?=dev
+LDFLAGS=-ldflags "-X ${pkg}/internal/version.Version=${v}"
 build_cmd=go build -v ${LDFLAGS}
 
 .PHONY: deps
 deps:
 	go mod download
+
+.PHONY: build
+build: ${build_dir}/${name}
+
+${build_dir}/${name}: deps
+	GOOS=darwin ${build_cmd} -o ${build_dir}/${name}-darwin .
+	GOOS=darwin GOARCH=amd64 ${build_cmd} -o ${build_dir}/${name}-darwin-amd64 .
+	openssl dgst -sha256 ${build_dir}/${name}-darwin-amd64
+	GOOS=darwin GOARCH=arm64 ${build_cmd} -o ${build_dir}/${name}-darwin-arm64 .
+	openssl dgst -sha256 ${build_dir}/${name}-darwin-arm64
+.PHONY: test
+test:
+	go test -race -v -count=1 ./...
+
+.PHONY: run
+run: build
+	${build_dir}/${name}
+
 .PHONY: vet
 vet:
 	go vet ./...
@@ -12,37 +34,19 @@ vet:
 .PHONY: fmt
 fmt:
 	go fmt ./...
-.PHONY: build
-build: deps vet fmt
-	env GOOS=darwin ${build_cmd} -o bin/gitr-darwin main.go
-	env GOOS=darwin GOARCH=amd64 ${build_cmd} -o bin/gitr-darwin-amd64 main.go
-	env GOOS=darwin GOARCH=arm64 ${build_cmd} -o bin/gitr-darwin-arm64 main.go
-.PHONY: checksum
 
-checksum: build
-	openssl dgst -sha256 bin/gitr-darwin-amd64
-	openssl dgst -sha256 bin/gitr-darwin-arm64
+.PHONY: clean
+clean:
+	rm -rf ${build_dir}
 
-.PHONY: setup-tests
-setup-tests:
-	mv pkg/git/git_test_data/r1-no-remote/.git-temp pkg/git/git_test_data/r1-no-remote/.git
-	mv pkg/git/git_test_data/r2-with-remote/.git-temp pkg/git/git_test_data/r2-with-remote/.git
-	mv pkg/git/git_test_data/r3-with-remote-custom-branch/.git-temp pkg/git/git_test_data/r3-with-remote-custom-branch/.git
-.PHONY: execute-tests
-execute-tests:
-	go test -v -coverpkg github.com/swarupdonepudi/gitr/internal/..  -cover ./... -coverprofile=internal.cov || true
-	go test -v -coverpkg github.com/swarupdonepudi/gitr/pkg/...  -cover ./... -coverprofile=pkg.cov || true
-.PHONY: cleanup-tests
-cleanup-tests:
-	mv pkg/git/git_test_data/r1-no-remote/.git pkg/git/git_test_data/r1-no-remote/.git-temp
-	mv pkg/git/git_test_data/r2-with-remote/.git pkg/git/git_test_data/r2-with-remote/.git-temp
-	mv pkg/git/git_test_data/r3-with-remote-custom-branch/.git pkg/git/git_test_data/r3-with-remote-custom-branch/.git-temp
-.PHONY: test
-test: setup-tests execute-tests cleanup-tests
-.PHONY: analyze-tests
-analyze-tests:
-	go tool cover -func=internal.cov
-	go tool cover -func=pkg.cov
-.PHONY: local
-local: build
-	sudo cp bin/gitr-darwin /usr/local/bin/gitr
+checksum:
+	@openssl dgst -sha256 ${build_dir}/${name}-darwin
+
+local:
+	sudo rm -f /usr/local/bin/${name_local}
+	sudo cp ./${build_dir}/${name}-darwin /usr/local/bin/${name_local}
+	sudo chmod +x /usr/local/bin/${name_local}
+
+release: build
+	gsutil -h "Cache-Control:no-cache" cp build/gitr-darwin-amd64 gs://planton-pcs-artifact-file-repo/tool/gitr/download/gitr-${v}-amd64
+	gsutil -h "Cache-Control:no-cache" cp build/gitr-darwin-arm64 gs://planton-pcs-artifact-file-repo/tool/gitr/download/gitr-${v}-arm64
