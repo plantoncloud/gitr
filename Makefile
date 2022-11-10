@@ -1,8 +1,8 @@
+v?=v1.0.0
 name=gitr
 name_local=gitr
 pkg=github.com/plantoncloud/gitr
 build_dir=build
-v?=dev
 LDFLAGS=-ldflags "-X ${pkg}/internal/version.Version=${v}"
 build_cmd=go build -v ${LDFLAGS}
 
