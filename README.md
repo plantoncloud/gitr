@@ -387,7 +387,7 @@ alias branches="gitr branches "
 
 ```
 brew uninstall gitr
-brew untap swarupdonepudi/homebrew-gitr
+brew untap plantoncloud/homebrew-tap
 ```
 
 ### contribute
