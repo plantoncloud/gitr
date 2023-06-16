@@ -50,7 +50,7 @@ knowledge that is built into it to smartly navigate you to the right web page of
 the [binary](https://github.com/swarupdonepudi/gitr/releases), it has not been tested on those platforms.
 
 ```
-brew tap swarupdonepudi/homebrew-gitr
+brew tap plantoncloud/homebrew-tap
 brew install gitr
 ```
 
@@ -387,7 +387,7 @@ alias branches="gitr branches "
 
 ```
 brew uninstall gitr
-brew untap swarupdonepudi/homebrew-gitr
+brew untap plantoncloud/homebrew-tap
 ```
 
 ### contribute
