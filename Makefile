@@ -1,9 +1,9 @@
-v?=v1.0.0
+version?=v1.0.1
 name=gitr
 name_local=gitr
-pkg=github.com/plantoncloud/gitr
+pkg=github.com/gitrcloud/gitr
 build_dir=build
-LDFLAGS=-ldflags "-X ${pkg}/internal/version.Version=${v}"
+LDFLAGS=-ldflags "-X ${pkg}/internal/version.Version=${version}"
 build_cmd=go build -v ${LDFLAGS}
 
 .PHONY: deps
@@ -19,6 +19,7 @@ ${build_dir}/${name}: deps
 	openssl dgst -sha256 ${build_dir}/${name}-darwin-amd64
 	GOOS=darwin GOARCH=arm64 ${build_cmd} -o ${build_dir}/${name}-darwin-arm64 .
 	openssl dgst -sha256 ${build_dir}/${name}-darwin-arm64
+	GOOS=linux GOARCH=amd64 ${build_cmd} -o ${build_dir}/${name}-linux .
 .PHONY: test
 test:
 	go test -race -v -count=1 ./...
@@ -48,5 +49,6 @@ local:
 	sudo chmod +x /usr/local/bin/${name_local}
 
 release: build
-	gsutil -h "Cache-Control:no-cache" cp build/gitr-darwin-amd64 gs://planton-pcs-artifact-file-repo/tool/gitr/download/gitr-${v}-amd64
-	gsutil -h "Cache-Control:no-cache" cp build/gitr-darwin-arm64 gs://planton-pcs-artifact-file-repo/tool/gitr/download/gitr-${v}-arm64
+	gsutil -h "Cache-Control:no-cache" cp build/gitr-linux gs://gitr-downloads/${version}/gitr-${version}-linux
+	gsutil -h "Cache-Control:no-cache" cp build/gitr-darwin-amd64 gs://gitr-downloads/${version}/gitr-${version}-amd64
+	gsutil -h "Cache-Control:no-cache" cp build/gitr-darwin-arm64 gs://gitr-downloads/${version}/gitr-${version}-arm64
