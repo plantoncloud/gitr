@@ -2,6 +2,11 @@ package web
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
+	gitrgit "github.com/plantoncloud/gitr/pkg/git"
+	"github.com/plantoncloud/gitr/pkg/url"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/plantoncloud/gitr/pkg/config"
@@ -29,4 +34,51 @@ func GetFileURL(p config.ScmProvider, base, ref, rel string) string {
 	default: // GitHub and similar
 		return fmt.Sprintf("%s/blob/%s/%s", base, ref, rel)
 	}
+}
+
+// FileURLFromPwd returns the provider-specific web URL for fileName,
+// where fileName is given **relative to the current working directory**.
+func FileURLFromPwd(fileName string) (string, error) {
+	wd, _ := os.Getwd()
+
+	// repo, remote, ref
+	repo, err := gitrgit.GetGitRepo(wd)
+	if err != nil {
+		return "", errors.Wrap(err, "git repo not found")
+	}
+	remote, err := gitrgit.GetGitRemoteUrl(repo)
+	if err != nil {
+		return "", errors.Wrap(err, "remote URL not found")
+	}
+	ref, err := gitrgit.GetGitBranch(repo)
+	if err != nil {
+		return "", errors.Wrap(err, "branch not found")
+	}
+
+	// provider & base URL
+	cfg, err := config.NewGitrConfig()
+	if err != nil {
+		return "", err
+	}
+	host := url.GetHostname(remote)
+	hostCfg, err := config.GetScmHost(cfg, host)
+	if err != nil {
+		return "", err
+	}
+	repoPath, err := url.GetRepoPath(remote, host, hostCfg.Provider)
+	if err != nil {
+		return "", err
+	}
+	base := GetWebUrl(hostCfg.Provider, hostCfg.Scheme, host, repoPath)
+
+	// path inside repo
+	wt, _ := repo.Worktree()
+	abs := filepath.Join(wd, fileName)
+	rel, err := filepath.Rel(wt.Filesystem.Root(), abs)
+	if err != nil {
+		return "", errors.Wrap(err, "relative path calc failed")
+	}
+
+	// final link
+	return GetFileURL(hostCfg.Provider, base, ref, filepath.ToSlash(rel)), nil
 }

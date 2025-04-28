@@ -38,6 +38,7 @@ func init() {
 		root.RemCmd,
 		root.TagsCmd,
 		root.WebCmd,
+		root.WebUrlCmd,
 	)
 	cobra.OnInitialize(func() {
 		if debug {
