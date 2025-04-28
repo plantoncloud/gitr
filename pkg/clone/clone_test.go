@@ -1,7 +1,7 @@
 package clone
 
 import (
-	"github.com/swarupdonepudi/gitr/pkg/config"
+	"github.com/plantoncloud/gitr/pkg/config"
 	"testing"
 )
 

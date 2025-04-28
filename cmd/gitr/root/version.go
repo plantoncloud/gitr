@@ -2,8 +2,8 @@ package root
 
 import (
 	"fmt"
+	"github.com/plantoncloud/gitr/pkg/version"
 	"github.com/spf13/cobra"
-	"github.com/swarupdonepudi/gitr/pkg/version"
 )
 
 var Version = &cobra.Command{
