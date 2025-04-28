@@ -33,5 +33,17 @@ snapshot: deps ## build a local snapshot using GoReleaser
 local: snapshot ## copy binary to ~/bin for quick use
 	install -m 0755 $(build_dir)/gitr_*_$(shell uname -m)/gitr $(HOME)/bin/$(name)
 
+# ── release tagging ────────────────────────────────────────────────────────────
+.PHONY: release build-check
+build-check:   ## quick compile to verify build
+	go build -o /dev/null ./cmd/$(name)
+
+release: test build-check ## tag & push if everything passes
+ifndef version
+	$(error version is not set. Use: make release version=vX.Y.Z)
+endif
+	git tag -a $(version) -m "$(version)"
+	git push origin $(version)
+
 # ── default target ─────────────────────────────────────────────────────────────
 .DEFAULT_GOAL := test
