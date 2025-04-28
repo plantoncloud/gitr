@@ -1,0 +1,47 @@
+project_name: gitr
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: gitr
+    main: .
+    ldflags:
+      - -s -w -X github.com/plantoncloud/gitr/cmd/gitr/root/version.VersionLabel={{.Version}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - id: default
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE*
+
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+
+release:
+  github:
+    owner: plantoncloud
+    name: gitr
+
+brews:
+  - name: gitr
+    tap:
+      owner: plantoncloud
+      name: homebrew-tap
+    folder: Formula
+    homepage: https://github.com/plantoncloud/gitr
+    description: "git rapid – open Git repos on the web from the CLI"
+    install: |
+      bin.install "{{ .ProjectName }}"

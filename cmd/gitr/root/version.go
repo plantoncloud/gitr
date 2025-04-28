@@ -2,9 +2,10 @@ package root
 
 import (
 	"fmt"
-	"github.com/plantoncloud/gitr/pkg/version"
 	"github.com/spf13/cobra"
 )
+
+var VersionLabel = "dev"
 
 var Version = &cobra.Command{
 	Use:     "version",
@@ -14,5 +15,5 @@ var Version = &cobra.Command{
 }
 
 func versionHandler(cmd *cobra.Command, args []string) {
-	fmt.Println(fmt.Sprintf("version %s", version.Version))
+	fmt.Println(fmt.Sprintf("version %s", VersionLabel))
 }
