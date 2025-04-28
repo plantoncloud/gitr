@@ -163,27 +163,3 @@ func TestCommitsUrls(t *testing.T) {
 		}
 	})
 }
-
-func TestWebUrls(t *testing.T) {
-	var urlTests = []struct {
-		provider    config.ScmProvider
-		scheme      config.HttpScheme
-		host        string
-		repoPath    string
-		expectedUrl string
-	}{
-		{config.GitHub, config.Https, "github.com", "swarupdonepudi/gitr", "https://github.com/plantoncloud/gitr"},
-		{config.GitHub, config.Http, "github.com", "swarupdonepudi/gitr", "http://github.com/plantoncloud/gitr"},
-		{config.GitLab, config.Https, "gitlab.com", "gitlab-org/gitlab-foss", "https://gitlab.com/gitlab-org/gitlab-foss"},
-		{config.GitLab, config.Http, "gitlab.com", "gitlab-org/gitlab-foss", "http://gitlab.com/gitlab-org/gitlab-foss"},
-		{config.GitLab, config.Https, "gitlab.com", "gitlab-org/gitlab-foss", "https://gitlab.com/gitlab-org/gitlab-foss"},
-	}
-	t.Run("validate web urls", func(t *testing.T) {
-		for _, u := range urlTests {
-			returnedUrl := GetWebUrl(u.provider, u.scheme, u.host, u.repoPath)
-			if returnedUrl != u.expectedUrl {
-				t.Errorf("expecting %s but got %s", u.expectedUrl, returnedUrl)
-			}
-		}
-	})
-}

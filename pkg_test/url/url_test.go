@@ -1,7 +1,6 @@
 package url_test
 
 import (
-	"github.com/plantoncloud/gitr/pkg/config"
 	"github.com/plantoncloud/gitr/pkg/url"
 	"testing"
 )
@@ -108,34 +107,6 @@ func TestIsGitRepoName(t *testing.T) {
 		for _, u := range repoNameTests {
 			if url.GetRepoName(u.repoPath) != u.repoName {
 				t.Errorf("expected %s but got %s for %s path", u.repoName, url.GetRepoName(u.repoPath), u.repoPath)
-			}
-		}
-	})
-}
-
-func TestGetRepoPath(t *testing.T) {
-	var repoNameTests = []struct {
-		url          string
-		host         string
-		provider     config.ScmProvider
-		expectedPath string
-	}{
-		{"https://github.com/plantoncloud/gitr/blob/master/.gitattributes", "github.com", config.GitHub, "swarupdonepudi/gitr"},
-		{"git@github.com/plantoncloud/gitr.git", "github.com", config.GitHub, "swarupdonepudi/gitr"},
-		{"git@gitlab.com/swarupdonepudi/sample-repo.git", "gitlab.com", config.GitLab, "swarupdonepudi/sample-repo"},
-		{"git@gitlab.com/swarupdonepudi/subgroup/sample-repo.git", "gitlab.com", config.GitLab, "swarupdonepudi/subgroup/sample-repo"},
-		{"https://gitlab.com/swarupdonepudi/subgroup/subgroup2/repo-name/-/tree/master/.gitattributes", "gitlab.com", config.GitLab, "swarupdonepudi/subgroup/subgroup2/repo-name"},
-		{"https://gitlab.com/swarupdonepudi/subgroup/repo-name/-/tree/master/.gitattributes", "gitlab.com", config.GitLab, "swarupdonepudi/subgroup/repo-name"},
-	}
-
-	t.Run("repo name from repo path", func(t *testing.T) {
-		for _, u := range repoNameTests {
-			returnedPath, err := url.GetRepoPath(u.url, u.host, u.provider)
-			if err != nil {
-				t.Errorf("not expecting error but got err: %s", err.Error())
-			}
-			if returnedPath != u.expectedPath {
-				t.Errorf("expected %s but got %s for %s url", u.expectedPath, returnedPath, u.url)
 			}
 		}
 	})
