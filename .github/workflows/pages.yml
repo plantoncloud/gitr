@@ -1,0 +1,75 @@
+name: Deploy GitHub Pages (site/ subdir)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+# Required permissions for actions/deploy-pages
+# Ref: https://github.com/actions/deploy-pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Enables Pages and provides metadata; safe to run in all builds
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      # Build the Vite app from the site/ folder
+      - name: Build site
+        env:
+          # Custom domain/user site: serve from root
+          BASE_PATH: /
+        run: |
+          npm run build
+          # SPA deep links: serve index.html for unknown routes
+          if [ -f dist/index.html ]; then
+            cp dist/index.html dist/404.html
+          fi
+
+      # Upload the built static site for Pages to deploy
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+

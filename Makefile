@@ -47,3 +47,14 @@ endif
 
 # ── default target ─────────────────────────────────────────────────────────────
 .DEFAULT_GOAL := test
+
+
+.PHONY: develop-site
+develop-site:
+	cd site && npm install --no-audit --no-fund
+	cd site && npm run dev
+
+.PHONY: preview-site
+preview-site:
+	cd site && npm install --no-audit --no-fund
+	cd site && npm run build:serve

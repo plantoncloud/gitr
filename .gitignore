@@ -3,3 +3,5 @@ bin
 tmp
 *.cov
 build
+site/node_modules/
+site/dist/
