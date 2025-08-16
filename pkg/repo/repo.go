@@ -2,9 +2,9 @@ package repo
 
 import (
 	"github.com/pkg/errors"
-	"github.com/swarupdonepudi/gitr/pkg/config"
-	gitrgit "github.com/swarupdonepudi/gitr/pkg/git"
-	"github.com/swarupdonepudi/gitr/pkg/url"
+	"github.com/plantoncloud/gitr/pkg/config"
+	gitrgit "github.com/plantoncloud/gitr/pkg/git"
+	"github.com/plantoncloud/gitr/pkg/url"
 	"os"
 )
 

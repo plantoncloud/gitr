@@ -2,11 +2,11 @@ package gitr
 
 import (
 	"fmt"
+	"github.com/plantoncloud/gitr/cmd/gitr/root"
+	"github.com/plantoncloud/gitr/internal/cli"
+	"github.com/plantoncloud/gitr/pkg/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/swarupdonepudi/gitr/cmd/gitr/root"
-	"github.com/swarupdonepudi/gitr/internal/cli"
-	"github.com/swarupdonepudi/gitr/pkg/config"
 	"os"
 	"runtime"
 )
@@ -38,6 +38,7 @@ func init() {
 		root.RemCmd,
 		root.TagsCmd,
 		root.WebCmd,
+		root.WebUrlCmd,
 	)
 	cobra.OnInitialize(func() {
 		if debug {

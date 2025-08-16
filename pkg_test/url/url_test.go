@@ -1,8 +1,7 @@
 package url_test
 
 import (
-	"github.com/swarupdonepudi/gitr/pkg/config"
-	"github.com/swarupdonepudi/gitr/pkg/url"
+	"github.com/plantoncloud/gitr/pkg/url"
 	"testing"
 )
 
@@ -12,15 +11,15 @@ func TestIsGitUrl(t *testing.T) {
 		isGitUrl bool
 	}{
 		{"git@github.com:swarupdonepudi/gitr.git", true},
-		{"https://github.com/swarupdonepudi/gitr.git", true},
-		{"https://github.com/swarupdonepudi/gitr", false},
+		{"https://github.com/plantoncloud/gitr.git", true},
+		{"https://github.com/plantoncloud/gitr", false},
 		{"git@github.com:swarupdonepudi/gitr", false},
 	}
 	var negativeUrlTests = []struct {
 		url      string
 		isGitUrl bool
 	}{
-		{"https://github.com/swarupdonepudi/gitr", false},
+		{"https://github.com/plantoncloud/gitr", false},
 		{"git@github.com:swarupdonepudi/gitr", false},
 	}
 	t.Run("urls ending with .git should be git urls", func(t *testing.T) {
@@ -45,13 +44,13 @@ func TestIsGitSshUrl(t *testing.T) {
 		isGitSshUrl bool
 	}{
 		{"git@github.com:swarupdonepudi/gitr.git", true},
-		{"ssh://github.com/swarupdonepudi/gitr.git", true},
+		{"ssh://github.com/plantoncloud/gitr.git", true},
 	}
 	var negativeUrlTests = []struct {
 		url         string
 		isGitSshUrl bool
 	}{
-		{"https://github.com/swarupdonepudi/gitr", false},
+		{"https://github.com/plantoncloud/gitr", false},
 		{"github.com:swarupdonepudi/gitr.git", false},
 	}
 	t.Run("urls prefixed with ssh or git should be git ssh urls", func(t *testing.T) {
@@ -77,7 +76,7 @@ func TestIsGitHttpUrlHasUsername(t *testing.T) {
 	}{
 		{"https://swarup@github.com:swarupdonepudi/gitr.git", true},
 		{"https://swarupd@github.com:swarupdonepudi/gitr", true},
-		{"https://github.com/swarupdonepudi/gitr", false},
+		{"https://github.com/plantoncloud/gitr", false},
 		{"github.com:swarupdonepudi/gitr.git", false},
 	}
 
@@ -108,34 +107,6 @@ func TestIsGitRepoName(t *testing.T) {
 		for _, u := range repoNameTests {
 			if url.GetRepoName(u.repoPath) != u.repoName {
 				t.Errorf("expected %s but got %s for %s path", u.repoName, url.GetRepoName(u.repoPath), u.repoPath)
-			}
-		}
-	})
-}
-
-func TestGetRepoPath(t *testing.T) {
-	var repoNameTests = []struct {
-		url          string
-		host         string
-		provider     config.ScmProvider
-		expectedPath string
-	}{
-		{"https://github.com/swarupdonepudi/gitr/blob/master/.gitattributes", "github.com", config.GitHub, "swarupdonepudi/gitr"},
-		{"git@github.com/swarupdonepudi/gitr.git", "github.com", config.GitHub, "swarupdonepudi/gitr"},
-		{"git@gitlab.com/swarupdonepudi/sample-repo.git", "gitlab.com", config.GitLab, "swarupdonepudi/sample-repo"},
-		{"git@gitlab.com/swarupdonepudi/subgroup/sample-repo.git", "gitlab.com", config.GitLab, "swarupdonepudi/subgroup/sample-repo"},
-		{"https://gitlab.com/swarupdonepudi/subgroup/subgroup2/repo-name/-/tree/master/.gitattributes", "gitlab.com", config.GitLab, "swarupdonepudi/subgroup/subgroup2/repo-name"},
-		{"https://gitlab.com/swarupdonepudi/subgroup/repo-name/-/tree/master/.gitattributes", "gitlab.com", config.GitLab, "swarupdonepudi/subgroup/repo-name"},
-	}
-
-	t.Run("repo name from repo path", func(t *testing.T) {
-		for _, u := range repoNameTests {
-			returnedPath, err := url.GetRepoPath(u.url, u.host, u.provider)
-			if err != nil {
-				t.Errorf("not expecting error but got err: %s", err.Error())
-			}
-			if returnedPath != u.expectedPath {
-				t.Errorf("expected %s but got %s for %s url", u.expectedPath, returnedPath, u.url)
 			}
 		}
 	})

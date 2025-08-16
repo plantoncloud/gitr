@@ -16,7 +16,7 @@ limitations under the License.
 package main
 
 import (
-	"github.com/swarupdonepudi/gitr/cmd/gitr"
+	"github.com/plantoncloud/gitr/cmd/gitr"
 )
 
 func main() {

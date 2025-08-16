@@ -1,57 +1,53 @@
-version?=v1.0.1
-name=gitr
-name_local=gitr
-pkg=github.com/gitrcloud/gitr
-build_dir=build
-LDFLAGS=-ldflags "-X ${pkg}/internal/version.Version=${version}"
-build_cmd=go build -v ${LDFLAGS}
+# ── project metadata ────────────────────────────────────────────────────────────
+name        := gitr
+pkg         := github.com/plantoncloud/gitr
+build_dir   := build
+LDFLAGS     := -ldflags "-X $(pkg)/cmd/gitr/root/version.VersionLabel=$$(git describe --tags --always --dirty)"
 
-.PHONY: deps
-deps:
+# ── helper vars ────────────────────────────────────────────────────────────────
+build_cmd   := go build $(LDFLAGS)
+
+# ── quality / housekeeping ─────────────────────────────────────────────────────
+.PHONY: deps vet fmt test clean
+deps:          ## download & tidy modules
 	go mod download
+	go mod tidy
 
-.PHONY: build
-build: ${build_dir}/${name}
-
-${build_dir}/${name}: deps
-	GOOS=darwin ${build_cmd} -o ${build_dir}/${name}-darwin .
-	GOOS=darwin GOARCH=amd64 ${build_cmd} -o ${build_dir}/${name}-darwin-amd64 .
-	openssl dgst -sha256 ${build_dir}/${name}-darwin-amd64
-	GOOS=darwin GOARCH=arm64 ${build_cmd} -o ${build_dir}/${name}-darwin-arm64 .
-	openssl dgst -sha256 ${build_dir}/${name}-darwin-arm64
-	GOOS=linux GOARCH=amd64 ${build_cmd} -o ${build_dir}/${name}-linux .
-.PHONY: test
-test:
-	go test -race -v -count=1 ./...
-
-.PHONY: run
-run: build
-	${build_dir}/${name}
-
-.PHONY: vet
-vet:
+vet:           ## go vet
 	go vet ./...
 
-.PHONY: fmt
-fmt:
+fmt:           ## go fmt
 	go fmt ./...
 
-.PHONY: clean
-clean:
-	rm -rf ${build_dir}
+test: vet      ## run tests with race detector
+	go test -race -v -count=1 ./...
 
-checksum:
-	@openssl dgst -sha256 ${build_dir}/${name}-darwin
+clean:         ## remove build artifacts
+	rm -rf $(build_dir)
 
-local:
-	sudo rm -f /usr/local/bin/${name_local}
-	sudo cp ./${build_dir}/${name}-darwin /usr/local/bin/${name_local}
-	sudo chmod +x /usr/local/bin/${name_local}
+# ── local utility ──────────────────────────────────────────────────────────────
+.PHONY: snapshot local
+snapshot: deps ## build a local snapshot using GoReleaser
+	goreleaser release --snapshot --clean --skip-publish
 
-release: build
-	gsutil -h "Cache-Control:no-cache" cp build/gitr-linux gs://gitr-downloads/${version}/gitr-${version}-linux
-	gsutil -h "Cache-Control:no-cache" cp build/gitr-darwin-amd64 gs://gitr-downloads/${version}/gitr-${version}-amd64
-	gsutil -h "Cache-Control:no-cache" cp build/gitr-darwin-arm64 gs://gitr-downloads/${version}/gitr-${version}-arm64
+local: snapshot ## copy binary to ~/bin for quick use
+	install -m 0755 $(build_dir)/gitr_*_$(shell uname -m)/gitr $(HOME)/bin/$(name)
+
+# ── release tagging ────────────────────────────────────────────────────────────
+.PHONY: release build-check
+build-check:   ## quick compile to verify build
+	go build -o /dev/null ./cmd/$(name)
+
+release: test build-check ## tag & push if everything passes
+ifndef version
+	$(error version is not set. Use: make release version=vX.Y.Z)
+endif
+	git tag -a $(version) -m "$(version)"
+	git push origin $(version)
+
+# ── default target ─────────────────────────────────────────────────────────────
+.DEFAULT_GOAL := test
+
 
 .PHONY: develop-site
 develop-site:
