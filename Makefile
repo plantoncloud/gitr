@@ -52,3 +52,13 @@ release: build
 	gsutil -h "Cache-Control:no-cache" cp build/gitr-linux gs://gitr-downloads/${version}/gitr-${version}-linux
 	gsutil -h "Cache-Control:no-cache" cp build/gitr-darwin-amd64 gs://gitr-downloads/${version}/gitr-${version}-amd64
 	gsutil -h "Cache-Control:no-cache" cp build/gitr-darwin-arm64 gs://gitr-downloads/${version}/gitr-${version}-arm64
+
+.PHONY: develop-site
+develop-site:
+	cd site && npm install --no-audit --no-fund
+	cd site && npm run dev
+
+.PHONY: preview-site
+preview-site:
+	cd site && npm install --no-audit --no-fund
+	cd site && npm run build:serve
