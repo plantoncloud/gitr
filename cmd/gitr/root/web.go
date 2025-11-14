@@ -138,7 +138,18 @@ func webHandler(cmd *cobra.Command, args []string) {
 	case webHome:
 		url.OpenInBrowser(webUrl)
 	case rem:
-		url.OpenInBrowser(web.GetRemUrl(s.Provider, webUrl, branch))
+		branchToOpen := branch
+		// Check if the current branch exists on the remote
+		if !git.DoesBranchExistOnRemote(r, branch) {
+			log.Warnf("Branch '%s' doesn't exist on remote. Opening default branch instead.", branch)
+			defaultBranch, err := git.GetDefaultBranch(r)
+			if err != nil {
+				log.Warnf("Unable to determine default branch: %v. Attempting to open '%s' anyway.", err, branch)
+			} else {
+				branchToOpen = defaultBranch
+			}
+		}
+		url.OpenInBrowser(web.GetRemUrl(s.Provider, webUrl, branchToOpen))
 	default:
 		log.Fatal("unknown web command")
 	}

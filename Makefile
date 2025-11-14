@@ -1,7 +1,7 @@
 # ── project metadata ────────────────────────────────────────────────────────────
 name        := gitr
 pkg         := github.com/plantoncloud/gitr
-build_dir   := build
+build_dir   := dist
 LDFLAGS     := -ldflags "-X $(pkg)/cmd/gitr/root/version.VersionLabel=$$(git describe --tags --always --dirty)"
 
 # ── helper vars ────────────────────────────────────────────────────────────────
@@ -28,10 +28,10 @@ clean:         ## remove build artifacts
 # ── local utility ──────────────────────────────────────────────────────────────
 .PHONY: snapshot local
 snapshot: deps ## build a local snapshot using GoReleaser
-	goreleaser release --snapshot --clean --skip-publish
+	goreleaser release --snapshot --clean --skip=publish
 
 local: snapshot ## copy binary to ~/bin for quick use
-	install -m 0755 $(build_dir)/gitr_*_$(shell uname -m)/gitr $(HOME)/bin/$(name)
+	install -m 0755 $(build_dir)/gitr_$(shell uname -s | tr '[:upper:]' '[:lower:]')_$(shell uname -m)*/gitr $(HOME)/bin/$(name)
 
 # ── release tagging ────────────────────────────────────────────────────────────
 .PHONY: release build-check

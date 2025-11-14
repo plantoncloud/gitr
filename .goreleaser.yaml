@@ -1,3 +1,5 @@
+version: 2
+
 project_name: gitr
 
 before:
@@ -37,10 +39,10 @@ release:
 
 brews:
   - name: gitr
-    tap:
+    repository:
       owner: plantoncloud
       name: homebrew-tap
-    folder: Formula
+    directory: Formula
     homepage: https://github.com/plantoncloud/gitr
     description: "git rapid – open Git repos on the web from the CLI"
     install: |
