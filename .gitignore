@@ -3,5 +3,9 @@ bin
 tmp
 *.cov
 build
+dist
 site/node_modules/
 site/dist/
+
+# Cursor workspace (temporary PR description files)
+.cursor/workspace/

@@ -1,0 +1,258 @@
+---
+description: Action rule to commit gitr changes with appropriate conventional commit messages
+alwaysApply: false
+---
+
+# Rule: Commit Gitr Changes
+
+## Purpose
+
+When triggered, create a Git commit with an appropriate commit message following Conventional Commits format, based on the current conversation context and file changes.
+
+## Rule Type
+
+**Action Rule** - Executes git commit operations
+
+## When to Use
+
+- When user explicitly asks to commit changes
+- After completing a feature or fix that's ready to be committed
+- When wrapping up a development session
+
+## Commit Message Format
+
+Follow Conventional Commits format:
+
+```
+<type>(<scope>): <subject>
+
+[optional body]
+
+[optional footer]
+```
+
+### Types
+
+Use these commit types:
+- `feat`: New feature
+- `fix`: Bug fix
+- `refactor`: Code refactoring (no functional changes)
+- `docs`: Documentation only changes
+- `test`: Adding or updating tests
+- `chore`: Build process, tooling, dependencies
+- `perf`: Performance improvements
+- `style`: Code style changes (formatting, no logic changes)
+- `ci`: CI/CD changes
+- `revert`: Reverting previous commits
+
+### Scope
+
+Determine scope from the affected files/components in the gitr repository:
+
+#### Core Commands
+- `cmd`: CLI commands and command handlers
+- `cmd/root`: Root command implementation
+
+#### Packages
+- `pkg/clone`: Clone functionality
+- `pkg/config`: Configuration management
+- `pkg/git`: Git repository operations
+- `pkg/repo`: Repository utilities
+- `pkg/url`: URL parsing and handling
+- `pkg/web`: Web URL generation and browser operations
+
+#### Internal
+- `internal/cli`: CLI flag handling
+- `internal/ssh`: SSH configuration
+
+#### Site
+- `site`: Landing page website
+
+#### Build & Tooling
+- `build`: Build system and Makefile changes
+- `release`: GoReleaser configuration
+- `deps`: Dependency updates
+
+#### Documentation
+- `docs`: Documentation changes
+- `readme`: README updates
+
+#### Cross-cutting
+- If multiple areas: Use broader scope or omit scope
+- For repo-wide changes: Use `repo` or omit scope
+
+### Subject
+
+- Use imperative mood ("add" not "added" or "adds")
+- No period at the end
+- Keep under 72 characters
+- Be specific but concise
+
+### Body (Optional)
+
+Add detailed body when:
+- The change is complex and needs explanation
+- Multiple related changes are included
+- There are breaking changes
+- Context would help future developers understand "why"
+
+Body guidelines:
+- Wrap at 72 characters
+- Explain what and why, not how
+- Use bullet points for multiple items
+- Reference issues/tickets if applicable
+
+### Footer (Optional)
+
+Include footer for:
+- `BREAKING CHANGE:` for breaking changes
+- `Closes #123` or `Fixes #123` for issue references
+- Co-authored-by for pair programming
+
+## Execution Steps
+
+1. **Analyze Changes**
+   - Check `git status` to see modified files
+   - Review the conversation context to understand what was changed
+   - Identify the type and scope of changes
+
+2. **Determine Commit Type and Scope**
+   - Map file changes to appropriate type
+   - Determine most relevant scope from file paths
+   - Consider which part(s) of gitr are affected
+
+3. **Craft Commit Message**
+   - Write concise subject line (< 72 chars)
+   - Decide if detailed body is needed based on:
+     - Complexity of changes
+     - Number of related changes
+     - Need for future context
+   - Add footer if there are breaking changes or issue references
+
+4. **Create Commit**
+   - Stage all changes with `git add -A`
+   - Commit with the crafted message using `git commit -m "subject" [-m "body"]`
+   - Use `-m` flag multiple times for subject + body, or use multiline format
+
+## Examples
+
+### Simple Feature Addition
+
+```bash
+git commit -m "feat(pkg/web): add support for opening remote branches in browser"
+```
+
+### Bug Fix with Context
+
+```bash
+git commit -m "fix(pkg/git): resolve branch detection for detached HEAD state" \
+  -m "The branch detection was failing when in detached HEAD state.
+This commit adds fallback logic to handle detached HEAD and provide
+a meaningful error message to the user."
+```
+
+### Command Enhancement
+
+```bash
+git commit -m "feat(cmd): add dry-run flag to preview web URLs without opening browser" \
+  -m "Implement --dry flag across all web commands to allow users to preview
+the URL that would be opened without actually launching the browser.
+Useful for scripting and debugging."
+```
+
+### Refactoring with Multiple Files
+
+```bash
+git commit -m "refactor(pkg/git): extract remote branch validation to separate functions" \
+  -m "- Add DoesBranchExistOnRemote() helper function
+- Add GetDefaultBranch() helper function
+- Update rem command to use local remote-tracking branches
+- Improve error handling and fallback logic
+- No functional changes to external behavior"
+```
+
+### Breaking Change
+
+```bash
+git commit -m "feat(pkg/config)!: change config file format to YAML" \
+  -m "BREAKING CHANGE: Config file format changed from TOML to YAML.
+
+Existing .gitr.toml files must be converted to .gitr.yaml format.
+Migration guide provided in docs/migration.md.
+
+This change enables better readability and aligns with common
+configuration file conventions."
+```
+
+### Documentation Update
+
+```bash
+git commit -m "docs(readme): add installation instructions for Homebrew"
+```
+
+### Site Update
+
+```bash
+git commit -m "feat(site): add features comparison section to landing page"
+```
+
+### Build System
+
+```bash
+git commit -m "chore(build): update GoReleaser config to version 2 format"
+```
+
+## Command Patterns
+
+For simple commits:
+```bash
+git add -A && git commit -m "<type>(<scope>): <subject>"
+```
+
+For commits with body:
+```bash
+git add -A && git commit -m "<type>(<scope>): <subject>" -m "<body>"
+```
+
+For commits with multi-paragraph body:
+```bash
+git add -A
+git commit -m "<type>(<scope>): <subject>" \
+  -m "<paragraph 1>" \
+  -m "" \
+  -m "<paragraph 2>"
+```
+
+## Important Notes
+
+- **Always run in gitr workspace**: `/Users/suresh/scm/github.com/plantoncloud/gitr`
+- **Don't commit without reviewing**: Show the proposed commit message to the user before executing if the changes are significant
+- **Stage selectively if needed**: If only some changes should be committed, stage specific files instead of `git add -A`
+- **Don't skip hooks**: Never use `--no-verify` unless explicitly requested
+- **Check for unstaged changes**: Review `git status` output to ensure all intended changes are staged
+
+## Error Handling
+
+If commit fails:
+- Check if there are actually changes to commit
+- Verify you're in the correct directory
+- Check if a commit is already in progress (merge/rebase)
+- Ensure commit message format is valid
+
+## Workflow Integration
+
+This rule works well with:
+- `@generate-gitr-pr-info` - Generate PR info before creating pull request
+- After completing a development task
+- Before creating a pull request
+
+## Execution
+
+When this rule is triggered:
+
+1. Navigate to gitr workspace
+2. Run `git status` to check current changes
+3. Analyze changes and conversation context
+4. Propose commit message following the format above
+5. Execute the commit command with appropriate permissions (git_write)
+6. Confirm successful commit

@@ -1,0 +1,188 @@
+---
+description: Generate a PR title and a Markdown PR description as exactly two copyable code blocks (ask-only). Conventional Commit prefix + scope from file paths. No repo edits.
+globs:
+alwaysApply: false
+---
+
+# Rule: Pull Request Title and Description for Gitr (ask-only)
+
+Purpose: When asked to write a PR title and PR description for gitr, respond with exactly two copyable code blocks — first the title, then the description — without making any repository changes.
+
+This rule is designed for ask mode only. Do not modify files, run commands, or propose edits. Output only the two fenced code blocks described below.
+
+Usage: In Ask mode, invoke explicitly as `@generate-gitr-pr-info` or `@pr-info`.
+
+## How to respond (strict)
+1) First block: PR Title
+   - Fenced code block with language: `text`
+   - Single line only
+   - Prefix using Conventional Commits: one of `feat`, `fix`, `refactor`, `docs`, `test`, `perf`, `ci`, `build`, `chore`, `revert`
+   - Scope is required and must be component-aware, using a token derived from changed files (examples below)
+   - Imperative mood, concise, ≤ 72 characters after the prefix
+   - No trailing period
+
+2) Second block: PR Description
+   - Fenced code block with language: `markdown`
+   - Use the following sections when applicable. Omit any that are not relevant.
+     - "Summary": 1–3 sentences describing what this PR does in plain language
+     - "Context": Why this change is needed (problem, bug, or goal)
+     - "Changes": Bullet list of key changes; group by area if helpful
+     - "Implementation notes": Important design decisions or trade-offs
+     - "Breaking changes": Clearly call out any breaking behavior and migration steps
+     - "Test plan": How this was verified (tests, manual steps, screenshots/links)
+     - "Risks": Known risks or rollback plan
+     - "Checklist": Markdown checkboxes for docs, tests, backward compatibility
+     - Optionally include issue links like `Closes #123` when known
+
+## Title format (exactly)
+
+```text
+<prefix>(<scope>): <concise, imperative title>
+```
+
+- Examples of valid scopes: `cmd`, `pkg/git`, `pkg/web`, `pkg/config`, `pkg/clone`, `pkg/url`, `pkg/repo`, `internal/cli`, `internal/ssh`, `site`, `build`, `release`, `docs`, `readme`, `repo`.
+
+## How to infer the title prefix
+- `feat`: Adds a new capability, command, flag, or config that users can opt into
+- `fix`: Corrects a bug or regression
+- `refactor`: Code restructuring without changing externally visible behavior
+- `docs`: Documentation-only changes (`*.md`, docs)
+- `test`: Tests only
+- `perf`: Performance improvements
+- `ci`: CI pipeline/config changes
+- `build`: Build system or dependency changes (Makefile, GoReleaser, go.mod)
+- `chore`: Routine maintenance (formatting, small cleanups) not covered above
+- `revert`: Reverts a previous commit/PR
+
+Prefer `feat` vs `refactor` based on whether user-facing capability is introduced. Prefer `fix` when the primary intent is to resolve a defect, even if some refactoring was required.
+
+## Scope heuristics (gitr repository)
+Determine the `<scope>` from the changed files. Use the most impacted area by lines changed; if multiple, see multi-area guidance below.
+
+- Core Commands
+  - `cmd/gitr/root/*.go` → `cmd` or `cmd/<specific-command>` (e.g., `cmd/clone`, `cmd/web`)
+  - If multiple commands affected → `cmd`
+
+- Packages
+  - `pkg/git/**` → `pkg/git`
+  - `pkg/web/**` → `pkg/web`
+  - `pkg/config/**` → `pkg/config`
+  - `pkg/clone/**` → `pkg/clone`
+  - `pkg/url/**` → `pkg/url`
+  - `pkg/repo/**` → `pkg/repo`
+  - Multiple packages → `pkg`
+
+- Internal
+  - `internal/cli/**` → `internal/cli`
+  - `internal/ssh/**` → `internal/ssh`
+  - Multiple internal packages → `internal`
+
+- Site (Landing Page)
+  - `site/**` → `site`
+  - `site/src/components/**` → `site` (unless very specific)
+
+- Build and Configuration
+  - `Makefile` or `hack/Makefile` → `build`
+  - `.goreleaser.yaml` → `release`
+  - `go.mod`, `go.sum` → `deps`
+  - `.gitignore`, `.github/**` → `repo`
+
+- Documentation
+  - `README.md` (root) → `readme`
+  - `docs/**` or other markdown files → `docs`
+
+### Multi-area changes
+- If changes span multiple packages, use `pkg`
+- If changes span commands and packages, use the primary area or omit scope
+- If changes are broadly cross-cutting (≥3 unrelated areas), use `repo`
+
+## Inputs to use when generating
+- The full diff and edit history from this session
+- Changed files and their paths to infer scope using the rules above
+- Commit messages, branch name, or linked issues if available
+
+If context is insufficient to infer details, choose the best effort scope from filenames and touched areas. Do not ask questions; still produce both blocks.
+
+## Output blocks (exactly two, nothing else)
+
+```text
+<prefix>(<scope>): <concise, imperative title>
+```
+
+```markdown
+## Summary
+<1–3 sentences>
+
+## Context
+<why this change was needed>
+
+## Changes
+- <key change 1>
+- <key change 2>
+- <key change 3>
+
+## Implementation notes
+- <notable decision or trade-off>
+
+## Breaking changes
+- <explicitly list or state "None">
+
+## Test plan
+- <how verified>
+
+## Risks
+- <risks and rollback>
+
+## Checklist
+- [ ] Docs updated (if needed)
+- [ ] Tests added/updated (if needed)
+- [ ] Backward compatible
+
+<!-- Optionally: Closes #123 -->
+```
+
+## Example Output
+
+For a change that adds remote branch validation to the rem command:
+
+```text
+feat(pkg/git): add remote branch validation with fallback to default branch
+```
+
+```markdown
+## Summary
+Adds validation to check if a local branch exists on the remote before opening it in the browser. Falls back to the default branch (main/master) when the local branch hasn't been pushed yet.
+
+## Context
+Users running `gitr rem` on unpushed local branches were getting "page not found" errors in their browser because the branch doesn't exist on the remote yet. This creates a poor user experience.
+
+## Changes
+- Add `DoesBranchExistOnRemote()` function to check local remote-tracking branches
+- Add `GetDefaultBranch()` function to determine the repository's default branch
+- Update `rem` command handler to validate branch existence and fallback gracefully
+- Display warning message when falling back to default branch
+- Use local git references instead of SSH connection for validation
+
+## Implementation notes
+- Uses local remote-tracking branches (refs/remotes/origin/*) instead of querying the remote server, avoiding SSH authentication issues and network dependency
+- Falls back to checking common default branch names (main, master) if remote HEAD reference is not found
+- Provides clear warning messages to inform users about the fallback behavior
+
+## Breaking changes
+- None
+
+## Test plan
+- Built and tested locally with `make local`
+- Verified warning message displays correctly for unpushed branches
+- Verified successful opening of default branch when local branch doesn't exist remotely
+- Verified normal behavior preserved for branches that exist on remote
+
+## Risks
+- Low risk: Fallback logic ensures graceful degradation
+- If remote-tracking branches are out of sync (haven't fetched recently), validation may be inaccurate
+
+## Checklist
+- [x] Docs updated (if needed)
+- [x] Tests added/updated (if needed)
+- [x] Backward compatible
+```

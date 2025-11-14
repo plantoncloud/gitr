@@ -1,0 +1,318 @@
+---
+description: Action rule to create a well-structured changelog document capturing meaningful engineering work, sized proportionally to the feature's impact and complexity.
+globs: []
+alwaysApply: false
+---
+
+# Rule: Create Gitr Changelog (action)
+
+Purpose: When invoked, create a comprehensive changelog document in the `_changelog/` directory that captures the essence, context, and impact of recent engineering work. The changelog should be meaningful, well-structured, and appropriately sized based on the scope and impact of the change.
+
+Usage: Invoke explicitly as `@create-gitr-changelog` after completing meaningful work in a conversation.
+
+References: `@commit-gitr-changes`, existing changelogs in `_changelog/`
+
+## ⚠️ CRITICAL: Explicit Invocation Only
+
+**DO NOT** create a changelog automatically or proactively. Changelogs must ONLY be created when the user explicitly invokes this rule with `@create-gitr-changelog`.
+
+Never:
+- ❌ Suggest creating a changelog without being asked
+- ❌ Create a changelog at the end of a conversation automatically
+- ❌ Assume the user wants a changelog created
+- ❌ Create a changelog "to be helpful" without explicit request
+
+Always:
+- ✅ Wait for explicit `@create-gitr-changelog` invocation
+- ✅ Confirm the request before creating the file
+- ✅ Let the user decide when/if a changelog is needed
+
+**This is a user-controlled action, not an automatic process.**
+
+## When to Create a Changelog
+
+Create a changelog when:
+- ✅ You've completed a meaningful feature, refactoring, or improvement
+- ✅ The work involved multiple files or components
+- ✅ The change introduces new commands or significant enhancements
+- ✅ The work took significant time/effort (typically 1+ hours)
+- ✅ The change has notable impact on gitr users or functionality
+- ✅ You want to preserve the context and rationale for future reference
+
+**Skip changelogs for**:
+- ✋ Trivial bug fixes or typo corrections
+- ✋ Minor configuration tweaks
+- ✋ Work-in-progress or incomplete changes
+- ✋ Changes already well-documented in PR descriptions
+
+## Sizing Guidance: Use Your Judgment
+
+**Critical principle**: The changelog length should be **proportional to the feature's complexity and impact**, not artificially constrained or inflated.
+
+### Small Changes (150-300 lines)
+- Single command updates or enhancements
+- Focused bug fixes with clear before/after
+- Minor flag additions
+- Configuration improvements
+- URL handling improvements
+
+**Example**: Adding dry-run flag to commands - straightforward problem, clear solution, limited scope
+
+### Medium Changes (300-600 lines)
+- New command implementations
+- Significant refactoring of core packages
+- Integration with new SCM providers
+- Multi-component improvements
+
+**Example**: Remote branch validation with fallback - new pattern, multiple functions, improved UX
+
+### Large Changes (600-1000+ lines)
+- Major architectural changes
+- Complete rewrites of subsystems
+- New provider support with comprehensive testing
+- System-wide refactoring with broad impact
+
+**Example**: Complete SSH config management system, multi-provider web URL support
+
+**Golden rule**: If you're unsure, start shorter and add detail only where it adds real value. Quality over quantity.
+
+## Changelog Structure
+
+### File Naming
+```
+YYYY-MM-DD-HHMMSS-brief-descriptive-slug.md
+```
+
+Examples:
+- `2025-11-14-180530-remote-branch-validation.md`
+- `2025-11-10-143022-gorelease-v2-upgrade.md`
+- `2025-11-05-091545-new-rem-command.md`
+
+**IMPORTANT**: Get the actual current timestamp by running the command `date +"%Y-%m-%d-%H%M%S"` and use that exact output as the prefix for the filename. Do NOT make up or guess the timestamp. Follow with a clear, kebab-case slug describing the change. The timestamp (HHMMSS) ensures automatic chronological sorting when multiple changelogs are created on the same day.
+
+### Required Sections
+
+Every changelog should include:
+
+```markdown
+# [Clear, Descriptive Title]
+
+**Date**: [Month Day, Year]
+
+## Summary
+
+[2-4 sentence overview of what was accomplished and why it matters]
+
+## Problem Statement
+
+[Describe the problem or need that motivated this work]
+
+### Pain Points
+
+[Bullet list of specific issues being addressed]
+
+## Solution
+
+[High-level description of the approach taken]
+
+### Key Components
+
+[Component descriptions, affected packages, new functions]
+
+## Implementation Details
+
+[Technical specifics - code changes, new patterns, key decisions]
+
+## Benefits
+
+[Concrete improvements - UX enhancements, performance, reliability]
+
+## Impact
+
+[Who/what is affected and how - users, developers, workflows]
+
+## Related Work
+
+[Connect to other changelogs, features, or initiatives]
+
+---
+
+**Status**: ✅ [Production Ready | In Progress | Experimental]
+**Timeline**: [Duration if relevant]
+```
+
+### Optional Sections (Include When Valuable)
+
+Add these sections only when they provide meaningful value:
+
+- **Breaking Changes**: When CLI flags, commands, or behavior changes
+- **Migration Guide**: When users need to update their workflows
+- **Testing Strategy**: For complex features requiring verification
+- **Performance Characteristics**: When performance is a key concern
+- **Known Limitations**: For incomplete implementations
+- **Future Enhancements**: For planned follow-up work
+- **Code Metrics**: Statistics that tell a story (files changed, LOC, etc.)
+- **Design Decisions**: When trade-offs were significant
+- **Examples/Usage**: When it helps understanding (command examples, outputs)
+- **Supported Providers**: When SCM provider support is affected (GitHub, GitLab, Bitbucket)
+
+## Writing Guidelines
+
+### Do:
+- ✅ **Start with context**: Why did this work happen?
+- ✅ **Focus on value**: What problem does this solve for gitr users?
+- ✅ **Use concrete examples**: Show before/after commands, outputs
+- ✅ **Include numbers**: Metrics, file counts, performance improvements
+- ✅ **Explain decisions**: Why this approach vs alternatives?
+- ✅ **Write for future you**: Capture the thinking, not just the what
+- ✅ **Link to related work**: Connect the dots with other changes
+- ✅ **Use formatting**: Code blocks, tables, bullet lists for readability
+- ✅ **Show user impact**: How does this improve the user experience?
+
+### Don't:
+- ❌ **Over-explain the obvious**: Assume the reader is technical
+- ❌ **Include every detail**: Focus on what matters
+- ❌ **Write generic summaries**: Be specific to gitr's functionality
+- ❌ **Skip the "why"**: Context is critical for future understanding
+- ❌ **Ignore trade-offs**: Document decisions and their rationale
+- ❌ **Use jargon without context**: Define terms that may be unclear
+
+## Tone and Style
+
+- **Informative, not promotional**: Focus on facts and impact
+- **Technical but accessible**: Balance depth with clarity
+- **Professional but human**: You can say "this was tricky" or "users were frustrated"
+- **Present tense for descriptions**: "The command now does X"
+- **Past tense for actions**: "We implemented Y"
+
+## Quality Checklist
+
+Before finalizing a changelog:
+
+- [ ] Title clearly describes the change
+- [ ] Summary captures essence in 2-4 sentences
+- [ ] Problem statement explains why work was needed
+- [ ] Solution section describes the approach
+- [ ] Implementation details are technical but focused
+- [ ] Benefits are concrete and measurable
+- [ ] Code/command examples are actual examples, not pseudocode
+- [ ] Related work connects this to other changes
+- [ ] Length is proportional to scope and impact
+- [ ] No sensitive information (credentials, private URLs, etc.)
+
+## Proportionality Examples
+
+### ✅ Good: Appropriately Sized
+
+**Small feature** (200 lines): 
+- Problem: 1 paragraph
+- Solution: 1-2 paragraphs + key code snippet or command example
+- Benefits: 3-5 bullets
+- Impact: 1 paragraph
+
+**Medium feature** (500 lines):
+- Problem: 2-3 paragraphs with pain points
+- Solution: Architecture description + component details
+- Implementation: 3-4 key changes with examples
+- Benefits: Categorized list with user impact
+- Impact: User experience + workflow improvements
+
+**Large feature** (900 lines):
+- Problem: Comprehensive context with user scenarios
+- Solution: Full architecture with component breakdown
+- Implementation: Detailed technical sections per component
+- Benefits: Quantitative and qualitative analysis
+- Testing: Strategy and verification steps
+- Impact: Multi-dimensional (users, workflows, integrations)
+
+### ❌ Anti-patterns
+
+- **Over-detailed small change**: 800-line changelog for a simple flag addition
+- **Under-documented major change**: 150-line changelog for complete provider rewrite
+- **Kitchen sink**: Including every file touched, every line changed
+- **Too abstract**: Generic descriptions without concrete command examples
+
+## Gitr-Specific Guidelines
+
+### Scope Areas to Cover
+
+When writing changelogs for gitr, consider these areas:
+
+**Commands**:
+- Which commands were added, modified, or removed?
+- How do command behaviors change?
+- What new flags or options are available?
+
+**SCM Provider Support**:
+- Which providers are affected? (GitHub, GitLab, Bitbucket Cloud, Bitbucket Datacenter)
+- Are URL patterns updated?
+- Is provider detection improved?
+
+**User Workflows**:
+- How does this improve daily git workflows?
+- What time does it save?
+- What frustrations does it eliminate?
+
+**Package Architecture**:
+- Which packages were affected? (`pkg/git`, `pkg/web`, `pkg/config`, etc.)
+- What new abstractions or patterns were introduced?
+- How does this affect code organization?
+
+**Dependencies & Build**:
+- Were dependencies updated?
+- Did the build system change?
+- Are there new installation requirements?
+
+### Command Example Format
+
+When showing command examples, use this format:
+
+```bash
+# Before
+$ gitr rem
+# Opens browser to non-existent branch, shows 404
+
+# After
+$ gitr rem
+WARN[0001] Branch 'feature-xyz' doesn't exist on remote. Opening default branch instead.
+# Opens browser to main branch successfully
+```
+
+## Automation Notes
+
+When creating the changelog:
+1. **Get current timestamp**: Run `date +"%Y-%m-%d-%H%M%S"` to get the actual current date and time for the filename
+2. **Analyze the conversation**: Extract key decisions, changes, outcomes
+3. **Assess scope**: Count files, packages, commands affected
+4. **Determine sections**: Include only relevant sections
+5. **Size appropriately**: Match detail level to impact
+6. **Write the file**: Create in `_changelog/YYYY-MM/` (year-month directory) with proper naming using the timestamp from step 1
+7. **Confirm creation**: Provide file path and next steps
+
+## Example Invocations
+
+```
+"We just completed the remote branch validation feature. @create-gitr-changelog"
+
+"I've finished upgrading to GoReleaser v2 with all the config changes. 
+@create-gitr-changelog"
+
+"The new rem command with fallback logic is done and tested. 
+@create-gitr-changelog - this improves UX significantly"
+```
+
+## Remember
+
+**Changelogs are living documentation** that helps future developers (including you) understand:
+- What changed in gitr
+- Why it changed
+- How it was implemented
+- What the user impact was
+
+Write for the person who will need to understand this feature or debug an issue at 2am in six months. Give them the context they need - no more, no less.
+
+**When in doubt**: Start with the required sections, keep it focused, and add detail only where it truly helps understanding. A clear, concise 300-line changelog is better than a rambling 1000-line document.
+
+---
+
+*"Documentation is a love letter to your future self."* - Damian Conway
